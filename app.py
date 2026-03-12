@@ -7,10 +7,6 @@ import pandas as pd
 import streamlit as st
 
 
-# =========================
-# Константы и настройки
-# =========================
-
 st.set_page_config(page_title="Подбор рекламных форматов", layout="wide")
 
 APP_DIR = Path(__file__).resolve().parent
@@ -19,65 +15,6 @@ FORMATS_CSV = "DataLens - formats.csv"
 DICT_ITEMS_CSV = "DataLens - dict_items.csv"
 FORMAT_ITEMS_CSV = "DataLens - format_items.csv"
 FALLBACK_XLSX = "DataLens.xlsx"
-
-DICT_LABELS = {
-    "format_type": "Тип формата",
-    "device": "Устроиство",
-    "display": "Тип размещения креатива",
-    "dmp": "DMP / данные",
-    "instream_pos": "Позиция в потоке",
-    "other_markup": "Дополнительные надбавки",
-    "placement": "Размещение",
-    "production": "Продакшн",
-    "targeting": "Таргетинги",
-    "targeting_markup": "Таргетинги с наценкой",
-    "seasonality_coeff": "Сезонность",
-}
-
-BASE_COLUMN_LABELS = {
-    "format_id": "ID формата",
-    "type_service": "Тип сервиса",
-    "platform": "Платформа",
-    "format_name": "Название формата",
-    "example_url": "Пример",
-    "description": "Описание",
-    "max_reach": "Максимальный охват",
-    "min_budget": "Минимальныи бюджет",
-    "discount": "Скидка",
-    "buy_model": "Модель закупки",
-    "cpm_min": "CPM min",
-    "cpm_max": "CPM max",
-    "cpm_avg": "CPM avg",
-    "cpc_min": "CPC min",
-    "cpc_max": "CPC max",
-    "cpc_avg": "CPC avg",
-    "cpv_min": "CPV min",
-    "cpv_max": "CPV max",
-    "cpv_avg": "CPV avg",
-    "ctr_min": "CTR min",
-    "ctr_max": "CTR max",
-    "ctr_avg": "CTR avg",
-    "vtr_min": "VTR min",
-    "vtr_max": "VTR max",
-    "vtr_avg": "VTR avg",
-    "viewability_min": "Viewability min",
-    "viewability_max": "Viewability max",
-    "viewability_avg": "Viewability avg",
-    "verification_pixel": "Верификация Pixel",
-    "verification_js": "Верификация JS",
-    "verification_terms": "Условия верификации",
-    "commission": "Commission",
-    "bls": "BLS",
-    "sales_lift": "Sales Lift",
-    "bls_terms": "Условия BLS",
-    "sales_lift_terms": "Условия Sales Lift",
-    "seasonality_terms": "Условия сезонности",
-    "technical_requirements_url": "Технические требования",
-    "mediakit_url": "Медиакит",
-    "cases_url": "Кейсы",
-    "ecpm_discounted": "eCPM с учетом скидки",
-    "score": "Скоринг",
-}
 
 DEFAULT_WEIGHTS = {
     "max_reach": 25,
@@ -88,17 +25,64 @@ DEFAULT_WEIGHTS = {
     "commission": 10,
 }
 
+DICT_LABELS = {
+    "format_type": "Тип формата",
+    "device": "Устройство",
+    "display": "Показ креатива",
+    "dmp": "Данные и сегменты",
+    "instream_pos": "Позиция в потоке",
+    "other_markup": "Дополнительные наценки",
+    "placement": "Размещение",
+    "production": "Продакшн",
+    "targeting": "Таргетинги",
+    "targeting_markup": "Таргетинги с наценкой",
+    "seasonality_coeff": "Сезонность",
+}
 
-# =========================
-# Утилиты
-# =========================
-
-def safe_read_table(path_csv: Path, fallback_xlsx: Path, sheet_name: str) -> pd.DataFrame:
-    if path_csv.exists():
-        return pd.read_csv(path_csv)
-    if fallback_xlsx.exists():
-        return pd.read_excel(fallback_xlsx, sheet_name=sheet_name)
-    raise FileNotFoundError(f"Не наиден источник данных: {path_csv.name} / {fallback_xlsx.name}:{sheet_name}")
+COLUMN_LABELS = {
+    "format_id": "ID формата",
+    "type_service": "Тип сервиса",
+    "platform": "Площадка",
+    "format_name": "Формат",
+    "example_url": "Пример размещения",
+    "description": "Описание",
+    "max_reach": "Максимальный охват",
+    "min_budget": "Минимальный бюджет",
+    "discount": "Скидка",
+    "buy_model": "Модель закупки",
+    "cpm_min": "CPM, минимум",
+    "cpm_max": "CPM, максимум",
+    "cpm_avg": "CPM, среднее",
+    "cpc_min": "CPC, минимум",
+    "cpc_max": "CPC, максимум",
+    "cpc_avg": "CPC, среднее",
+    "cpv_min": "CPV, минимум",
+    "cpv_max": "CPV, максимум",
+    "cpv_avg": "CPV, среднее",
+    "ctr_min": "CTR, минимум",
+    "ctr_max": "CTR, максимум",
+    "ctr_avg": "CTR, среднее",
+    "vtr_min": "VTR, минимум",
+    "vtr_max": "VTR, максимум",
+    "vtr_avg": "VTR, среднее",
+    "viewability_min": "Viewability, минимум",
+    "viewability_max": "Viewability, максимум",
+    "viewability_avg": "Viewability, среднее",
+    "verification_pixel": "Поддержка Pixel",
+    "verification_js": "Поддержка JS",
+    "verification_terms": "Условия верификации",
+    "commission": "Комиссия",
+    "bls": "BLS",
+    "sales_lift": "Sales Lift",
+    "bls_terms": "Условия BLS",
+    "sales_lift_terms": "Условия Sales Lift",
+    "seasonality_terms": "Условия сезонности",
+    "technical_requirements_url": "Технические требования",
+    "mediakit_url": "Медиакит",
+    "cases_url": "Кейсы",
+    "ecpm_discounted": "eCPM с учетом скидки",
+    "score": "Скоринг",
+}
 
 
 def find_data_file(filename: str) -> Path:
@@ -113,37 +97,97 @@ def find_data_file(filename: str) -> Path:
     return APP_DIR / filename
 
 
+def safe_read_table(path_csv: Path, fallback_xlsx: Path, sheet_name: str) -> pd.DataFrame:
+    if path_csv.exists():
+        return pd.read_csv(path_csv)
+    if fallback_xlsx.exists():
+        return pd.read_excel(fallback_xlsx, sheet_name=sheet_name)
+    raise FileNotFoundError(
+        f"Не найден источник данных: {path_csv.name} или лист {sheet_name} в {fallback_xlsx.name}"
+    )
+
+
 def to_float(series: pd.Series) -> pd.Series:
-    if series is None:
-        return pd.Series(dtype="float64")
     cleaned = (
         series.astype(str)
         .str.replace("%", "", regex=False)
         .str.replace(" ", "", regex=False)
         .str.replace(",", ".", regex=False)
-        .replace({"None": np.nan, "nan": np.nan, "": np.nan})
+        .replace(
+            {
+                "": np.nan,
+                "nan": np.nan,
+                "None": np.nan,
+                "null": np.nan,
+                "NULL": np.nan,
+            }
+        )
     )
     return pd.to_numeric(cleaned, errors="coerce")
 
 
 def to_bool(series: pd.Series) -> pd.Series:
-    mapping = {
-        True: True,
-        False: False,
-        "TRUE": True,
-        "FALSE": False,
-        "true": True,
-        "false": False,
-        "1": True,
-        "0": False,
-        1: True,
-        0: False,
-        "Да": True,
-        "Нет": False,
-        "да": True,
-        "нет": False,
-    }
-    return series.map(lambda x: mapping.get(x, x)).fillna(False).astype(bool)
+    true_values = {"true", "1", "да", "yes", "y", "истина"}
+    false_values = {"false", "0", "нет", "no", "n", "ложь"}
+
+    def convert(value):
+        if pd.isna(value):
+            return False
+        if isinstance(value, bool):
+            return value
+        text = str(value).strip().lower()
+        if text in true_values:
+            return True
+        if text in false_values:
+            return False
+        return False
+
+    return series.apply(convert).astype(bool)
+
+
+def format_number(value, digits: int = 2) -> str:
+    if pd.isna(value):
+        return "—"
+    if isinstance(value, (int, np.integer)):
+        return f"{int(value):,}".replace(",", " ")
+    if isinstance(value, (float, np.floating)):
+        return f"{value:,.{digits}f}".replace(",", " ").replace(".", ",")
+    return str(value)
+
+
+def format_percent(value) -> str:
+    if pd.isna(value):
+        return "—"
+    return f"{float(value) * 100:.1f}%".replace(".", ",")
+
+
+def format_bool(value) -> str:
+    return "Да" if bool(value) else "Нет"
+
+
+def get_label(column_name: str) -> str:
+    return COLUMN_LABELS.get(column_name, DICT_LABELS.get(column_name, column_name))
+
+
+def normalize_weights(weights: Dict[str, float]) -> Dict[str, int]:
+    total = sum(max(0.0, float(v)) for v in weights.values())
+    if total <= 0:
+        return DEFAULT_WEIGHTS.copy()
+
+    scaled = {k: (max(0.0, float(v)) / total) * 100 for k, v in weights.items()}
+    rounded = {k: int(math.floor(v)) for k, v in scaled.items()}
+
+    remainder = 100 - sum(rounded.values())
+    if remainder > 0:
+        order = sorted(
+            scaled.keys(),
+            key=lambda key: scaled[key] - math.floor(scaled[key]),
+            reverse=True,
+        )
+        for i in range(remainder):
+            rounded[order[i % len(order)]] += 1
+
+    return rounded
 
 
 def safe_ratio_minmax(series: pd.Series) -> pd.Series:
@@ -170,61 +214,6 @@ def safe_inverse_minmax(series: pd.Series) -> pd.Series:
     return (max_v - s) / (max_v - min_v)
 
 
-def format_number(value, digits: int = 2) -> str:
-    if pd.isna(value):
-        return "—"
-    if isinstance(value, (int, np.integer)):
-        return f"{int(value):,}".replace(",", " ")
-    if isinstance(value, (float, np.floating)):
-        return f"{value:,.{digits}f}".replace(",", " ").replace(".", ",")
-    return str(value)
-
-
-def format_percent(value) -> str:
-    if pd.isna(value):
-        return "—"
-    return f"{float(value) * 100:.1f}%".replace(".", ",")
-
-
-def format_bool(value) -> str:
-    if pd.isna(value):
-        return "—"
-    return "Да" if bool(value) else "Нет"
-
-
-def normalize_weights(weights: Dict[str, float]) -> Dict[str, int]:
-    total = sum(max(0.0, float(v)) for v in weights.values())
-    if total <= 0:
-        return DEFAULT_WEIGHTS.copy()
-
-    scaled = {k: (max(0.0, float(v)) / total) * 100 for k, v in weights.items()}
-    rounded = {k: int(round(v)) for k, v in scaled.items()}
-
-    diff = 100 - sum(rounded.values())
-    if diff != 0:
-        remainders = sorted(
-            scaled.items(),
-            key=lambda kv: kv[1] - math.floor(kv[1]),
-            reverse=(diff > 0),
-        )
-        idx = 0
-        while diff != 0 and remainders:
-            key = remainders[idx % len(remainders)][0]
-            rounded[key] += 1 if diff > 0 else -1
-            diff += -1 if diff > 0 else 1
-            idx += 1
-
-    return rounded
-
-
-def get_column_label(column_name: str) -> str:
-    return BASE_COLUMN_LABELS.get(column_name, DICT_LABELS.get(column_name, column_name))
-
-
-# =========================
-# Загрузка и подготовка
-# =========================
-
 @st.cache_data
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     formats_path = find_data_file(FORMATS_CSV)
@@ -243,13 +232,28 @@ def preprocess_formats(formats: pd.DataFrame) -> pd.DataFrame:
     df = formats.copy()
 
     numeric_cols = [
-        "max_reach", "min_budget", "discount", "commission",
-        "cpm_min", "cpm_max", "cpm_avg",
-        "cpc_min", "cpc_max", "cpc_avg",
-        "cpv_min", "cpv_max", "cpv_avg",
-        "ctr_min", "ctr_max", "ctr_avg",
-        "vtr_min", "vtr_max", "vtr_avg",
-        "viewability_min", "viewability_max", "viewability_avg",
+        "max_reach",
+        "min_budget",
+        "discount",
+        "commission",
+        "cpm_min",
+        "cpm_max",
+        "cpm_avg",
+        "cpc_min",
+        "cpc_max",
+        "cpc_avg",
+        "cpv_min",
+        "cpv_max",
+        "cpv_avg",
+        "ctr_min",
+        "ctr_max",
+        "ctr_avg",
+        "vtr_min",
+        "vtr_max",
+        "vtr_avg",
+        "viewability_min",
+        "viewability_max",
+        "viewability_avg",
     ]
     bool_cols = ["verification_pixel", "verification_js", "bls", "sales_lift"]
 
@@ -272,19 +276,24 @@ def build_dict_aggregates(format_items: pd.DataFrame, dict_items: pd.DataFrame) 
         dict_df["is_active"] = to_bool(dict_df["is_active"])
         dict_df = dict_df[dict_df["is_active"]]
 
+    possible_name_cols = ["item_name", "name", "value", "title"]
+    item_name_col = next((col for col in possible_name_cols if col in dict_df.columns), None)
+    if item_name_col is None:
+        raise KeyError("В dict_items не найден столбец с названием элемента словаря")
+
     merged = fi_df.merge(
-        dict_df[["dict_id", "item_id", "item_name"]],
+        dict_df[["dict_id", "item_id", item_name_col]].rename(columns={item_name_col: "item_name"}),
         on=["dict_id", "item_id"],
         how="left",
     )
 
-    agg = (
+    grouped = (
         merged.groupby(["format_id", "dict_id"], dropna=False)["item_name"]
         .apply(lambda s: sorted({str(x).strip() for x in s.dropna() if str(x).strip()}))
         .reset_index()
     )
 
-    pivot = agg.pivot(index="format_id", columns="dict_id", values="item_name").reset_index()
+    pivot = grouped.pivot(index="format_id", columns="dict_id", values="item_name").reset_index()
 
     for col in pivot.columns:
         if col != "format_id":
@@ -293,13 +302,7 @@ def build_dict_aggregates(format_items: pd.DataFrame, dict_items: pd.DataFrame) 
     return pivot
 
 
-def calc_discounted_price(price_series: pd.Series, discount_series: pd.Series) -> pd.Series:
-    price = pd.to_numeric(price_series, errors="coerce")
-    discount = pd.to_numeric(discount_series, errors="coerce").fillna(0)
-    return price * (1 - discount)
-
-
-def calculate_ecpm(row: pd.Series) -> Optional[float]:
+def calculate_ecpm(row: pd.Series) -> float:
     discount = row.get("discount", 0)
     cpm = row.get("cpm_avg")
     cpc = row.get("cpc_avg")
@@ -307,12 +310,12 @@ def calculate_ecpm(row: pd.Series) -> Optional[float]:
     ctr = row.get("ctr_avg")
     vtr = row.get("vtr_avg")
 
+    discount_val = pd.to_numeric(pd.Series([discount]), errors="coerce").fillna(0).iloc[0]
     cpm_val = pd.to_numeric(pd.Series([cpm]), errors="coerce").iloc[0]
     cpc_val = pd.to_numeric(pd.Series([cpc]), errors="coerce").iloc[0]
     cpv_val = pd.to_numeric(pd.Series([cpv]), errors="coerce").iloc[0]
     ctr_val = pd.to_numeric(pd.Series([ctr]), errors="coerce").iloc[0]
     vtr_val = pd.to_numeric(pd.Series([vtr]), errors="coerce").iloc[0]
-    discount_val = pd.to_numeric(pd.Series([discount]), errors="coerce").fillna(0).iloc[0]
 
     if not pd.isna(cpm_val):
         return float(cpm_val * (1 - discount_val))
@@ -338,34 +341,38 @@ def enrich_formats(
 
     dict_columns = [col for col in dict_pivot.columns if col != "format_id"]
     for col in dict_columns:
-        if col not in df.columns:
-            df[col] = [[] for _ in range(len(df))]
-        else:
+        if col in df.columns:
             df[col] = df[col].apply(lambda x: x if isinstance(x, list) else [])
+        else:
+            df[col] = [[] for _ in range(len(df))]
 
     df["ecpm_discounted"] = df.apply(calculate_ecpm, axis=1)
 
     return df
 
 
-# =========================
-# Фильтрация
-# =========================
+def get_all_tag_values(df: pd.DataFrame, column_name: str) -> List[str]:
+    if column_name not in df.columns:
+        return []
+    values = set()
+    for items in df[column_name]:
+        if isinstance(items, list):
+            values.update([str(x) for x in items if str(x).strip()])
+    return sorted(values)
+
 
 def apply_filters(df: pd.DataFrame, state: Dict) -> pd.DataFrame:
     result = df.copy()
 
-    # Категориальные
     category_filters = {
         "platform": state.get("platforms", []),
         "type_service": state.get("service_types", []),
         "buy_model": state.get("buy_models", []),
     }
     for col, values in category_filters.items():
-        if values:
+        if col in result.columns and values:
             result = result[result[col].isin(values)]
 
-    # Булевы ограничения
     bool_filters = {
         "verification_pixel": state.get("need_verification_pixel", False),
         "verification_js": state.get("need_verification_js", False),
@@ -373,10 +380,9 @@ def apply_filters(df: pd.DataFrame, state: Dict) -> pd.DataFrame:
         "sales_lift": state.get("need_sales_lift", False),
     }
     for col, enabled in bool_filters.items():
-        if enabled:
+        if col in result.columns and enabled:
             result = result[result[col] == True]
 
-    # Теги из словареи
     tag_filter_map = {
         "format_type": state.get("filter_format_type", []),
         "device": state.get("filter_device", []),
@@ -395,93 +401,71 @@ def apply_filters(df: pd.DataFrame, state: Dict) -> pd.DataFrame:
             selected_set = set(selected_tags)
             result = result[result[col].apply(lambda tags: selected_set.issubset(set(tags or [])))]
 
-    # Числовые пороги
     numeric_thresholds = {
-        "max_reach": state.get("min_reach"),
-        "min_budget": state.get("max_budget"),
-        "ctr_avg": state.get("min_ctr"),
-        "vtr_avg": state.get("min_vtr"),
-        "viewability_avg": state.get("min_viewability"),
-        "ecpm_discounted": state.get("max_ecpm"),
-        "commission": state.get("max_commission"),
+        "min_reach": state.get("min_reach"),
+        "min_ctr": state.get("min_ctr"),
+        "min_vtr": state.get("min_vtr"),
+        "min_viewability": state.get("min_viewability"),
+        "max_ecpm": state.get("max_ecpm"),
+        "max_commission": state.get("max_commission"),
     }
 
-    if numeric_thresholds["max_reach"] is not None:
-        result = result[result["max_reach"].fillna(-np.inf) >= numeric_thresholds["max_reach"]]
+    if numeric_thresholds["min_reach"] is not None and "max_reach" in result.columns:
+        result = result[result["max_reach"].fillna(-np.inf) >= numeric_thresholds["min_reach"]]
 
-    if numeric_thresholds["max_budget"] is not None:
-        result = result[result["min_budget"].fillna(np.inf) <= numeric_thresholds["max_budget"]]
-
-    if numeric_thresholds["min_ctr"] is not None:
+    if numeric_thresholds["min_ctr"] is not None and "ctr_avg" in result.columns:
         result = result[result["ctr_avg"].fillna(-np.inf) >= numeric_thresholds["min_ctr"]]
 
-    if numeric_thresholds["min_vtr"] is not None:
+    if numeric_thresholds["min_vtr"] is not None and "vtr_avg" in result.columns:
         result = result[result["vtr_avg"].fillna(-np.inf) >= numeric_thresholds["min_vtr"]]
 
-    if numeric_thresholds["min_viewability"] is not None:
+    if numeric_thresholds["min_viewability"] is not None and "viewability_avg" in result.columns:
         result = result[result["viewability_avg"].fillna(-np.inf) >= numeric_thresholds["min_viewability"]]
 
-    if numeric_thresholds["max_ecpm"] is not None:
+    if numeric_thresholds["max_ecpm"] is not None and "ecpm_discounted" in result.columns:
         result = result[result["ecpm_discounted"].fillna(np.inf) <= numeric_thresholds["max_ecpm"]]
 
-    if numeric_thresholds["max_commission"] is not None:
+    if numeric_thresholds["max_commission"] is not None and "commission" in result.columns:
         result = result[result["commission"].fillna(np.inf) <= numeric_thresholds["max_commission"]]
 
     return result
 
 
-# =========================
-# Скоринг
-# =========================
-
 def compute_score(df: pd.DataFrame, weights: Dict[str, float]) -> pd.DataFrame:
     result = df.copy()
 
-    norm_reach = safe_ratio_minmax(result["max_reach"])
-    norm_ecpm = safe_inverse_minmax(result["ecpm_discounted"])
-    norm_ctr = safe_ratio_minmax(result["ctr_avg"])
-    norm_vtr = safe_ratio_minmax(result["vtr_avg"])
-    norm_viewability = safe_ratio_minmax(result["viewability_avg"])
-    norm_commission = safe_ratio_minmax(result["commission"])
+    reach_score = safe_ratio_minmax(result["max_reach"]) if "max_reach" in result.columns else 0
+    ecpm_score = safe_inverse_minmax(result["ecpm_discounted"]) if "ecpm_discounted" in result.columns else 0
+    ctr_score = safe_ratio_minmax(result["ctr_avg"]) if "ctr_avg" in result.columns else 0
+    vtr_score = safe_ratio_minmax(result["vtr_avg"]) if "vtr_avg" in result.columns else 0
+    viewability_score = safe_ratio_minmax(result["viewability_avg"]) if "viewability_avg" in result.columns else 0
+    commission_score = safe_ratio_minmax(result["commission"]) if "commission" in result.columns else 0
 
     result["score"] = (
-        norm_reach.fillna(0) * weights["max_reach"] +
-        norm_ecpm.fillna(0) * weights["ecpm_discounted"] +
-        norm_ctr.fillna(0) * weights["ctr_avg"] +
-        norm_vtr.fillna(0) * weights["vtr_avg"] +
-        norm_viewability.fillna(0) * weights["viewability_avg"] +
-        norm_commission.fillna(0) * weights["commission"]
+        reach_score * weights["max_reach"]
+        + ecpm_score * weights["ecpm_discounted"]
+        + ctr_score * weights["ctr_avg"]
+        + vtr_score * weights["vtr_avg"]
+        + viewability_score * weights["viewability_avg"]
+        + commission_score * weights["commission"]
     )
 
     return result
 
 
-# =========================
-# UI: сайдбар и состояние
-# =========================
-
-def get_all_tag_values(df: pd.DataFrame, column_name: str) -> List[str]:
-    if column_name not in df.columns:
-        return []
-    values = set()
-    for items in df[column_name]:
-        if isinstance(items, list):
-            values.update([str(x) for x in items if str(x).strip()])
-    return sorted(values)
-
-
-def init_weight_state():
+def init_weight_state() -> None:
     for key, value in DEFAULT_WEIGHTS.items():
-        if f"weight_{key}" not in st.session_state:
-            st.session_state[f"weight_{key}"] = value
+        session_key = f"weight_{key}"
+        if session_key not in st.session_state:
+            st.session_state[session_key] = value
 
 
-def reset_weights():
+def reset_weights() -> None:
     for key, value in DEFAULT_WEIGHTS.items():
         st.session_state[f"weight_{key}"] = value
 
 
-def normalize_weight_state():
+def normalize_weight_state() -> None:
     current = {
         "max_reach": st.session_state.get("weight_max_reach", 0),
         "ecpm_discounted": st.session_state.get("weight_ecpm_discounted", 0),
@@ -491,96 +475,142 @@ def normalize_weight_state():
         "commission": st.session_state.get("weight_commission", 0),
     }
     normalized = normalize_weights(current)
-    st.session_state["weight_max_reach"] = normalized["max_reach"]
-    st.session_state["weight_ecpm_discounted"] = normalized["ecpm_discounted"]
-    st.session_state["weight_ctr_avg"] = normalized["ctr_avg"]
-    st.session_state["weight_vtr_avg"] = normalized["vtr_avg"]
-    st.session_state["weight_viewability_avg"] = normalized["viewability_avg"]
-    st.session_state["weight_commission"] = normalized["commission"]
+    for key, value in normalized.items():
+        st.session_state[f"weight_{key}"] = value
 
 
 def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
     st.sidebar.header("Фильтры")
 
-    filters = {}
+    filters: Dict[str, Optional[float] | List[str] | bool] = {}
 
     filters["platforms"] = st.sidebar.multiselect(
-        "Платформа",
-        options=sorted(df["platform"].dropna().unique().tolist()),
+        "Площадка",
+        options=sorted(df["platform"].dropna().unique().tolist()) if "platform" in df.columns else [],
+        placeholder="",
     )
 
     filters["service_types"] = st.sidebar.multiselect(
         "Тип сервиса",
-        options=sorted(df["type_service"].dropna().unique().tolist()),
+        options=sorted(df["type_service"].dropna().unique().tolist()) if "type_service" in df.columns else [],
+        placeholder="",
     )
 
     filters["buy_models"] = st.sidebar.multiselect(
         "Модель закупки",
-        options=sorted(df["buy_model"].dropna().unique().tolist()),
+        options=sorted(df["buy_model"].dropna().unique().tolist()) if "buy_model" in df.columns else [],
+        placeholder="",
     )
 
-    st.sidebar.subheader("Логические ограничения")
-    filters["need_verification_pixel"] = st.sidebar.checkbox("Нужна верификация Pixel")
-    filters["need_verification_js"] = st.sidebar.checkbox("Нужна верификация JS")
-    filters["need_bls"] = st.sidebar.checkbox("Требуется BLS")
-    filters["need_sales_lift"] = st.sidebar.checkbox("Требуется Sales Lift")
+    st.sidebar.subheader("Дополнительные требования")
 
-    st.sidebar.subheader("Таргетинги и параметры")
+    filters["need_verification_pixel"] = st.sidebar.checkbox("Нужна поддержка Pixel")
+    filters["need_verification_js"] = st.sidebar.checkbox("Нужна поддержка JS")
+    filters["need_bls"] = st.sidebar.checkbox("Нужен BLS")
+    filters["need_sales_lift"] = st.sidebar.checkbox("Нужен Sales Lift")
+
+    st.sidebar.subheader("Параметры и таргетинги")
+
     filters["filter_format_type"] = st.sidebar.multiselect(
         "Тип формата",
         options=get_all_tag_values(df, "format_type"),
+        placeholder="",
     )
     filters["filter_device"] = st.sidebar.multiselect(
-        "Устроиство",
+        "Устройство",
         options=get_all_tag_values(df, "device"),
+        placeholder="",
     )
     filters["filter_placement"] = st.sidebar.multiselect(
         "Размещение",
         options=get_all_tag_values(df, "placement"),
+        placeholder="",
     )
     filters["filter_display"] = st.sidebar.multiselect(
-        "Тип размещения креатива",
+        "Показ креатива",
         options=get_all_tag_values(df, "display"),
+        placeholder="",
     )
     filters["filter_dmp"] = st.sidebar.multiselect(
-        "DMP / данные",
+        "Данные и сегменты",
         options=get_all_tag_values(df, "dmp"),
+        placeholder="",
     )
     filters["filter_targeting"] = st.sidebar.multiselect(
         "Таргетинги",
         options=get_all_tag_values(df, "targeting"),
+        placeholder="",
     )
     filters["filter_targeting_markup"] = st.sidebar.multiselect(
         "Таргетинги с наценкой",
         options=get_all_tag_values(df, "targeting_markup"),
+        placeholder="",
     )
     filters["filter_production"] = st.sidebar.multiselect(
         "Продакшн",
         options=get_all_tag_values(df, "production"),
+        placeholder="",
     )
     filters["filter_other_markup"] = st.sidebar.multiselect(
-        "Дополнительные надбавки",
+        "Дополнительные наценки",
         options=get_all_tag_values(df, "other_markup"),
+        placeholder="",
     )
     filters["filter_instream_pos"] = st.sidebar.multiselect(
         "Позиция в потоке",
         options=get_all_tag_values(df, "instream_pos"),
+        placeholder="",
     )
 
-    st.sidebar.subheader("Числовые пороги")
-    filters["min_reach"] = st.sidebar.number_input("Минимальныи охват", min_value=0, value=0, step=10000)
-    filters["max_budget"] = st.sidebar.number_input("Максимальныи минимальныи бюджет", min_value=0, value=0, step=10000)
-    filters["min_ctr"] = st.sidebar.number_input("Минимальныи CTR", min_value=0.0, value=0.0, step=0.001, format="%.3f")
-    filters["min_vtr"] = st.sidebar.number_input("Минимальныи VTR", min_value=0.0, value=0.0, step=0.01, format="%.2f")
-    filters["min_viewability"] = st.sidebar.number_input("Минимальныи Viewability", min_value=0.0, value=0.0, step=0.01, format="%.2f")
-    filters["max_ecpm"] = st.sidebar.number_input("Максимальныи eCPM", min_value=0.0, value=0.0, step=10.0, format="%.2f")
-    filters["max_commission"] = st.sidebar.number_input("Максимальныи Commission", min_value=0.0, value=0.0, step=0.01, format="%.2f")
+    st.sidebar.subheader("Пороговые значения")
 
-    for key in ["max_budget", "min_ctr", "min_vtr", "min_viewability", "max_ecpm", "max_commission"]:
-        if filters[key] == 0:
-            filters[key] = None
+    filters["min_reach"] = st.sidebar.number_input(
+        "Минимальный охват",
+        min_value=0,
+        value=0,
+        step=10000,
+    )
+    filters["min_ctr"] = st.sidebar.number_input(
+        "Минимальный CTR",
+        min_value=0.0,
+        value=0.0,
+        step=0.001,
+        format="%.3f",
+    )
+    filters["min_vtr"] = st.sidebar.number_input(
+        "Минимальный VTR",
+        min_value=0.0,
+        value=0.0,
+        step=0.01,
+        format="%.2f",
+    )
+    filters["min_viewability"] = st.sidebar.number_input(
+        "Минимальный Viewability",
+        min_value=0.0,
+        value=0.0,
+        step=0.01,
+        format="%.2f",
+    )
+    filters["max_ecpm"] = st.sidebar.number_input(
+        "Максимальный eCPM",
+        min_value=0.0,
+        value=0.0,
+        step=10.0,
+        format="%.2f",
+    )
+    filters["max_commission"] = st.sidebar.number_input(
+        "Максимальная комиссия",
+        min_value=0.0,
+        value=0.0,
+        step=0.01,
+        format="%.2f",
+    )
+
     if filters["min_reach"] == 0:
         filters["min_reach"] = None
+    for key in ["min_ctr", "min_vtr", "min_viewability", "max_ecpm", "max_commission"]:
+        if filters[key] == 0:
+            filters[key] = None
 
     st.sidebar.divider()
     st.sidebar.header("Скоринг")
@@ -589,19 +619,19 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
 
     init_weight_state()
 
-    st.sidebar.number_input("Вес: максимальныи охват", min_value=0, max_value=100, key="weight_max_reach")
-    st.sidebar.number_input("Вес: eCPM со скидкои", min_value=0, max_value=100, key="weight_ecpm_discounted")
+    st.sidebar.number_input("Вес: максимальный охват", min_value=0, max_value=100, key="weight_max_reach")
+    st.sidebar.number_input("Вес: eCPM с учетом скидки", min_value=0, max_value=100, key="weight_ecpm_discounted")
     st.sidebar.number_input("Вес: CTR", min_value=0, max_value=100, key="weight_ctr_avg")
     st.sidebar.number_input("Вес: VTR", min_value=0, max_value=100, key="weight_vtr_avg")
     st.sidebar.number_input("Вес: Viewability", min_value=0, max_value=100, key="weight_viewability_avg")
-    st.sidebar.number_input("Вес: Commission", min_value=0, max_value=100, key="weight_commission")
+    st.sidebar.number_input("Вес: комиссия", min_value=0, max_value=100, key="weight_commission")
 
-    col_a, col_b = st.sidebar.columns(2)
-    with col_a:
-        if st.button("Нормализовать веса"):
+    col1, col2 = st.sidebar.columns(2)
+    with col1:
+        if st.button("Нормализовать"):
             normalize_weight_state()
-    with col_b:
-        if st.button("Сбросить веса"):
+    with col2:
+        if st.button("Сбросить"):
             reset_weights()
 
     weights = {
@@ -613,27 +643,19 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
         "commission": int(st.session_state["weight_commission"]),
     }
 
-    total_weight = sum(weights.values())
-    st.sidebar.caption(f"Сумма весов: {total_weight}")
+    st.sidebar.caption(f"Сумма весов: {sum(weights.values())}")
 
     return filters, weights, scoring_enabled
 
 
-# =========================
-# UI: таблица и карточка
-# =========================
-
 def build_table_view(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFrame:
-    table_df = df.copy()
-
-    show_columns = [
+    columns = [
         "format_id",
         "platform",
         "format_name",
         "type_service",
         "buy_model",
         "max_reach",
-        "min_budget",
         "ecpm_discounted",
         "ctr_avg",
         "vtr_avg",
@@ -641,26 +663,30 @@ def build_table_view(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFrame:
         "commission",
     ]
 
-    if scoring_applied:
-        show_columns.insert(0, "score")
+    if scoring_applied and "score" in df.columns:
+        columns = ["score"] + columns
 
-    table_df = table_df[show_columns].copy()
+    existing_columns = [col for col in columns if col in df.columns]
+
+    table_df = df[existing_columns].copy()
     table_df.insert(0, "Выбрать", False)
 
-    rename_map = {col: get_column_label(col) for col in table_df.columns if col != "Выбрать"}
+    rename_map = {col: get_label(col) for col in existing_columns}
     table_df = table_df.rename(columns=rename_map)
 
     return table_df
 
 
 def render_table_selection(table_df: pd.DataFrame, source_df: pd.DataFrame) -> Optional[pd.Series]:
+    disabled_columns = [col for col in table_df.columns if col != "Выбрать"]
+
     edited = st.data_editor(
         table_df,
         hide_index=True,
         use_container_width=True,
-        disabled=[col for col in table_df.columns if col != "Выбрать"],
+        disabled=disabled_columns,
         column_config={
-            "Выбрать": st.column_config.CheckboxColumn(required=False),
+            "Выбрать": st.column_config.CheckboxColumn("Выбрать"),
         },
     )
 
@@ -669,45 +695,46 @@ def render_table_selection(table_df: pd.DataFrame, source_df: pd.DataFrame) -> O
     if selected_rows.empty:
         return None
 
-    selected_format_id = selected_rows.iloc[0][get_column_label("format_id")]
-    match = source_df[source_df["format_id"] == selected_format_id]
+    format_id_label = get_label("format_id")
+    selected_format_id = selected_rows.iloc[0][format_id_label]
 
+    match = source_df[source_df["format_id"] == selected_format_id]
     if match.empty:
         return None
 
     return match.iloc[0]
 
 
-def render_tag_section(title: str, values: List[str]):
+def render_tag_line(title: str, values: List[str]) -> None:
     if values:
         st.markdown(f"**{title}:** {', '.join(values)}")
 
 
-def render_format_card(row: pd.Series):
+def render_format_card(row: pd.Series) -> None:
     st.subheader("Карточка формата")
 
     st.markdown(f"### {row.get('format_name', 'Без названия')}")
     st.markdown(f"**ID:** {row.get('format_id', '—')}")
-    st.markdown(f"**Платформа:** {row.get('platform', '—')}")
+    st.markdown(f"**Площадка:** {row.get('platform', '—')}")
     st.markdown(f"**Тип сервиса:** {row.get('type_service', '—')}")
     st.markdown(f"**Модель закупки:** {row.get('buy_model', '—')}")
 
     st.markdown("#### Описание")
     st.write(row.get("description") or "—")
 
-    st.markdown("#### Ключевые параметры")
+    st.markdown("#### Основные показатели")
     metrics = pd.DataFrame(
         [
-            ("Максимальныи охват", format_number(row.get("max_reach"), 0)),
-            ("Минимальныи бюджет", format_number(row.get("min_budget"), 0)),
+            ("Максимальный охват", format_number(row.get("max_reach"), 0)),
+            ("Минимальный бюджет", format_number(row.get("min_budget"), 0)),
             ("Скидка", format_percent(row.get("discount"))),
             ("eCPM с учетом скидки", format_number(row.get("ecpm_discounted"))),
-            ("Commission", format_percent(row.get("commission"))),
-            ("CTR avg", format_percent(row.get("ctr_avg"))),
-            ("VTR avg", format_percent(row.get("vtr_avg"))),
-            ("Viewability avg", format_percent(row.get("viewability_avg"))),
-            ("Верификация Pixel", format_bool(row.get("verification_pixel"))),
-            ("Верификация JS", format_bool(row.get("verification_js"))),
+            ("Комиссия", format_percent(row.get("commission"))),
+            ("CTR, среднее", format_percent(row.get("ctr_avg"))),
+            ("VTR, среднее", format_percent(row.get("vtr_avg"))),
+            ("Viewability, среднее", format_percent(row.get("viewability_avg"))),
+            ("Поддержка Pixel", format_bool(row.get("verification_pixel"))),
+            ("Поддержка JS", format_bool(row.get("verification_js"))),
             ("BLS", format_bool(row.get("bls"))),
             ("Sales Lift", format_bool(row.get("sales_lift"))),
         ],
@@ -715,14 +742,14 @@ def render_format_card(row: pd.Series):
     )
     st.dataframe(metrics, hide_index=True, use_container_width=True)
 
-    st.markdown("#### Параметры словареи")
+    st.markdown("#### Параметры формата")
     for dict_id, title in DICT_LABELS.items():
         if dict_id in row.index:
             values = row.get(dict_id, [])
-            if isinstance(values, list):
-                render_tag_section(title, values)
+            if isinstance(values, list) and values:
+                render_tag_line(title, values)
 
-    st.markdown("#### Условия и надбавки")
+    st.markdown("#### Условия")
     info_fields = {
         "Условия верификации": row.get("verification_terms"),
         "Условия BLS": row.get("bls_terms"),
@@ -733,24 +760,21 @@ def render_format_card(row: pd.Series):
         if pd.notna(value) and str(value).strip():
             st.markdown(f"**{title}:** {value}")
 
-    st.markdown("#### Ссылки")
+    st.markdown("#### Полезные ссылки")
     link_fields = {
-        "Пример": row.get("example_url"),
+        "Пример размещения": row.get("example_url"),
         "Технические требования": row.get("technical_requirements_url"),
         "Медиакит": row.get("mediakit_url"),
-        "Кейсы": row.get("cases_url"),
+        "Кейсы": row.get("cases_url"),
     }
     for title, url in link_fields.items():
         if pd.notna(url) and str(url).strip():
             st.markdown(f"- [{title}]({url})")
 
 
-# =========================
-# Основнои сценарии
-# =========================
-
-def main():
+def main() -> None:
     st.title("Подбор рекламных форматов")
+    st.caption("Фильтры применяются раньше скоринга.")
 
     try:
         formats, dict_items, format_items = load_data()
@@ -763,26 +787,27 @@ def main():
 
     filtered_df = apply_filters(df, filters)
 
-    total_weight = sum(weights.values())
-    scoring_applied = scoring_enabled and total_weight == 100
+    weights_total = sum(weights.values())
+    scoring_applied = scoring_enabled and weights_total == 100
 
-    if scoring_enabled and total_weight != 100:
-        st.warning("Скоринг не применен: сумма весов должна быть равна 100.")
+    if scoring_enabled and weights_total != 100:
+        st.warning("Скоринг не применен. Сумма весов должна быть равна 100.")
 
     if scoring_applied:
-        filtered_df = compute_score(filtered_df, weights).sort_values(
-            by=["score", "ecpm_discounted"],
-            ascending=[False, True],
-            na_position="last",
-        )
+        filtered_df = compute_score(filtered_df, weights)
+        sort_columns = [col for col in ["score", "ecpm_discounted"] if col in filtered_df.columns]
+        ascending = [False, True][: len(sort_columns)]
+        filtered_df = filtered_df.sort_values(by=sort_columns, ascending=ascending, na_position="last")
     else:
-        filtered_df = filtered_df.sort_values(
-            by=["platform", "format_name"],
-            ascending=[True, True],
-            na_position="last",
-        )
+        sort_columns = [col for col in ["platform", "format_name"] if col in filtered_df.columns]
+        if sort_columns:
+            filtered_df = filtered_df.sort_values(by=sort_columns, ascending=True, na_position="last")
 
-    st.caption(f"Наидено форматов: {len(filtered_df)}")
+    st.caption(f"Найдено форматов: {len(filtered_df)}")
+
+    if filtered_df.empty:
+        st.info("По заданным условиям ничего не найдено.")
+        return
 
     table_df = build_table_view(filtered_df, scoring_applied=scoring_applied)
     selected_row = render_table_selection(table_df, filtered_df)
@@ -790,16 +815,16 @@ def main():
     if selected_row is not None:
         render_format_card(selected_row)
     else:
-        st.info("Выберите один формат в таблице, чтобы открыть карточку.")
+        st.info("Выберите формат в таблице, чтобы открыть карточку.")
 
-    with st.expander("Технические примечания"):
+    with st.expander("Как считается eCPM"):
         st.write(
             """
-            - eCPM считает скидку, но не учитывает commission.
-            - Для CPM используется discounted CPM.
+            - В расчете eCPM учитывается скидка.
+            - Комиссия в eCPM не входит.
+            - Для CPM используется средний CPM с учетом скидки.
             - Для CPC используется формула: CPC × CTR × 1000 с учетом скидки.
-            - Для CPV добавлена поддержка на случаи, если в данных есть такая модель: CPV × VTR × 1000 с учетом скидки.
-            - Фильтры применяются раньше скоринга.
+            - Для CPV используется формула: CPV × VTR × 1000 с учетом скидки.
             """
         )
 
