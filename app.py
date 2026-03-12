@@ -1,3 +1,4 @@
+import html
 import math
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -84,6 +85,20 @@ COLUMN_LABELS = {
     "score": "Скоринг",
 }
 
+PILL_GROUP_ORDER = [
+    "format_type",
+    "device",
+    "placement",
+    "display",
+    "dmp",
+    "targeting",
+    "instream_pos",
+    "production",
+    "other_markup",
+    "targeting_markup",
+    "seasonality_coeff",
+]
+
 
 def inject_styles() -> None:
     st.markdown(
@@ -91,10 +106,15 @@ def inject_styles() -> None:
         <style>
             :root {
                 --main-bg: #FFFFFF;
-                --sidebar-bg: #D7B8FF;
+                --sidebar-top: #D7B8FF;
+                --sidebar-bottom: #725BFF;
                 --text-dark: #070037;
                 --text-light: #FFFFFF;
                 --accent: #3E20FF;
+                --card-border: #D9CCFF;
+                --card-soft: #F5F1FF;
+                --pill-bg: #EEE9FF;
+                --pill-text: #070037;
             }
 
             .stApp,
@@ -106,11 +126,28 @@ def inject_styles() -> None:
                 color: var(--text-dark);
             }
 
+            .main .block-container {
+                padding-top: 1.25rem;
+                padding-bottom: 3rem;
+            }
+
             [data-testid="stSidebar"],
             [data-testid="stSidebar"] > div,
             [data-testid="stSidebarContent"] {
-                background: var(--sidebar-bg);
-                color: var(--text-dark);
+                background: linear-gradient(180deg, var(--sidebar-top) 0%, var(--sidebar-bottom) 100%);
+                color: var(--text-light) !important;
+            }
+
+            [data-testid="stSidebar"] *,
+            [data-testid="stSidebar"] label,
+            [data-testid="stSidebar"] p,
+            [data-testid="stSidebar"] div,
+            [data-testid="stSidebar"] span,
+            [data-testid="stSidebar"] h1,
+            [data-testid="stSidebar"] h2,
+            [data-testid="stSidebar"] h3,
+            [data-testid="stSidebar"] h4 {
+                color: var(--text-light) !important;
             }
 
             .stApp,
@@ -124,7 +161,6 @@ def inject_styles() -> None:
             .stApp h4,
             .stApp h5,
             .stApp h6,
-            [data-testid="stSidebar"] *,
             [data-testid="stMarkdownContainer"] * {
                 color: var(--text-dark);
             }
@@ -139,6 +175,7 @@ def inject_styles() -> None:
                 background: var(--accent) !important;
                 color: var(--text-light) !important;
                 border: 1px solid var(--accent) !important;
+                border-radius: 12px !important;
             }
 
             .stButton > button:hover,
@@ -149,17 +186,16 @@ def inject_styles() -> None:
                 border: 1px solid var(--accent) !important;
             }
 
-            .stCheckbox label,
-            .stRadio label,
-            .stSelectbox label,
-            .stMultiSelect label,
-            .stNumberInput label,
-            .stSlider label {
-                color: var(--text-dark) !important;
+            [data-testid="stSidebar"] .stButton > button {
+                background: rgba(255,255,255,0.16) !important;
+                border: 1px solid rgba(255,255,255,0.28) !important;
+                color: var(--text-light) !important;
+                backdrop-filter: blur(6px);
             }
 
-            input, textarea {
-                color: var(--text-dark) !important;
+            [data-testid="stSidebar"] .stButton > button:hover {
+                background: rgba(255,255,255,0.22) !important;
+                border: 1px solid rgba(255,255,255,0.36) !important;
             }
 
             .stTextInput input,
@@ -167,13 +203,27 @@ def inject_styles() -> None:
             .stTextArea textarea {
                 background: #FFFFFF !important;
                 color: var(--text-dark) !important;
-                border-color: #B9A3F8 !important;
+                border-color: #C9BBFF !important;
+            }
+
+            [data-testid="stSidebar"] .stTextInput input,
+            [data-testid="stSidebar"] .stNumberInput input,
+            [data-testid="stSidebar"] .stTextArea textarea {
+                background: rgba(255,255,255,0.96) !important;
+                color: var(--text-dark) !important;
+                border-color: rgba(255,255,255,0.45) !important;
             }
 
             div[data-baseweb="select"] > div {
                 background: #FFFFFF !important;
                 color: var(--text-dark) !important;
-                border-color: #B9A3F8 !important;
+                border-color: #C9BBFF !important;
+            }
+
+            [data-testid="stSidebar"] div[data-baseweb="select"] > div {
+                background: rgba(255,255,255,0.96) !important;
+                color: var(--text-dark) !important;
+                border-color: rgba(255,255,255,0.45) !important;
             }
 
             div[data-baseweb="select"] input {
@@ -189,22 +239,164 @@ def inject_styles() -> None:
                 color: var(--text-light) !important;
             }
 
-            .stSlider [data-baseweb="slider"] * {
-                color: var(--text-dark) !important;
-            }
-
             .stAlert {
                 background: #F4EEFF !important;
                 color: var(--text-dark) !important;
                 border: 1px solid #CDBBFF !important;
-            }
-
-            .stDataFrame, .stTable {
-                color: var(--text-dark) !important;
+                border-radius: 16px !important;
             }
 
             [data-testid="stDataEditor"] * {
                 color: var(--text-dark) !important;
+            }
+
+            [data-testid="stSidebar"] [data-testid="stDataEditor"] * {
+                color: var(--text-light) !important;
+            }
+
+            .stSlider [data-testid="stTickBarMin"],
+            .stSlider [data-testid="stTickBarMax"] {
+                display: none !important;
+            }
+
+            .result-card {
+                background: #FFFFFF;
+                border: 1px solid var(--card-border);
+                border-radius: 24px;
+                padding: 24px;
+                box-shadow: 0 10px 30px rgba(62, 32, 255, 0.06);
+                margin-top: 12px;
+            }
+
+            .result-card__title {
+                font-size: 28px;
+                line-height: 1.15;
+                font-weight: 700;
+                color: var(--text-dark);
+                margin: 0 0 12px 0;
+            }
+
+            .result-card__meta {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+                margin: 0 0 24px 0;
+            }
+
+            .result-card__meta-item {
+                background: var(--card-soft);
+                border: 1px solid var(--card-border);
+                border-radius: 16px;
+                padding: 12px 14px;
+            }
+
+            .result-card__meta-label {
+                font-size: 13px;
+                line-height: 1.25;
+                color: rgba(7, 0, 55, 0.72);
+                margin-bottom: 6px;
+            }
+
+            .result-card__meta-value {
+                font-size: 14px;
+                line-height: 1.35;
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+            .result-card__section {
+                margin-top: 22px;
+            }
+
+            .result-card__section-title {
+                font-size: 15px;
+                line-height: 1.35;
+                font-weight: 700;
+                color: var(--text-dark);
+                margin: 0 0 12px 0;
+            }
+
+            .result-card__text {
+                font-size: 15px;
+                line-height: 1.55;
+                color: var(--text-dark);
+                margin: 0;
+            }
+
+            .pill-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 6px;
+            }
+
+            .pill {
+                display: inline-flex;
+                align-items: center;
+                padding: 9px 12px;
+                border-radius: 999px;
+                background: var(--pill-bg);
+                color: var(--pill-text);
+                border: 1px solid var(--card-border);
+                font-size: 13px;
+                line-height: 1.25;
+                font-weight: 600;
+            }
+
+            .metric-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .metric-card {
+                background: var(--card-soft);
+                border: 1px solid var(--card-border);
+                border-radius: 16px;
+                padding: 14px;
+            }
+
+            .metric-card__label {
+                font-size: 13px;
+                line-height: 1.25;
+                color: rgba(7, 0, 55, 0.72);
+                margin-bottom: 6px;
+            }
+
+            .metric-card__value {
+                font-size: 16px;
+                line-height: 1.35;
+                font-weight: 700;
+                color: var(--text-dark);
+            }
+
+            .link-list {
+                display: grid;
+                gap: 10px;
+            }
+
+            .link-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 14px;
+                border-radius: 16px;
+                border: 1px solid var(--card-border);
+                background: #FFFFFF;
+            }
+
+            .link-item a {
+                font-size: 14px;
+                line-height: 1.35;
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+            @media (max-width: 900px) {
+                .result-card__meta,
+                .metric-grid {
+                    grid-template-columns: 1fr;
+                }
             }
         </style>
         """,
@@ -296,6 +488,20 @@ def get_label(column_name: str) -> str:
     return COLUMN_LABELS.get(column_name, DICT_LABELS.get(column_name, column_name))
 
 
+def format_item_badge(item: Dict) -> str:
+    name = str(item.get("item_name", "")).strip()
+    item_value = item.get("item_value")
+    item_unit = item.get("item_unit")
+
+    if pd.notna(item_value):
+        value_text = format_number(item_value, 0 if float(item_value).is_integer() else 2)
+        if pd.notna(item_unit) and str(item_unit).strip():
+            return f"{name} — {value_text} {str(item_unit).strip()}"
+        return f"{name} — {value_text}"
+
+    return name
+
+
 def normalize_weights(weights: Dict[str, float]) -> Dict[str, int]:
     total = sum(max(0.0, float(v)) for v in weights.values())
     if total <= 0:
@@ -311,8 +517,7 @@ def normalize_weights(weights: Dict[str, float]) -> Dict[str, int]:
             key=lambda key: scaled[key] - rounded[key],
             reverse=True,
         )
-        steps = remainder // 5
-        for i in range(steps):
+        for i in range(remainder // 5):
             rounded[order[i % len(order)]] += 5
 
     return rounded
@@ -409,25 +614,58 @@ def build_dict_aggregates(format_items: pd.DataFrame, dict_items: pd.DataFrame) 
     if item_name_col is None:
         raise KeyError("В dict_items не найден столбец с названием элемента словаря")
 
+    if "item_value" in dict_df.columns:
+        dict_df["item_value"] = to_float(dict_df["item_value"])
+    else:
+        dict_df["item_value"] = np.nan
+
+    if "item_unit" not in dict_df.columns:
+        dict_df["item_unit"] = np.nan
+
     merged = fi_df.merge(
-        dict_df[["dict_id", "item_id", item_name_col]].rename(columns={item_name_col: "item_name"}),
+        dict_df[["dict_id", "item_id", item_name_col, "item_value", "item_unit"]].rename(
+            columns={item_name_col: "item_name"}
+        ),
         on=["dict_id", "item_id"],
         how="left",
     )
 
-    grouped = (
+    grouped_names = (
         merged.groupby(["format_id", "dict_id"], dropna=False)["item_name"]
         .apply(lambda s: sorted({str(x).strip() for x in s.dropna() if str(x).strip()}))
         .reset_index()
     )
+    pivot_names = grouped_names.pivot(index="format_id", columns="dict_id", values="item_name").reset_index()
 
-    pivot = grouped.pivot(index="format_id", columns="dict_id", values="item_name").reset_index()
+    grouped_rich = (
+        merged.groupby(["format_id", "dict_id"], dropna=False)
+        .apply(
+            lambda group: [
+                {
+                    "item_id": item["item_id"],
+                    "item_name": str(item["item_name"]).strip() if pd.notna(item["item_name"]) else "",
+                    "item_value": item["item_value"],
+                    "item_unit": item["item_unit"],
+                }
+                for _, item in group.drop_duplicates(subset=["item_id"]).iterrows()
+                if pd.notna(item["item_name"]) and str(item["item_name"]).strip()
+            ],
+            include_groups=False,
+        )
+        .reset_index(name="items_rich")
+    )
+    pivot_rich = grouped_rich.pivot(index="format_id", columns="dict_id", values="items_rich").reset_index()
+    pivot_rich = pivot_rich.rename(
+        columns={col: f"{col}__rich" for col in pivot_rich.columns if col != "format_id"}
+    )
 
-    for col in pivot.columns:
+    merged_pivot = pivot_names.merge(pivot_rich, on="format_id", how="left")
+
+    for col in merged_pivot.columns:
         if col != "format_id":
-            pivot[col] = pivot[col].apply(lambda x: x if isinstance(x, list) else [])
+            merged_pivot[col] = merged_pivot[col].apply(lambda x: x if isinstance(x, list) else [])
 
-    return pivot
+    return merged_pivot
 
 
 def calculate_ecpm(row: pd.Series) -> float:
@@ -736,11 +974,9 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
 
     col1, col2 = st.sidebar.columns(2)
     with col1:
-        if st.button("Нормализовать"):
-            normalize_weight_state()
+        st.button("Нормализовать", key="normalize_weights_btn", on_click=normalize_weight_state)
     with col2:
-        if st.button("Сбросить"):
-            reset_weights()
+        st.button("Сбросить", key="reset_weights_btn", on_click=reset_weights)
 
     weights = {
         "max_reach": int(st.session_state["weight_max_reach"]),
@@ -813,83 +1049,160 @@ def render_table_selection(table_df: pd.DataFrame, source_df: pd.DataFrame) -> O
     return match.iloc[0]
 
 
-def render_tag_line(title: str, values: List[str]) -> None:
-    if values:
-        st.markdown(f"**{title}:** {', '.join(values)}")
+def render_pills(title: str, values: List[str]) -> None:
+    if not values:
+        return
+
+    pills_html = "".join(
+        f'<span class="pill">{html.escape(str(value))}</span>'
+        for value in values
+        if str(value).strip()
+    )
+    if not pills_html:
+        return
+
+    st.markdown(
+        f"""
+        <div class="result-card__section">
+            <div class="result-card__section-title">{html.escape(title)}</div>
+            <div class="pill-group">{pills_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_metrics(row: pd.Series) -> None:
+    metrics = [
+        ("Максимальный охват", format_number(row.get("max_reach"), 0)),
+        ("Минимальный бюджет", format_number(row.get("min_budget"), 0)),
+        ("Скидка", format_percent(row.get("discount"))),
+        ("eCPM с учетом скидки", format_number(row.get("ecpm_discounted"))),
+        ("Комиссия", format_percent(row.get("commission"))),
+        ("CTR, среднее", format_percent(row.get("ctr_avg"))),
+        ("VTR, среднее", format_percent(row.get("vtr_avg"))),
+        ("Viewability, среднее", format_percent(row.get("viewability_avg"))),
+        ("Пиксель отслеживания", format_bool(row.get("verification_pixel"))),
+        ("JavaScript-трекинг", format_bool(row.get("verification_js"))),
+        ("Brand Lift", format_bool(row.get("bls"))),
+        ("Sales Lift", format_bool(row.get("sales_lift"))),
+    ]
+
+    cards_html = "".join(
+        f"""
+        <div class="metric-card">
+            <div class="metric-card__label">{html.escape(label)}</div>
+            <div class="metric-card__value">{html.escape(value)}</div>
+        </div>
+        """
+        for label, value in metrics
+    )
+
+    st.markdown(
+        f"""
+        <div class="result-card__section">
+            <div class="result-card__section-title">Основные показатели</div>
+            <div class="metric-grid">{cards_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_text_block(title: str, value: Optional[str]) -> None:
+    if pd.isna(value) or not str(value).strip():
+        return
+
+    st.markdown(
+        f"""
+        <div class="result-card__section">
+            <div class="result-card__section-title">{html.escape(title)}</div>
+            <p class="result-card__text">{html.escape(str(value).strip())}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_links(row: pd.Series) -> None:
+    links = [
+        ("Пример размещения", row.get("example_url")),
+        ("Технические требования", row.get("technical_requirements_url")),
+        ("Медиакит", row.get("mediakit_url")),
+        ("Кейсы", row.get("cases_url")),
+    ]
+
+    items_html = "".join(
+        f"""
+        <div class="link-item">
+            <a href="{html.escape(str(url))}" target="_blank">{html.escape(title)}</a>
+        </div>
+        """
+        for title, url in links
+        if pd.notna(url) and str(url).strip()
+    )
+
+    if not items_html:
+        return
+
+    st.markdown(
+        f"""
+        <div class="result-card__section">
+            <div class="result-card__section-title">Полезные ссылки</div>
+            <div class="link-list">{items_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_format_card(row: pd.Series) -> None:
     st.subheader("Карточка формата")
 
-    st.markdown(f"### {row.get('format_name', 'Без названия')}")
-    st.markdown(f"**ID:** {row.get('format_id', '—')}")
-    st.markdown(f"**Площадка:** {row.get('platform', '—')}")
-    st.markdown(f"**Тип сервиса:** {row.get('type_service', '—')}")
-    st.markdown(f"**Модель закупки:** {row.get('buy_model', '—')}")
+    title = str(row.get("format_name", "Без названия"))
+    platform = str(row.get("platform", "—"))
+    service = str(row.get("type_service", "—"))
+    buy_model = str(row.get("buy_model", "—"))
 
-    st.markdown("#### Описание")
-    st.write(row.get("description") or "—")
-
-    st.markdown("#### Основные показатели")
-    metrics = pd.DataFrame(
-        [
-            ("Максимальный охват", format_number(row.get("max_reach"), 0)),
-            ("Минимальный бюджет", format_number(row.get("min_budget"), 0)),
-            ("Скидка", format_percent(row.get("discount"))),
-            ("eCPM с учетом скидки", format_number(row.get("ecpm_discounted"))),
-            ("Комиссия", format_percent(row.get("commission"))),
-            ("CTR, среднее", format_percent(row.get("ctr_avg"))),
-            ("VTR, среднее", format_percent(row.get("vtr_avg"))),
-            ("Viewability, среднее", format_percent(row.get("viewability_avg"))),
-            ("Пиксель отслеживания", format_bool(row.get("verification_pixel"))),
-            ("JavaScript-трекинг", format_bool(row.get("verification_js"))),
-            ("Brand Lift", format_bool(row.get("bls"))),
-            ("Sales Lift", format_bool(row.get("sales_lift"))),
-        ],
-        columns=["Параметр", "Значение"],
+    st.markdown(
+        f"""
+        <div class="result-card">
+            <div class="result-card__title">{html.escape(title)}</div>
+            <div class="result-card__meta">
+                <div class="result-card__meta-item">
+                    <div class="result-card__meta-label">Площадка</div>
+                    <div class="result-card__meta-value">{html.escape(platform)}</div>
+                </div>
+                <div class="result-card__meta-item">
+                    <div class="result-card__meta-label">Тип сервиса</div>
+                    <div class="result-card__meta-value">{html.escape(service)}</div>
+                </div>
+                <div class="result-card__meta-item">
+                    <div class="result-card__meta-label">Модель закупки</div>
+                    <div class="result-card__meta-value">{html.escape(buy_model)}</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    st.dataframe(metrics, hide_index=True, use_container_width=True)
 
-    st.markdown("#### Параметры формата")
-    for dict_id in [
-        "format_type",
-        "device",
-        "placement",
-        "display",
-        "dmp",
-        "targeting",
-        "instream_pos",
-        "production",
-        "other_markup",
-        "targeting_markup",
-        "seasonality_coeff",
-    ]:
-        if dict_id in row.index:
-            values = row.get(dict_id, [])
-            if isinstance(values, list) and values:
-                render_tag_line(DICT_LABELS.get(dict_id, dict_id), values)
+    render_text_block("Описание", row.get("description"))
+    render_metrics(row)
 
-    st.markdown("#### Условия")
-    info_fields = {
-        "Условия верификации": row.get("verification_terms"),
-        "Условия Brand Lift": row.get("bls_terms"),
-        "Условия Sales Lift": row.get("sales_lift_terms"),
-        "Условия сезонности": row.get("seasonality_terms"),
-    }
-    for title, value in info_fields.items():
-        if pd.notna(value) and str(value).strip():
-            st.markdown(f"**{title}:** {value}")
+    for dict_id in PILL_GROUP_ORDER:
+        rich_col = f"{dict_id}__rich"
+        if rich_col in row.index and isinstance(row.get(rich_col), list) and row.get(rich_col):
+            values = [format_item_badge(item) for item in row.get(rich_col)]
+            render_pills(DICT_LABELS.get(dict_id, dict_id), values)
+        elif dict_id in row.index and isinstance(row.get(dict_id), list) and row.get(dict_id):
+            render_pills(DICT_LABELS.get(dict_id, dict_id), row.get(dict_id))
 
-    st.markdown("#### Полезные ссылки")
-    link_fields = {
-        "Пример размещения": row.get("example_url"),
-        "Технические требования": row.get("technical_requirements_url"),
-        "Медиакит": row.get("mediakit_url"),
-        "Кейсы": row.get("cases_url"),
-    }
-    for title, url in link_fields.items():
-        if pd.notna(url) and str(url).strip():
-            st.markdown(f"- [{title}]({url})")
+    render_text_block("Условия верификации", row.get("verification_terms"))
+    render_text_block("Условия Brand Lift", row.get("bls_terms"))
+    render_text_block("Условия Sales Lift", row.get("sales_lift_terms"))
+    render_text_block("Условия сезонности", row.get("seasonality_terms"))
+    render_links(row)
 
 
 def main() -> None:
