@@ -4,6 +4,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Подбор форматов", layout="wide")
 
+
 # =========================
 # Стили
 # =========================
@@ -11,58 +12,85 @@ st.markdown(
     """
     <style>
         .block-container {
-            padding-top: 2rem;
+            padding-top: 1.6rem;
             padding-bottom: 2rem;
         }
 
         section[data-testid="stSidebar"] .block-container {
-            padding-top: 1.25rem;
+            padding-top: 1.1rem;
         }
 
+        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
         section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] .stCheckbox,
-        section[data-testid="stSidebar"] .stRadio,
-        section[data-testid="stSidebar"] .stNumberInput,
-        section[data-testid="stSidebar"] .stMultiSelect,
-        section[data-testid="stSidebar"] .stSelectbox,
-        section[data-testid="stSidebar"] p,
         section[data-testid="stSidebar"] span,
         section[data-testid="stSidebar"] div {
-            font-size: 14px;
+            font-size: 15px !important;
         }
 
-        .sidebar-section-title {
-            font-size: 18px;
+        section[data-testid="stSidebar"] input,
+        section[data-testid="stSidebar"] textarea {
+            font-size: 15px !important;
+        }
+
+        .sidebar-title {
+            font-size: 20px;
             font-weight: 700;
-            margin: 1rem 0 0.5rem 0;
+            margin: 0.3rem 0 0.8rem 0;
         }
 
-        .sidebar-subtitle {
-            font-size: 14px;
+        .sidebar-group {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 1.1rem 0 0.45rem 0;
+        }
+
+        .sidebar-field {
+            font-size: 15px;
             font-weight: 600;
-            margin: 0.5rem 0 0.25rem 0;
-        }
-
-        .small-muted {
-            color: #6b7280;
-            font-size: 13px;
+            margin: 0.55rem 0 0.2rem 0;
         }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# =========================
-# Настройки
-# =========================
-DEFAULT_CSV_NAME = "DataLens - formats.csv"
 
+# =========================
+# Файлы
+# =========================
+FORMATS_CANDIDATES = [
+    "DataLens - formats.csv",
+]
+
+DICT_CANDIDATES = [
+    "DataLens - dict_items.csv",
+    "DataLens - dict_items (1).csv",
+]
+
+FORMAT_ITEMS_CANDIDATES = [
+    "DataLens - format_items.csv",
+]
+
+
+# =========================
+# Названия полей
+# =========================
 LABELS = {
     "format_id": "ID формата",
     "format_name": "Название формата",
+    "format_type": "Тип формата",
     "type_service": "Тип сервиса",
     "platform": "Площадка",
     "buy_model": "Модель закупки",
+    "device": "Устройства",
+    "display": "Тип показа",
+    "placement": "Размещение",
+    "instream_pos": "Позиция в ролике",
+    "dmp": "DMP",
+    "production": "Продакшн",
+    "other_markup": "Прочие надбавки",
+    "targeting": "Таргетинги",
+    "targeting_markup": "Надбавки за таргетинги",
     "description": "Описание",
     "example_url": "Пример",
     "technical_requirements_url": "Технические требования",
@@ -77,33 +105,47 @@ LABELS = {
     "ctr_avg": "CTR",
     "vtr_avg": "VTR",
     "viewability_avg": "Viewability",
-    "bls": "BLS",
-    "sales_lift": "Sales Lift",
     "verification_pixel": "Верификация пикселем",
     "verification_js": "Верификация JS-кодом",
     "verification_terms": "Условия верификации",
-    "seasonality_terms": "Сезонность",
+    "bls": "BLS",
+    "sales_lift": "Sales Lift",
     "bls_terms": "Условия BLS",
     "sales_lift_terms": "Условия Sales Lift",
+    "seasonality_terms": "Сезонность",
+    "score": "Скоринг",
 }
 
+
+# =========================
+# Конфиг интерфейса
+# =========================
 TEXT_SEARCH_COLUMNS = [
     "format_id",
     "format_name",
     "platform",
-    "type_service",
     "description",
+    "type_service",
     "buy_model",
+    "format_type",
 ]
 
-PERCENT_COLUMNS = {
-    "discount",
-    "commission",
-    "ctr_avg",
-    "vtr_avg",
-    "viewability_avg",
-    "score",
-}
+MAIN_CATEGORY_FILTERS = [
+    "format_type",
+    "platform",
+    "device",
+    "placement",
+    "buy_model",
+    "type_service",
+    "display",
+    "instream_pos",
+    "dmp",
+]
+
+TAG_FILTERS = [
+    "targeting",
+    "targeting_markup",
+]
 
 BOOLEAN_REQUIRE_COLUMNS = [
     "verification_pixel",
@@ -112,11 +154,16 @@ BOOLEAN_REQUIRE_COLUMNS = [
     "sales_lift",
 ]
 
-CATEGORY_FILTER_COLUMNS = [
-    "platform",
-    "type_service",
-    "buy_model",
-]
+FILTER_CONFIG = {
+    "min_budget": {"mode": "max", "step": 10000.0},
+    "max_reach": {"mode": "min", "step": 10000.0},
+    "ecpm_discounted": {"mode": "max", "step": 10.0},
+    "ctr_avg": {"mode": "min", "step": 0.1},
+    "vtr_avg": {"mode": "min", "step": 0.1},
+    "viewability_avg": {"mode": "min", "step": 0.1},
+    "commission": {"mode": "min", "step": 0.1},
+    "discount": {"mode": "min", "step": 0.1},
+}
 
 SCORING_COLUMNS = [
     "max_reach",
@@ -132,71 +179,75 @@ SCORING_REVERSE_COLUMNS = {
 }
 
 TABLE_COLUMNS = [
-    "format_id",
+    "score",
     "format_name",
-    "type_service",
+    "format_type",
     "platform",
+    "device",
     "buy_model",
     "min_budget",
     "max_reach",
-    "discount",
-    "commission",
     "ecpm_discounted",
     "ctr_avg",
     "vtr_avg",
     "viewability_avg",
+    "discount",
+    "commission",
     "verification_pixel",
     "verification_js",
     "bls",
     "sales_lift",
 ]
 
-DETAIL_ORDER = [
-    "format_id",
-    "format_name",
-    "type_service",
-    "platform",
-    "buy_model",
+CARD_TAG_COLUMNS = [
+    "format_type",
+    "device",
+    "display",
+    "placement",
+    "instream_pos",
+    "dmp",
+    "production",
+    "other_markup",
+]
+
+CARD_TEXT_COLUMNS = [
     "description",
-    "min_budget",
-    "max_reach",
-    "discount",
-    "commission",
-    "ecpm_base",
-    "ecpm_discounted",
-    "ctr_avg",
-    "vtr_avg",
-    "viewability_avg",
-    "bls",
-    "sales_lift",
-    "verification_pixel",
-    "verification_js",
     "verification_terms",
-    "seasonality_terms",
     "bls_terms",
     "sales_lift_terms",
-    "example_url",
-    "technical_requirements_url",
-    "mediakit_url",
-    "cases_url",
+    "seasonality_terms",
 ]
 
-FILTER_CONFIG = {
-    "min_budget": {"mode": "max", "step": 10000.0},
-    "max_reach": {"mode": "min", "step": 10000.0},
-    "ecpm_discounted": {"mode": "max", "step": 10.0},
-    "ctr_avg": {"mode": "min", "step": 0.1},
-    "vtr_avg": {"mode": "min", "step": 0.1},
-    "viewability_avg": {"mode": "min", "step": 0.1},
-    "commission": {"mode": "min", "step": 0.1},
-    "discount": {"mode": "min", "step": 0.1},
+PERCENT_COLUMNS = {
+    "discount",
+    "commission",
+    "ctr_avg",
+    "vtr_avg",
+    "viewability_avg",
+    "score",
 }
+
+BOOL_TEXT_COLUMNS = {
+    "verification_pixel",
+    "verification_js",
+}
+
 
 # =========================
 # Вспомогательные функции
 # =========================
-def label(col: str) -> str:
-    return LABELS.get(col, col)
+def label(column: str) -> str:
+    return LABELS.get(column, column)
+
+
+def find_existing_file(candidates: list[str]) -> str:
+    for filename in candidates:
+        try:
+            with open(filename, "r", encoding="utf-8"):
+                return filename
+        except FileNotFoundError:
+            continue
+    raise FileNotFoundError(f"Не найден ни один файл из списка: {candidates}")
 
 
 def safe_to_numeric(series: pd.Series) -> pd.Series:
@@ -239,40 +290,6 @@ def clean_yes_no(series: pd.Series) -> pd.Series:
     return result
 
 
-def format_number(value, digits: int = 2) -> str:
-    if pd.isna(value):
-        return "—"
-    return f"{value:,.{digits}f}".replace(",", " ")
-
-
-def format_percent(value, digits: int = 2) -> str:
-    if pd.isna(value):
-        return "—"
-    return f"{value * 100:.{digits}f}%"
-
-
-def display_value(col: str, value):
-    if pd.isna(value):
-        return "—"
-
-    if col in PERCENT_COLUMNS:
-        return format_percent(value)
-
-    if col in ["min_budget", "max_reach"]:
-        return format_number(value, 0)
-
-    if col in ["ecpm_base", "ecpm_discounted"]:
-        return format_number(value, 2)
-
-    if col in ["verification_pixel", "verification_js"]:
-        return str(value)
-
-    if col in ["bls", "sales_lift"]:
-        return "Да" if safe_scalar_to_bool(value) else "—"
-
-    return value
-
-
 def safe_scalar_to_bool(value) -> bool:
     if pd.isna(value):
         return False
@@ -286,6 +303,49 @@ def safe_scalar_to_bool(value) -> bool:
         return False
 
 
+def format_number(value, digits: int = 2) -> str:
+    if pd.isna(value):
+        return "—"
+    formatted = f"{value:,.{digits}f}"
+    formatted = formatted.replace(",", " ").replace(".", ",")
+    return formatted
+
+
+def format_integer(value) -> str:
+    if pd.isna(value):
+        return "—"
+    return f"{int(round(float(value))):,}".replace(",", " ")
+
+
+def format_percent(value, digits: int = 2) -> str:
+    if pd.isna(value):
+        return "—"
+    formatted = f"{value * 100:.{digits}f}".replace(".", ",")
+    return f"{formatted}%"
+
+
+def display_value(column: str, value):
+    if pd.isna(value):
+        return "—"
+
+    if column in PERCENT_COLUMNS:
+        return format_percent(value)
+
+    if column in ["min_budget", "max_reach"]:
+        return format_integer(value)
+
+    if column in ["ecpm_base", "ecpm_discounted"]:
+        return format_number(value, 2)
+
+    if column in BOOL_TEXT_COLUMNS:
+        return str(value)
+
+    if column in ["bls", "sales_lift"]:
+        return "Да" if safe_scalar_to_bool(value) else "—"
+
+    return value
+
+
 def percent_to_internal(value: float) -> float:
     return value / 100
 
@@ -294,17 +354,43 @@ def internal_to_percent(value: float) -> float:
     return value * 100
 
 
+def split_tags(value) -> list[str]:
+    if pd.isna(value):
+        return []
+    if isinstance(value, list):
+        return value
+    text = str(value).strip()
+    if not text:
+        return []
+    return [x.strip() for x in text.split(",") if x.strip()]
+
+
+def join_unique(values: list[str]) -> str:
+    cleaned = []
+    seen = set()
+    for value in values:
+        if pd.isna(value):
+            continue
+        text = str(value).strip()
+        if not text:
+            continue
+        if text not in seen:
+            seen.add(text)
+            cleaned.append(text)
+    return ", ".join(cleaned)
+
+
 def apply_text_search(df: pd.DataFrame, query: str) -> pd.DataFrame:
     if not query.strip():
         return df
 
+    q = query.strip()
     search_cols = [c for c in TEXT_SEARCH_COLUMNS if c in df.columns]
+
     if not search_cols:
         return df
 
     mask = pd.Series(False, index=df.index)
-    q = query.strip()
-
     for col in search_cols:
         mask = mask | df[col].astype(str).str.contains(q, case=False, na=False)
 
@@ -312,13 +398,18 @@ def apply_text_search(df: pd.DataFrame, query: str) -> pd.DataFrame:
 
 
 def apply_categorical_filter(df: pd.DataFrame, column: str, selected_values: list[str]) -> pd.DataFrame:
-    if not selected_values or column not in df.columns:
+    if column not in df.columns or not selected_values:
         return df
-    return df[df[column].isin(selected_values)]
+
+    def has_any_match(cell):
+        values = split_tags(cell)
+        return any(v in values for v in selected_values)
+
+    return df[df[column].apply(has_any_match)]
 
 
 def apply_required_flag_filter(df: pd.DataFrame, column: str, required: bool) -> pd.DataFrame:
-    if not required or column not in df.columns:
+    if column not in df.columns or not required:
         return df
 
     if df[column].dtype == "object":
@@ -366,7 +457,6 @@ def normalize_series(series: pd.Series, reverse: bool = False) -> pd.Series:
 
 def normalize_weights_to_100(weights: dict[str, int]) -> dict[str, int]:
     total = sum(weights.values())
-
     if total == 0:
         return weights.copy()
 
@@ -377,29 +467,19 @@ def normalize_weights_to_100(weights: dict[str, int]) -> dict[str, int]:
 
     while diff != 0:
         if diff > 0:
-            candidates = sorted(raw.keys(), key=lambda k: raw[k] - rounded[k], reverse=True)
-            moved = False
-            for k in candidates:
-                if rounded[k] <= 95:
-                    rounded[k] += 5
+            order = sorted(raw.keys(), key=lambda k: raw[k] - rounded[k], reverse=True)
+            for key in order:
+                if rounded[key] <= 95:
+                    rounded[key] += 5
                     diff -= 5
-                    moved = True
-                    if diff == 0:
-                        break
-            if not moved:
-                break
+                    break
         else:
-            candidates = sorted(raw.keys(), key=lambda k: raw[k] - rounded[k])
-            moved = False
-            for k in candidates:
-                if rounded[k] >= 5:
-                    rounded[k] -= 5
+            order = sorted(raw.keys(), key=lambda k: raw[k] - rounded[k])
+            for key in order:
+                if rounded[key] >= 5:
+                    rounded[key] -= 5
                     diff += 5
-                    moved = True
-                    if diff == 0:
-                        break
-            if not moved:
-                break
+                    break
 
     return rounded
 
@@ -445,23 +525,43 @@ def display_link(title: str, url: str):
         st.markdown(f"**{title}:** [открыть]({url})")
 
 
+def render_tag_block(title: str, value):
+    tags = split_tags(value)
+    if tags:
+        st.markdown(f"**{title}:** {', '.join(tags)}")
+
+
 def render_format_card(row: pd.Series):
     st.markdown("---")
-    st.subheader("Карточка формата")
+    st.subheader(row.get("format_name", "Карточка формата"))
 
-    left, right = st.columns([1.4, 1])
+    left, right = st.columns([1.3, 1])
 
     with left:
-        st.markdown(f"## {row.get('format_name', 'Без названия')}")
         st.write(f"**{label('format_id')}:** {display_value('format_id', row.get('format_id'))}")
         st.write(f"**{label('platform')}:** {display_value('platform', row.get('platform'))}")
+        st.write(f"**{label('format_type')}:** {display_value('format_type', row.get('format_type'))}")
         st.write(f"**{label('type_service')}:** {display_value('type_service', row.get('type_service'))}")
         st.write(f"**{label('buy_model')}:** {display_value('buy_model', row.get('buy_model'))}")
 
-        description = row.get("description")
-        if pd.notna(description) and str(description).strip():
-            st.markdown("### Описание")
-            st.write(description)
+        st.markdown("### Параметры")
+        for column in CARD_TAG_COLUMNS:
+            if column in row.index:
+                render_tag_block(label(column), row.get(column))
+
+        if "targeting" in row.index and split_tags(row.get("targeting")):
+            st.markdown("### Таргетинги")
+            st.write(", ".join(split_tags(row.get("targeting"))))
+
+        if "targeting_markup" in row.index and split_tags(row.get("targeting_markup")):
+            st.markdown("### Надбавки за таргетинги")
+            st.write(", ".join(split_tags(row.get("targeting_markup"))))
+
+        for column in CARD_TEXT_COLUMNS:
+            value = row.get(column)
+            if pd.notna(value) and str(value).strip():
+                st.markdown(f"### {label(column)}")
+                st.write(value)
 
         st.markdown("### Ссылки")
         display_link("Пример", row.get("example_url"))
@@ -469,40 +569,20 @@ def render_format_card(row: pd.Series):
         display_link("Медиакит", row.get("mediakit_url"))
         display_link("Кейсы", row.get("cases_url"))
 
-        verification_terms = row.get("verification_terms")
-        if pd.notna(verification_terms) and str(verification_terms).strip():
-            st.markdown("### Условия верификации")
-            st.write(verification_terms)
-
-        seasonality_terms = row.get("seasonality_terms")
-        if pd.notna(seasonality_terms) and str(seasonality_terms).strip():
-            st.markdown("### Сезонность")
-            st.write(seasonality_terms)
-
-        bls_terms = row.get("bls_terms")
-        if pd.notna(bls_terms) and str(bls_terms).strip():
-            st.markdown("### Условия BLS")
-            st.write(bls_terms)
-
-        sales_lift_terms = row.get("sales_lift_terms")
-        if pd.notna(sales_lift_terms) and str(sales_lift_terms).strip():
-            st.markdown("### Условия Sales Lift")
-            st.write(sales_lift_terms)
-
     with right:
         st.markdown("### Метрики")
 
         c1, c2 = st.columns(2)
-        c1.metric(label("min_budget"), format_number(row.get("min_budget"), 0))
-        c2.metric(label("max_reach"), format_number(row.get("max_reach"), 0))
+        c1.metric(label("min_budget"), format_integer(row.get("min_budget")))
+        c2.metric(label("max_reach"), format_integer(row.get("max_reach")))
 
         c3, c4 = st.columns(2)
         c3.metric(label("discount"), format_percent(row.get("discount")))
         c4.metric(label("commission"), format_percent(row.get("commission")))
 
         c5, c6 = st.columns(2)
-        c5.metric(label("ecpm_base"), format_number(row.get("ecpm_base")))
-        c6.metric(label("ecpm_discounted"), format_number(row.get("ecpm_discounted")))
+        c5.metric(label("ecpm_base"), format_number(row.get("ecpm_base"), 2))
+        c6.metric(label("ecpm_discounted"), format_number(row.get("ecpm_discounted"), 2))
 
         c7, c8 = st.columns(2)
         c7.metric(label("ctr_avg"), format_percent(row.get("ctr_avg")))
@@ -510,26 +590,54 @@ def render_format_card(row: pd.Series):
 
         c9, c10 = st.columns(2)
         c9.metric(label("viewability_avg"), format_percent(row.get("viewability_avg")))
-        c10.metric("Скоринг", format_percent(row.get("score")) if "score" in row.index and pd.notna(row.get("score")) else "—")
+        c10.metric(label("score"), format_percent(row.get("score")) if pd.notna(row.get("score")) else "—")
 
-        st.markdown("### Дополнительно")
+        st.markdown("### Обязательные параметры")
         st.write(f"**{label('verification_pixel')}:** {display_value('verification_pixel', row.get('verification_pixel'))}")
         st.write(f"**{label('verification_js')}:** {display_value('verification_js', row.get('verification_js'))}")
         st.write(f"**{label('bls')}:** {'Да' if safe_scalar_to_bool(row.get('bls')) else '—'}")
         st.write(f"**{label('sales_lift')}:** {'Да' if safe_scalar_to_bool(row.get('sales_lift')) else '—'}")
 
-    with st.expander("Показать все поля"):
-        payload = {}
-        for col in DETAIL_ORDER:
-            if col in row.index:
-                payload[label(col)] = display_value(col, row.get(col))
-        st.json(payload)
+
+# =========================
+# Коллбэки для скоринга
+# =========================
+def normalize_weight_state():
+    weights = {metric: int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS}
+    normalized = normalize_weights_to_100(weights)
+    for metric, value in normalized.items():
+        st.session_state[f"score_{metric}"] = value
 
 
+def reset_weight_state():
+    defaults = {
+        "max_reach": 20,
+        "ecpm_discounted": 25,
+        "ctr_avg": 20,
+        "vtr_avg": 10,
+        "viewability_avg": 10,
+        "commission": 15,
+    }
+    for metric, value in defaults.items():
+        st.session_state[f"score_{metric}"] = value
+
+
+# =========================
+# Загрузка и сборка данных
+# =========================
 @st.cache_data
 def load_data() -> pd.DataFrame:
-    df = pd.read_csv(DEFAULT_CSV_NAME)
-    df.columns = [c.strip() for c in df.columns]
+    formats_path = find_existing_file(FORMATS_CANDIDATES)
+    dict_path = find_existing_file(DICT_CANDIDATES)
+    format_items_path = find_existing_file(FORMAT_ITEMS_CANDIDATES)
+
+    formats = pd.read_csv(formats_path)
+    dict_items = pd.read_csv(dict_path)
+    format_items = pd.read_csv(format_items_path)
+
+    formats.columns = [c.strip() for c in formats.columns]
+    dict_items.columns = [c.strip() for c in dict_items.columns]
+    format_items.columns = [c.strip() for c in format_items.columns]
 
     numeric_columns = [
         "max_reach",
@@ -559,23 +667,44 @@ def load_data() -> pd.DataFrame:
     ]
 
     for col in numeric_columns:
-        if col in df.columns:
-            df[col] = safe_to_numeric(df[col])
-
-    for col in ["verification_pixel", "verification_js"]:
-        if col in df.columns:
-            df[col] = clean_yes_no(df[col])
+        if col in formats.columns:
+            formats[col] = safe_to_numeric(formats[col])
 
     for col in ["discount", "commission", "ctr_avg", "vtr_avg", "viewability_avg"]:
-        if col in df.columns:
-            df[col] = to_rate(df[col])
+        if col in formats.columns:
+            formats[col] = to_rate(formats[col])
 
-    for col in ["bls", "sales_lift"]:
-        if col in df.columns:
-            df[col] = safe_to_numeric(df[col]).fillna(0)
+    if "buy_model" in formats.columns:
+        formats["buy_model"] = formats["buy_model"].astype(str).str.strip().str.upper()
 
-    if "buy_model" in df.columns:
-        df["buy_model"] = df["buy_model"].astype(str).str.strip().str.upper()
+    for col in ["verification_pixel", "verification_js"]:
+        if col in formats.columns:
+            formats[col] = clean_yes_no(formats[col])
+
+    merged_items = format_items.merge(
+        dict_items[["dict_id", "item_id", "item_name"]],
+        on=["dict_id", "item_id"],
+        how="left",
+    )
+
+    pivot_dict = {}
+    for dict_id in merged_items["dict_id"].dropna().unique():
+        grouped = (
+            merged_items[merged_items["dict_id"] == dict_id]
+            .groupby("format_id")["item_name"]
+            .apply(lambda s: join_unique(sorted(pd.unique(s.dropna()))))
+            .reset_index()
+            .rename(columns={"item_name": dict_id})
+        )
+        pivot_dict[dict_id] = grouped
+
+    df = formats.copy()
+
+    for dict_id, part in pivot_dict.items():
+        df = df.merge(part, on="format_id", how="left")
+
+    if "format_type" not in df.columns:
+        df["format_type"] = np.nan
 
     df["ecpm_base"] = np.nan
 
@@ -606,9 +735,9 @@ def load_data() -> pd.DataFrame:
 
 
 # =========================
-# Состояние
+# Инициализация состояния
 # =========================
-default_weights = {
+defaults = {
     "max_reach": 20,
     "ecpm_discounted": 25,
     "ctr_avg": 20,
@@ -617,43 +746,35 @@ default_weights = {
     "commission": 15,
 }
 
-if "weights" not in st.session_state:
-    st.session_state["weights"] = default_weights.copy()
+for metric, value in defaults.items():
+    if f"score_{metric}" not in st.session_state:
+        st.session_state[f"score_{metric}"] = value
 
-# Чтобы после нормализации слайдеры реально обновлялись
-for metric in SCORING_COLUMNS:
-    widget_key = f"score_{metric}"
-    if widget_key not in st.session_state:
-        st.session_state[widget_key] = st.session_state["weights"][metric]
-
-# Выбор карточки
 if "selected_format_id" not in st.session_state:
     st.session_state["selected_format_id"] = None
 
+
 # =========================
-# Данные
+# Основной экран
 # =========================
 st.title("Подбор форматов")
-st.caption("Каталог форматов, фильтры и скоринг в одном интерфейсе")
 
 try:
     df = load_data()
-except FileNotFoundError:
-    st.error("Файл `DataLens - formats.csv` не найден рядом с `app.py`.")
-    st.stop()
 except Exception as e:
-    st.error(f"Не удалось прочитать файл: {e}")
+    st.error(f"Не удалось загрузить данные: {e}")
     st.stop()
 
 if df.empty:
-    st.warning("Файл прочитан, но в нем нет строк.")
+    st.warning("В данных нет строк.")
     st.stop()
 
+
 # =========================
-# Фильтры и скоринг
+# Sidebar
 # =========================
 with st.sidebar:
-    st.markdown('<div class="sidebar-section-title">Фильтры</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">Фильтры</div>', unsafe_allow_html=True)
 
     search_query = st.text_input(
         "Поиск",
@@ -662,27 +783,52 @@ with st.sidebar:
 
     filtered_df = apply_text_search(df, search_query)
 
-    for col in CATEGORY_FILTER_COLUMNS:
+    for col in MAIN_CATEGORY_FILTERS:
         if col in filtered_df.columns:
-            values = sorted([x for x in filtered_df[col].dropna().unique().tolist()])
-            st.markdown(f'<div class="sidebar-subtitle">{label(col)}</div>', unsafe_allow_html=True)
-            selected = st.multiselect(
-                label(col),
-                values,
-                label_visibility="collapsed",
-                placeholder="Выбери",
-                key=f"cat_{col}",
+            values = sorted(
+                {
+                    item
+                    for cell in filtered_df[col].dropna().tolist()
+                    for item in split_tags(cell)
+                }
             )
-            filtered_df = apply_categorical_filter(filtered_df, col, selected)
+            if values:
+                st.markdown(f'<div class="sidebar-field">{label(col)}</div>', unsafe_allow_html=True)
+                selected = st.multiselect(
+                    label(col),
+                    values,
+                    label_visibility="collapsed",
+                    placeholder="Выбери",
+                    key=f"filter_{col}",
+                )
+                filtered_df = apply_categorical_filter(filtered_df, col, selected)
 
-    st.markdown('<div class="sidebar-subtitle">Обязательные параметры</div>', unsafe_allow_html=True)
+    for col in TAG_FILTERS:
+        if col in filtered_df.columns:
+            values = sorted(
+                {
+                    item
+                    for cell in filtered_df[col].dropna().tolist()
+                    for item in split_tags(cell)
+                }
+            )
+            if values:
+                st.markdown(f'<div class="sidebar-field">{label(col)}</div>', unsafe_allow_html=True)
+                selected = st.multiselect(
+                    label(col),
+                    values,
+                    label_visibility="collapsed",
+                    placeholder="Выбери",
+                    key=f"tag_{col}",
+                )
+                filtered_df = apply_categorical_filter(filtered_df, col, selected)
 
     for col in BOOLEAN_REQUIRE_COLUMNS:
         if col in filtered_df.columns:
             required = st.checkbox(label(col), value=False, key=f"required_{col}")
             filtered_df = apply_required_flag_filter(filtered_df, col, required)
 
-    st.markdown('<div class="sidebar-subtitle">Пороговые значения</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-group">Пороговые значения</div>', unsafe_allow_html=True)
 
     for col, config in FILTER_CONFIG.items():
         if col not in filtered_df.columns:
@@ -702,7 +848,7 @@ with st.sidebar:
         ui_min = round(internal_to_percent(min_val), 2) if is_percent else min_val
         ui_max = round(internal_to_percent(max_val), 2) if is_percent else max_val
 
-        st.markdown(f'<div class="sidebar-subtitle">{label(col)}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sidebar-field">{label(col)}</div>', unsafe_allow_html=True)
 
         if config["mode"] == "max":
             value = st.number_input(
@@ -710,10 +856,10 @@ with st.sidebar:
                 value=ui_max,
                 step=config["step"],
                 label_visibility="collapsed",
-                key=f"max_only_{col}",
+                key=f"max_{col}",
             )
-            internal_value = percent_to_internal(value) if is_percent else value
-            filtered_df = apply_max_filter(filtered_df, col, internal_value)
+            internal = percent_to_internal(value) if is_percent else value
+            filtered_df = apply_max_filter(filtered_df, col, internal)
 
         if config["mode"] == "min":
             value = st.number_input(
@@ -721,82 +867,74 @@ with st.sidebar:
                 value=ui_min,
                 step=config["step"],
                 label_visibility="collapsed",
-                key=f"min_only_{col}",
+                key=f"min_{col}",
             )
-            internal_value = percent_to_internal(value) if is_percent else value
-            filtered_df = apply_min_filter(filtered_df, col, internal_value)
+            internal = percent_to_internal(value) if is_percent else value
+            filtered_df = apply_min_filter(filtered_df, col, internal)
 
-    st.markdown("---")
-    st.markdown('<div class="sidebar-section-title">Скоринг</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-group">Скоринг</div>', unsafe_allow_html=True)
 
     scoring_enabled = st.checkbox("Включить скоринг", value=False, key="scoring_enabled")
 
     if scoring_enabled:
-        st.markdown(
-            '<div class="small-muted">Укажи важность параметров. Шаг — 5. Сумма должна быть 100.</div>',
-            unsafe_allow_html=True,
-        )
-
-        for col in SCORING_COLUMNS:
-            current_val = st.slider(
-                label(col),
-                min_value=0,
-                max_value=100,
-                step=5,
-                key=f"score_{col}",
-            )
-            st.session_state["weights"][col] = current_val
-
-        total_weights = sum(st.session_state["weights"].values())
-        st.write(f"**Сумма:** {total_weights}")
-
-        c1, c2 = st.columns(2)
-
-        with c1:
-            if st.button("Нормализовать", use_container_width=True):
-                normalized = normalize_weights_to_100(st.session_state["weights"])
-                st.session_state["weights"] = normalized.copy()
-                for metric, value in normalized.items():
-                    st.session_state[f"score_{metric}"] = value
-                st.rerun()
-
-        with c2:
-            if st.button("Сбросить", use_container_width=True):
-                st.session_state["weights"] = default_weights.copy()
-                for metric, value in default_weights.items():
-                    st.session_state[f"score_{metric}"] = value
-                st.rerun()
-
         top_n = st.number_input(
             "Сколько форматов показать",
             min_value=1,
             max_value=max(1, len(filtered_df)),
             value=min(10, max(1, len(filtered_df))),
             step=1,
+            key="top_n",
         )
+
+        for col in SCORING_COLUMNS:
+            st.markdown(f'<div class="sidebar-field">{label(col)}</div>', unsafe_allow_html=True)
+            st.slider(
+                label(col),
+                min_value=0,
+                max_value=100,
+                step=5,
+                label_visibility="collapsed",
+                key=f"score_{col}",
+            )
+
+        total_weights = sum(int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS)
+        st.write(f"**Сумма:** {total_weights}")
+
+        c1, c2 = st.columns(2)
+        with c1:
+            st.button("Нормализовать", use_container_width=True, on_click=normalize_weight_state)
+        with c2:
+            st.button("Сбросить", use_container_width=True, on_click=reset_weight_state)
     else:
         top_n = len(filtered_df)
 
+
 # =========================
-# Скоринг и выдача
+# Скоринг
 # =========================
 result_df = filtered_df.copy()
 
 if scoring_enabled:
-    result_df = add_scoring(result_df, st.session_state["weights"])
-    result_df = result_df.sort_values(by="score", ascending=False, na_position="last")
-    result_df = result_df.head(int(top_n))
+    current_weights = {
+        metric: int(st.session_state.get(f"score_{metric}", 0))
+        for metric in SCORING_COLUMNS
+    }
+    result_df = add_scoring(result_df, current_weights)
+    result_df = result_df.sort_values(by="score", ascending=False, na_position="last").head(int(top_n))
+else:
+    if "score" not in result_df.columns:
+        result_df["score"] = np.nan
+
 
 # =========================
 # Верхние метрики
 # =========================
 m1, m2, m3, m4 = st.columns(4)
-
 m1.metric("Форматов в выдаче", len(result_df))
 m2.metric("Площадок", int(result_df["platform"].nunique()) if "platform" in result_df.columns else 0)
 m3.metric(
     "Средний eCPM со скидкой",
-    format_number(result_df["ecpm_discounted"].mean()) if "ecpm_discounted" in result_df.columns else "—",
+    format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "—",
 )
 m4.metric(
     "Средний CTR",
@@ -805,57 +943,15 @@ m4.metric(
 
 st.divider()
 
+
 # =========================
 # Таблица
 # =========================
-st.subheader("Форматы")
+table_columns = [c for c in TABLE_COLUMNS if c in result_df.columns]
+if not scoring_enabled and "score" in table_columns:
+    table_columns.remove("score")
 
-sort_candidates = [
-    c for c in [
-        "format_name",
-        "platform",
-        "min_budget",
-        "max_reach",
-        "ecpm_discounted",
-        "ctr_avg",
-        "vtr_avg",
-        "viewability_avg",
-        "commission",
-    ]
-    if c in result_df.columns
-]
-
-if scoring_enabled and "score" in result_df.columns:
-    sort_candidates = ["score"] + sort_candidates
-
-c_sort_1, c_sort_2 = st.columns([2, 1])
-
-with c_sort_1:
-    sort_by = st.selectbox(
-        "Сортировать по",
-        sort_candidates,
-        format_func=label,
-    )
-
-with c_sort_2:
-    sort_order = st.selectbox(
-        "Порядок",
-        ["По убыванию", "По возрастанию"],
-    )
-
-table_df = result_df.sort_values(
-    by=sort_by,
-    ascending=(sort_order == "По возрастанию"),
-    na_position="last",
-).copy()
-
-raw_table_columns = TABLE_COLUMNS.copy()
-if scoring_enabled and "score" in table_df.columns:
-    raw_table_columns = ["score"] + raw_table_columns
-
-display_df = build_display_table(table_df, raw_table_columns)
-
-st.caption("Можно выбрать формат кликом по строке. Если строка не выделяется, используй поле выбора под таблицей.")
+display_df = build_display_table(result_df, table_columns)
 
 event = st.dataframe(
     display_df,
@@ -867,43 +963,15 @@ event = st.dataframe(
 )
 
 selected_rows = event.selection.rows if event and event.selection else []
-
 if selected_rows:
-    selected_format_id = table_df.iloc[selected_rows[0]]["format_id"]
-    st.session_state["selected_format_id"] = selected_format_id
+    st.session_state["selected_format_id"] = result_df.iloc[selected_rows[0]]["format_id"]
 
-selector_options_df = table_df.copy()
-selector_options_df["selector_label"] = (
-    selector_options_df["format_name"].fillna("Без названия").astype(str)
-    + " | "
-    + selector_options_df["format_id"].fillna("—").astype(str)
-)
-
-selected_label = st.selectbox(
-    "Выбор формата для карточки",
-    options=["—"] + selector_options_df["selector_label"].tolist(),
-    index=0,
-)
-
-if selected_label != "—":
-    selected_format_id_from_select = selector_options_df.loc[
-        selector_options_df["selector_label"] == selected_label, "format_id"
-    ].iloc[0]
-    st.session_state["selected_format_id"] = selected_format_id_from_select
-
-csv_bytes = table_df[[c for c in raw_table_columns if c in table_df.columns]].to_csv(index=False).encode("utf-8-sig")
-st.download_button(
-    "Скачать текущую выборку CSV",
-    data=csv_bytes,
-    file_name="filtered_formats.csv",
-    mime="text/csv",
-)
 
 # =========================
 # Карточка
 # =========================
 selected_format_id = st.session_state.get("selected_format_id")
 
-if selected_format_id is not None and selected_format_id in table_df["format_id"].values:
-    selected_row = table_df.loc[table_df["format_id"] == selected_format_id].iloc[0]
+if selected_format_id is not None and selected_format_id in result_df["format_id"].values:
+    selected_row = result_df.loc[result_df["format_id"] == selected_format_id].iloc[0]
     render_format_card(selected_row)
