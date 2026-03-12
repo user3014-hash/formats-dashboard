@@ -107,17 +107,24 @@ def inject_styles() -> None:
         """
         <style>
             :root {
-                --white: #FFFFFF;
-                --soft: #F8F2FF;
-                --line: #E7DCF9;
-                --line-strong: #D7B8FF;
+                --bg: #F8F2FF;
+                --surface: #FFFFFF;
+                --text: #070037;
                 --accent: #3E20FF;
-                --accent-soft: #725BFF;
-                --ink: #070037;
+                --accent-2: #A35AFF;
+                --soft-accent: #D7B8FF;
+                --secondary: #725BFF;
+                --line: rgba(7, 0, 55, 0.08);
+                --line-strong: rgba(62, 32, 255, 0.18);
                 --muted: rgba(7, 0, 55, 0.62);
+                --muted-2: rgba(7, 0, 55, 0.46);
+                --soft-fill: rgba(215, 184, 255, 0.18);
+                --soft-fill-2: rgba(62, 32, 255, 0.06);
+                --radius: 18px;
+                --radius-sm: 12px;
             }
 
-            html, body, [class*="css"]  {
+            html, body, [class*="css"] {
                 font-feature-settings: "tnum" 1, "lnum" 1;
             }
 
@@ -126,22 +133,24 @@ def inject_styles() -> None:
             [data-testid="stAppViewContainer"] > .main,
             [data-testid="stAppViewContainer"] > .main > div,
             .main .block-container {
-                background: var(--white);
-                color: var(--ink);
+                background: var(--bg);
+                color: var(--text);
             }
 
             .main .block-container {
-                padding-top: 1.3rem;
+                max-width: 1360px;
+                padding-top: 1.4rem;
                 padding-bottom: 3rem;
-                max-width: 1320px;
             }
 
-            [data-testid="stSidebar"],
+            [data-testid="stSidebar"] {
+                background: var(--bg);
+                border-right: 1px solid var(--line);
+            }
+
             [data-testid="stSidebar"] > div,
             [data-testid="stSidebarContent"] {
-                background: var(--soft);
-                color: var(--ink) !important;
-                border-right: 1px solid var(--line);
+                background: var(--bg);
             }
 
             [data-testid="stSidebar"] *,
@@ -153,7 +162,7 @@ def inject_styles() -> None:
             [data-testid="stSidebar"] h2,
             [data-testid="stSidebar"] h3,
             [data-testid="stSidebar"] h4 {
-                color: var(--ink) !important;
+                color: var(--text) !important;
             }
 
             .stApp,
@@ -168,27 +177,27 @@ def inject_styles() -> None:
             .stApp h5,
             .stApp h6,
             [data-testid="stMarkdownContainer"] * {
-                color: var(--ink);
+                color: var(--text);
             }
 
             h1 {
-                font-size: 2.05rem !important;
+                font-size: 31px !important;
                 line-height: 1.08 !important;
-                letter-spacing: -0.02em !important;
-                margin-bottom: 0.9rem !important;
+                letter-spacing: -0.03em !important;
                 font-weight: 700 !important;
+                margin-bottom: 0.35rem !important;
             }
 
             h2 {
-                font-size: 1.25rem !important;
-                line-height: 1.2 !important;
-                letter-spacing: -0.01em !important;
+                font-size: 18px !important;
+                line-height: 1.25 !important;
                 font-weight: 700 !important;
+                letter-spacing: -0.01em !important;
             }
 
             h3 {
-                font-size: 0.98rem !important;
-                line-height: 1.35 !important;
+                font-size: 16px !important;
+                line-height: 1.3 !important;
                 font-weight: 700 !important;
             }
 
@@ -203,14 +212,14 @@ def inject_styles() -> None:
             }
 
             a:hover {
-                color: var(--accent-soft) !important;
+                color: var(--accent-2) !important;
             }
 
             .stButton > button,
             .stDownloadButton > button,
             button[kind="primary"] {
                 background: var(--accent) !important;
-                color: var(--white) !important;
+                color: #FFFFFF !important;
                 border: 1px solid var(--accent) !important;
                 border-radius: 10px !important;
                 box-shadow: none !important;
@@ -220,49 +229,49 @@ def inject_styles() -> None:
             .stButton > button:hover,
             .stDownloadButton > button:hover,
             button[kind="primary"]:hover {
-                background: var(--accent-soft) !important;
-                border-color: var(--accent-soft) !important;
-                color: var(--white) !important;
+                background: var(--accent-2) !important;
+                border-color: var(--accent-2) !important;
+                color: #FFFFFF !important;
             }
 
             .stTextInput input,
             .stNumberInput input,
             .stTextArea textarea {
-                background: var(--white) !important;
-                color: var(--ink) !important;
+                background: var(--surface) !important;
+                color: var(--text) !important;
                 border: 1px solid var(--line-strong) !important;
                 border-radius: 10px !important;
             }
 
             div[data-baseweb="select"] > div {
-                background: var(--white) !important;
-                color: var(--ink) !important;
+                background: var(--surface) !important;
+                color: var(--text) !important;
                 border: 1px solid var(--line-strong) !important;
                 border-radius: 10px !important;
                 min-height: 42px !important;
             }
 
             div[data-baseweb="select"] input {
-                color: var(--ink) !important;
+                color: var(--text) !important;
             }
 
             [data-baseweb="tag"] {
-                background: var(--white) !important;
+                background: var(--surface) !important;
                 border: 1px solid var(--line-strong) !important;
-                border-radius: 6px !important;
-                color: var(--ink) !important;
+                border-radius: 7px !important;
+                color: var(--text) !important;
                 padding: 0 2px !important;
             }
 
             [data-baseweb="tag"] * {
-                color: var(--ink) !important;
+                color: var(--text) !important;
                 font-size: 12px !important;
                 line-height: 1.2 !important;
                 font-weight: 500 !important;
             }
 
             .stCheckbox {
-                margin-bottom: 0.15rem !important;
+                margin-bottom: 0.12rem !important;
             }
 
             .stSlider [role="tooltip"],
@@ -275,37 +284,237 @@ def inject_styles() -> None:
             }
 
             .stAlert {
-                background: var(--soft) !important;
-                color: var(--ink) !important;
+                background: var(--surface) !important;
+                color: var(--text) !important;
                 border: 1px solid var(--line-strong) !important;
-                border-radius: 12px !important;
+                border-radius: 14px !important;
             }
 
             [data-testid="stDataEditor"] {
-                border-radius: 14px !important;
+                border-radius: 16px !important;
                 overflow: hidden !important;
                 border: 1px solid var(--line) !important;
                 box-shadow: none !important;
+                background: var(--surface) !important;
             }
 
             [data-testid="stDataEditor"] * {
-                color: var(--ink) !important;
+                color: var(--text) !important;
+            }
+
+            .sidebar-section {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 14px 14px 12px 14px;
+                margin-bottom: 12px;
+            }
+
+            .sidebar-section__title {
+                font-size: 13px;
+                line-height: 1.25;
+                letter-spacing: 0.02em;
+                text-transform: uppercase;
+                color: var(--muted);
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            .hero {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 18px;
+                margin-bottom: 16px;
+            }
+
+            .hero__copy {
+                min-width: 0;
+            }
+
+            .hero__eyebrow {
+                font-size: 13px;
+                line-height: 1.3;
+                color: var(--secondary);
+                margin-bottom: 8px;
+                font-weight: 600;
+            }
+
+            .hero__desc {
+                font-size: 14px;
+                line-height: 1.5;
+                color: var(--muted);
+                margin: 0;
+                max-width: 760px;
+            }
+
+            .hero__status {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: flex-end;
+                align-items: center;
+                min-width: 260px;
+            }
+
+            .status-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 12px;
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                background: var(--surface);
+                font-size: 12px;
+                line-height: 1.2;
+                font-weight: 500;
+                color: var(--text);
+            }
+
+            .status-pill--accent {
+                border-color: rgba(62, 32, 255, 0.16);
+                background: rgba(62, 32, 255, 0.06);
+                color: var(--accent);
+            }
+
+            .surface {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                padding: 18px;
+            }
+
+            .kpi-grid {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 12px;
+                margin-bottom: 14px;
+            }
+
+            .kpi-card {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 14px 16px;
+            }
+
+            .kpi-label {
+                font-size: 12px;
+                line-height: 1.25;
+                color: var(--muted);
+                margin-bottom: 8px;
+                font-weight: 500;
+            }
+
+            .kpi-value {
+                font-size: 26px;
+                line-height: 1.05;
+                letter-spacing: -0.02em;
+                font-weight: 700;
+                color: var(--text);
+            }
+
+            .kpi-note {
+                margin-top: 6px;
+                font-size: 12px;
+                line-height: 1.3;
+                color: var(--muted-2);
+            }
+
+            .top-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .top-card {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 16px;
+                min-height: 158px;
+            }
+
+            .top-card__rank {
+                display: inline-flex;
+                align-items: center;
+                padding: 4px 8px;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 600;
+                line-height: 1.2;
+                color: var(--accent);
+                background: rgba(62, 32, 255, 0.06);
+                margin-bottom: 12px;
+            }
+
+            .top-card__title {
+                font-size: 17px;
+                line-height: 1.2;
+                font-weight: 700;
+                letter-spacing: -0.01em;
+                color: var(--text);
+                margin-bottom: 6px;
+            }
+
+            .top-card__meta {
+                font-size: 13px;
+                line-height: 1.4;
+                color: var(--muted);
+                margin-bottom: 12px;
+            }
+
+            .top-card__stats {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px 10px;
+            }
+
+            .mini-stat__label {
+                font-size: 11px;
+                line-height: 1.2;
+                color: var(--muted-2);
+                margin-bottom: 2px;
+            }
+
+            .mini-stat__value {
+                font-size: 13px;
+                line-height: 1.3;
+                font-weight: 600;
+                color: var(--text);
+            }
+
+            .table-shell {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                padding: 12px;
+                margin-top: 6px;
+            }
+
+            .table-shell__title {
+                font-size: 14px;
+                line-height: 1.35;
+                font-weight: 700;
+                color: var(--text);
+                margin: 0 0 10px 2px;
             }
 
             .dashboard-card {
-                background: var(--white);
+                background: var(--surface);
                 border: 1px solid var(--line);
-                border-radius: 16px;
-                padding: 20px;
+                border-radius: 20px;
+                padding: 22px;
                 margin-top: 8px;
             }
 
             .dashboard-card__title {
-                font-size: 28px;
-                line-height: 1.12;
+                font-size: 30px;
+                line-height: 1.08;
                 font-weight: 700;
-                letter-spacing: -0.02em;
-                color: var(--ink);
+                letter-spacing: -0.025em;
+                color: var(--text);
                 margin: 0 0 8px 0;
             }
 
@@ -313,12 +522,12 @@ def inject_styles() -> None:
                 font-size: 14px;
                 line-height: 1.45;
                 color: var(--muted);
-                margin: 0 0 16px 0;
+                margin: 0 0 18px 0;
             }
 
             .dashboard-card__meta strong {
-                color: var(--ink);
-                font-weight: 500;
+                color: var(--text);
+                font-weight: 600;
             }
 
             .stats-grid {
@@ -329,8 +538,8 @@ def inject_styles() -> None:
             }
 
             .stat {
-                background: var(--soft);
-                border-radius: 12px;
+                background: var(--soft-fill);
+                border-radius: 14px;
                 padding: 12px 14px;
                 border: 1px solid transparent;
             }
@@ -346,7 +555,7 @@ def inject_styles() -> None:
                 font-size: 14px;
                 line-height: 1.3;
                 font-weight: 600;
-                color: var(--ink);
+                color: var(--text);
             }
 
             .section {
@@ -354,17 +563,17 @@ def inject_styles() -> None:
             }
 
             .section-title {
-                font-size: 14px;
+                font-size: 15px;
                 line-height: 1.35;
                 font-weight: 700;
-                color: var(--ink);
+                color: var(--text);
                 margin: 0 0 8px 0;
             }
 
             .section-text {
                 font-size: 14px;
                 line-height: 1.55;
-                color: var(--ink);
+                color: var(--text);
                 margin: 0;
                 max-width: 980px;
             }
@@ -380,10 +589,10 @@ def inject_styles() -> None:
                 display: inline-flex;
                 align-items: center;
                 padding: 4px 8px;
-                border-radius: 6px;
-                background: var(--soft);
+                border-radius: 7px;
+                background: var(--soft-fill);
                 border: 1px solid var(--line-strong);
-                color: var(--ink);
+                color: var(--text);
                 font-size: 12px;
                 line-height: 1.2;
                 font-weight: 500;
@@ -402,9 +611,20 @@ def inject_styles() -> None:
                 font-weight: 500;
             }
 
-            @media (max-width: 900px) {
+            @media (max-width: 1100px) {
+                .kpi-grid,
+                .top-grid,
                 .stats-grid {
                     grid-template-columns: 1fr;
+                }
+
+                .hero {
+                    flex-direction: column;
+                }
+
+                .hero__status {
+                    justify-content: flex-start;
+                    min-width: 0;
                 }
             }
         </style>
@@ -425,7 +645,6 @@ def inject_dom_fixes() -> None:
                     '[data-baseweb="popover"]',
                     '[data-testid="stThumbValue"]'
                 ];
-
                 selectors.forEach((selector) => {
                     const nodes = window.parent.document.querySelectorAll(selector);
                     nodes.forEach((node) => {
@@ -439,9 +658,7 @@ def inject_dom_fixes() -> None:
                     });
                 });
             };
-
             hideSliderTooltips();
-
             const observer = new MutationObserver(() => hideSliderTooltips());
             observer.observe(window.parent.document.body, {
                 childList: true,
@@ -908,59 +1125,56 @@ def normalize_weight_state() -> None:
 
 
 def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool, int]:
-    st.sidebar.header("Фильтры")
-
-    filters: Dict[str, Optional[float] | List[str] | bool] = {}
-
-    filters["platforms"] = st.sidebar.multiselect(
+    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-section__title">Базовые фильтры</div>', unsafe_allow_html=True)
+    platforms = st.sidebar.multiselect(
         "Площадка",
         options=sorted(df["platform"].dropna().unique().tolist()) if "platform" in df.columns else [],
         placeholder="Выбрать",
     )
-    filters["service_types"] = st.sidebar.multiselect(
+    service_types = st.sidebar.multiselect(
         "Тип сервиса",
         options=sorted(df["type_service"].dropna().unique().tolist()) if "type_service" in df.columns else [],
         placeholder="Выбрать",
     )
-    filters["buy_models"] = st.sidebar.multiselect(
+    buy_models = st.sidebar.multiselect(
         "Модель закупки",
         options=sorted(df["buy_model"].dropna().unique().tolist()) if "buy_model" in df.columns else [],
         placeholder="Выбрать",
     )
+    st.sidebar.markdown("</div>", unsafe_allow_html=True)
 
-    filters["need_verification_pixel"] = st.sidebar.checkbox("Пиксель отслеживания")
-    filters["need_verification_js"] = st.sidebar.checkbox("JavaScript-трекинг")
-    filters["need_bls"] = st.sidebar.checkbox("Brand Lift")
-    filters["need_sales_lift"] = st.sidebar.checkbox("Sales Lift")
+    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-section__title">Требования</div>', unsafe_allow_html=True)
+    need_verification_pixel = st.sidebar.checkbox("Пиксель отслеживания")
+    need_verification_js = st.sidebar.checkbox("JavaScript-трекинг")
+    need_bls = st.sidebar.checkbox("Brand Lift")
+    need_sales_lift = st.sidebar.checkbox("Sales Lift")
+    st.sidebar.markdown("</div>", unsafe_allow_html=True)
 
-    st.sidebar.subheader("Параметры и таргетинги")
+    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-section__title">Параметры формата</div>', unsafe_allow_html=True)
+    filter_format_type = st.sidebar.multiselect("Тип формата", get_all_tag_values(df, "format_type"), placeholder="Выбрать")
+    filter_device = st.sidebar.multiselect("Устройство", get_all_tag_values(df, "device"), placeholder="Выбрать")
+    filter_placement = st.sidebar.multiselect("Размещение", get_all_tag_values(df, "placement"), placeholder="Выбрать")
+    filter_display = st.sidebar.multiselect("Показ креатива", get_all_tag_values(df, "display"), placeholder="Выбрать")
+    filter_dmp = st.sidebar.multiselect("Данные и сегменты", get_all_tag_values(df, "dmp"), placeholder="Выбрать")
+    filter_targeting = st.sidebar.multiselect("Таргетинги", get_all_tag_values(df, "targeting"), placeholder="Выбрать")
+    filter_instream_pos = st.sidebar.multiselect("Позиция в потоке", get_all_tag_values(df, "instream_pos"), placeholder="Выбрать")
+    st.sidebar.markdown("</div>", unsafe_allow_html=True)
 
-    filters["filter_format_type"] = st.sidebar.multiselect("Тип формата", get_all_tag_values(df, "format_type"), placeholder="Выбрать")
-    filters["filter_device"] = st.sidebar.multiselect("Устройство", get_all_tag_values(df, "device"), placeholder="Выбрать")
-    filters["filter_placement"] = st.sidebar.multiselect("Размещение", get_all_tag_values(df, "placement"), placeholder="Выбрать")
-    filters["filter_display"] = st.sidebar.multiselect("Показ креатива", get_all_tag_values(df, "display"), placeholder="Выбрать")
-    filters["filter_dmp"] = st.sidebar.multiselect("Данные и сегменты", get_all_tag_values(df, "dmp"), placeholder="Выбрать")
-    filters["filter_targeting"] = st.sidebar.multiselect("Таргетинги", get_all_tag_values(df, "targeting"), placeholder="Выбрать")
-    filters["filter_instream_pos"] = st.sidebar.multiselect("Позиция в потоке", get_all_tag_values(df, "instream_pos"), placeholder="Выбрать")
+    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-section__title">Пороговые значения</div>', unsafe_allow_html=True)
+    min_reach = st.sidebar.number_input("Минимальный охват", min_value=0, value=0, step=10000)
+    min_ctr = st.sidebar.number_input("Минимальный CTR", min_value=0.0, value=0.0, step=0.001, format="%.3f")
+    min_vtr = st.sidebar.number_input("Минимальный VTR", min_value=0.0, value=0.0, step=0.01, format="%.2f")
+    min_viewability = st.sidebar.number_input("Минимальный viewability", min_value=0.0, value=0.0, step=0.01, format="%.2f")
+    max_ecpm = st.sidebar.number_input("Максимальный eCPM", min_value=0.0, value=0.0, step=10.0, format="%.2f")
+    max_commission = st.sidebar.number_input("Максимальная комиссия", min_value=0.0, value=0.0, step=0.01, format="%.2f")
+    st.sidebar.markdown("</div>", unsafe_allow_html=True)
 
-    st.sidebar.subheader("Пороговые значения")
-
-    filters["min_reach"] = st.sidebar.number_input("Минимальный охват", min_value=0, value=0, step=10000)
-    filters["min_ctr"] = st.sidebar.number_input("Минимальный CTR", min_value=0.0, value=0.0, step=0.001, format="%.3f")
-    filters["min_vtr"] = st.sidebar.number_input("Минимальный VTR", min_value=0.0, value=0.0, step=0.01, format="%.2f")
-    filters["min_viewability"] = st.sidebar.number_input("Минимальный viewability", min_value=0.0, value=0.0, step=0.01, format="%.2f")
-    filters["max_ecpm"] = st.sidebar.number_input("Максимальный eCPM", min_value=0.0, value=0.0, step=10.0, format="%.2f")
-    filters["max_commission"] = st.sidebar.number_input("Максимальная комиссия", min_value=0.0, value=0.0, step=0.01, format="%.2f")
-
-    if filters["min_reach"] == 0:
-        filters["min_reach"] = None
-    for key in ["min_ctr", "min_vtr", "min_viewability", "max_ecpm", "max_commission"]:
-        if filters[key] == 0:
-            filters[key] = None
-
-    st.sidebar.divider()
-    st.sidebar.header("Скоринг")
-
+    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-section__title">Скоринг</div>', unsafe_allow_html=True)
     scoring_enabled = st.sidebar.checkbox("Включить скоринг", value=True)
 
     init_weight_state()
@@ -996,6 +1210,30 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool, int]:
     }
 
     st.sidebar.caption(f"Сумма весов: {sum(weights.values())}")
+    st.sidebar.markdown("</div>", unsafe_allow_html=True)
+
+    filters: Dict[str, Optional[float] | List[str] | bool] = {
+        "platforms": platforms,
+        "service_types": service_types,
+        "buy_models": buy_models,
+        "need_verification_pixel": need_verification_pixel,
+        "need_verification_js": need_verification_js,
+        "need_bls": need_bls,
+        "need_sales_lift": need_sales_lift,
+        "filter_format_type": filter_format_type,
+        "filter_device": filter_device,
+        "filter_placement": filter_placement,
+        "filter_display": filter_display,
+        "filter_dmp": filter_dmp,
+        "filter_targeting": filter_targeting,
+        "filter_instream_pos": filter_instream_pos,
+        "min_reach": None if min_reach == 0 else min_reach,
+        "min_ctr": None if min_ctr == 0 else min_ctr,
+        "min_vtr": None if min_vtr == 0 else min_vtr,
+        "min_viewability": None if min_viewability == 0 else min_viewability,
+        "max_ecpm": None if max_ecpm == 0 else max_ecpm,
+        "max_commission": None if max_commission == 0 else max_commission,
+    }
 
     return filters, weights, scoring_enabled, int(top_n)
 
@@ -1050,6 +1288,108 @@ def render_table_selection(table_df: pd.DataFrame, source_df: pd.DataFrame) -> O
     return match.iloc[0]
 
 
+def render_header(found_count: int, scoring_enabled: bool, scoring_applied: bool) -> None:
+    scoring_text = "Скоринг включен" if scoring_enabled else "Скоринг выключен"
+    if scoring_enabled and not scoring_applied:
+        scoring_text = "Скоринг не применен"
+
+    scoring_class = "status-pill status-pill--accent" if scoring_applied else "status-pill"
+
+    st.markdown(
+        f"""
+        <div class="hero">
+            <div class="hero__copy">
+                <div class="hero__eyebrow">Decision tool</div>
+                <h1>Подбор рекламных форматов</h1>
+                <p class="hero__desc">
+                    Сначала задайте фильтры и ограничения, затем настройте веса скоринга.
+                    Интерфейс помогает быстро сравнить форматы, выбрать сильные варианты и открыть детальную карточку.
+                </p>
+            </div>
+            <div class="hero__status">
+                <div class="status-pill">Найдено форматов: {found_count}</div>
+                <div class="{scoring_class}">{html.escape(scoring_text)}</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_quick_insights(df: pd.DataFrame, scoring_applied: bool) -> None:
+    best_score = df["score"].max() if scoring_applied and "score" in df.columns and not df.empty else np.nan
+    max_reach = df["max_reach"].max() if "max_reach" in df.columns and not df.empty else np.nan
+    min_ecpm = df["ecpm_discounted"].min() if "ecpm_discounted" in df.columns and not df.empty else np.nan
+    min_commission = df["commission"].min() if "commission" in df.columns and not df.empty else np.nan
+
+    cards = [
+        ("Найдено форматов", str(len(df)), "После всех фильтров"),
+        ("Лучший score", format_number(best_score), "Доступно при включенном скоринге"),
+        ("Максимальный охват", format_number(max_reach, 0), "Лучшее значение в выборке"),
+        ("Минимальный eCPM / комиссия", f"{format_number(min_ecpm)} / {format_percent(min_commission)}", "Для быстрого сравнения"),
+    ]
+
+    cards_html = "".join(
+        f"""
+        <div class="kpi-card">
+            <div class="kpi-label">{html.escape(label)}</div>
+            <div class="kpi-value">{html.escape(value)}</div>
+            <div class="kpi-note">{html.escape(note)}</div>
+        </div>
+        """
+        for label, value, note in cards
+    )
+
+    st.markdown(f'<div class="kpi-grid">{cards_html}</div>', unsafe_allow_html=True)
+
+
+def render_top_formats(df: pd.DataFrame, scoring_applied: bool) -> None:
+    if df.empty:
+        return
+
+    base = df.copy()
+    if scoring_applied and "score" in base.columns:
+        top_df = base.sort_values(by=["score", "ecpm_discounted"], ascending=[False, True], na_position="last").head(3)
+    else:
+        sort_cols = [col for col in ["max_reach", "ctr_avg"] if col in base.columns]
+        if sort_cols:
+            top_df = base.sort_values(by=sort_cols, ascending=[False] * len(sort_cols), na_position="last").head(3)
+        else:
+            top_df = base.head(3)
+
+    cards = []
+    for idx, (_, row) in enumerate(top_df.iterrows(), start=1):
+        cards.append(
+            f"""
+            <div class="top-card">
+                <div class="top-card__rank">Топ {idx}</div>
+                <div class="top-card__title">{html.escape(str(row.get("format_name", "Без названия")))}</div>
+                <div class="top-card__meta">{html.escape(str(row.get("platform", "—")))} · {html.escape(str(row.get("buy_model", "—")))}</div>
+                <div class="top-card__stats">
+                    <div>
+                        <div class="mini-stat__label">Score</div>
+                        <div class="mini-stat__value">{html.escape(format_number(row.get("score")))}</div>
+                    </div>
+                    <div>
+                        <div class="mini-stat__label">Охват</div>
+                        <div class="mini-stat__value">{html.escape(format_number(row.get("max_reach"), 0))}</div>
+                    </div>
+                    <div>
+                        <div class="mini-stat__label">CTR</div>
+                        <div class="mini-stat__value">{html.escape(format_percent(row.get("ctr_avg")))}</div>
+                    </div>
+                    <div>
+                        <div class="mini-stat__label">eCPM</div>
+                        <div class="mini-stat__value">{html.escape(format_number(row.get("ecpm_discounted")))}</div>
+                    </div>
+                </div>
+            </div>
+            """
+        )
+
+    st.markdown(f'<div class="top-grid">{"".join(cards)}</div>', unsafe_allow_html=True)
+
+
 def render_pills(title: str, values: List[str]) -> None:
     clean_values = [str(v).strip() for v in values if str(v).strip()]
     if not clean_values:
@@ -1091,7 +1431,7 @@ def render_stats(row: pd.Series) -> None:
     st.markdown(
         f"""
         <div class="section">
-            <div class="section-title">Основные показатели</div>
+            <div class="section-title">Ключевые показатели</div>
             <div class="stats-grid">{stats_html}</div>
         </div>
         """,
@@ -1171,8 +1511,8 @@ def render_format_card(row: pd.Series) -> None:
         unsafe_allow_html=True,
     )
 
-    render_text_block("Описание", row.get("description"))
     render_stats(row)
+    render_text_block("Описание", row.get("description"))
 
     for dict_id in PILL_GROUP_ORDER:
         rich_col = f"{dict_id}__rich"
@@ -1194,8 +1534,6 @@ def render_format_card(row: pd.Series) -> None:
 def main() -> None:
     inject_styles()
     inject_dom_fixes()
-
-    st.title("Подбор рекламных форматов")
 
     try:
         formats, dict_items, format_items = load_data()
@@ -1223,14 +1561,19 @@ def main() -> None:
         if sort_columns:
             filtered_df = filtered_df.sort_values(by=sort_columns, ascending=True, na_position="last")
 
-    st.caption(f"Найдено форматов: {len(filtered_df)}")
+    render_header(len(filtered_df), scoring_enabled, scoring_applied)
 
     if filtered_df.empty:
         st.info("По заданным условиям ничего не найдено.")
         return
 
+    render_quick_insights(filtered_df, scoring_applied)
+    render_top_formats(filtered_df, scoring_applied)
+
+    st.markdown('<div class="table-shell"><div class="table-shell__title">Список форматов</div>', unsafe_allow_html=True)
     table_df = build_table_view(filtered_df, scoring_applied=scoring_applied)
     selected_row = render_table_selection(table_df, filtered_df)
+    st.markdown("</div>", unsafe_allow_html=True)
 
     if selected_row is not None:
         render_format_card(selected_row)
