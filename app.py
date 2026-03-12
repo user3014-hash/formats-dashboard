@@ -7,275 +7,85 @@ st.set_page_config(page_title="Подбор форматов", layout="wide")
 
 
 # =========================
-# Фирменные цвета
-# =========================
-BRAND = {
-    "indigo": "#070037",
-    "blue": "#3E20FF",
-    "lavender": "#725BFF",
-    "lilac": "#A35AFF",
-    "pale_lilac": "#D7B8FF",
-    "light_violet": "#F8F2FF",
-    "white": "#FFFFFF",
-    "text": "#24184A",
-    "muted": "#6F66A8",
-    "line": "#DED4FF",
-    "tag_bg": "#F2ECFF",
-    "tag_border": "#D7C2FF",
-    "success_bg": "#EEF9F3",
-    "success_text": "#1E7A4D",
-}
-
-
-# =========================
-# Глобальные стили
+# Спокойные стили
 # =========================
 st.markdown(
-    f"""
+    """
     <style>
-        :root {{
-            --bg: {BRAND["light_violet"]};
-            --panel: {BRAND["white"]};
-            --panel-soft: {BRAND["tag_bg"]};
-            --text: {BRAND["text"]};
-            --muted: {BRAND["muted"]};
-            --line: {BRAND["line"]};
-            --blue: {BRAND["blue"]};
-            --lavender: {BRAND["lavender"]};
-            --lilac: {BRAND["lilac"]};
-            --indigo: {BRAND["indigo"]};
-            --tag-bg: {BRAND["tag_bg"]};
-            --tag-border: {BRAND["tag_border"]};
-        }}
-
-        html, body, [data-testid="stAppViewContainer"] {{
-            background: var(--bg);
-            color: var(--text);
-            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-        }}
-
-        [data-testid="stHeader"] {{
-            background: rgba(0, 0, 0, 0);
-        }}
-
-        .block-container {{
-            padding-top: 1.25rem;
+        .block-container {
+            padding-top: 1.4rem;
             padding-bottom: 2rem;
-        }}
+        }
 
-        section[data-testid="stSidebar"] {{
-            background: linear-gradient(180deg, {BRAND["blue"]} 0%, {BRAND["lavender"]} 54%, {BRAND["lilac"]} 100%);
-            border-right: 1px solid rgba(255,255,255,0.16);
-        }}
-
-        section[data-testid="stSidebar"] .block-container {{
+        section[data-testid="stSidebar"] .block-container {
             padding-top: 1rem;
-            padding-bottom: 1.25rem;
-        }}
+            padding-bottom: 1.2rem;
+        }
 
-        section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
-        section[data-testid="stSidebar"] span,
-        section[data-testid="stSidebar"] div {{
-            color: white !important;
-            font-size: 15px !important;
-            line-height: 1.35 !important;
-        }}
-
-        section[data-testid="stSidebar"] input {{
-            color: white !important;
-        }}
-
-        section[data-testid="stSidebar"] [data-baseweb="select"] > div,
-        section[data-testid="stSidebar"] [data-baseweb="input"] > div,
-        section[data-testid="stSidebar"] [data-testid="stNumberInput"] > div,
-        section[data-testid="stSidebar"] [data-baseweb="tag"] {{
-            background: rgba(7, 0, 55, 0.35) !important;
-            border: 1px solid rgba(255,255,255,0.16) !important;
-            border-radius: 18px !important;
-            box-shadow: none !important;
-            color: white !important;
-        }}
-
-        section[data-testid="stSidebar"] [data-baseweb="tag"] span {{
-            color: white !important;
-        }}
-
-        section[data-testid="stSidebar"] [data-testid="stNumberInput"] button {{
-            color: white !important;
-        }}
-
-        section[data-testid="stSidebar"] [data-testid="stCheckbox"] {{
-            margin-bottom: 0.18rem;
-        }}
-
-        .sidebar-title {{
+        .sidebar-title {
             font-size: 22px;
             font-weight: 700;
-            margin: 0 0 0.8rem 0;
-            color: white;
-        }}
+            margin: 0 0 0.85rem 0;
+        }
 
-        .sidebar-group {{
+        .sidebar-group {
             font-size: 17px;
             font-weight: 700;
-            margin: 1rem 0 0.4rem 0;
-            color: white;
-        }}
+            margin: 1rem 0 0.45rem 0;
+        }
 
-        .sidebar-field {{
-            font-size: 14px;
-            font-weight: 600;
-            margin: 0.32rem 0 0.12rem 0;
-            color: rgba(255,255,255,0.95);
-        }}
-
-        .page-title {{
-            font-size: 42px;
-            font-weight: 700;
-            line-height: 1.05;
-            margin: 0 0 1rem 0;
-            color: {BRAND["text"]};
-        }}
-
-        .metric-grid {{
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 16px;
-            margin: 0.2rem 0 1rem 0;
-        }}
-
-        .metric-card {{
-            background: rgba(255,255,255,0.82);
-            border: 1px solid {BRAND["line"]};
-            border-radius: 22px;
-            padding: 18px 18px 16px 18px;
-            backdrop-filter: blur(8px);
-        }}
-
-        .metric-label {{
-            font-size: 13px;
-            line-height: 1.3;
-            color: {BRAND["muted"]};
-            margin-bottom: 8px;
-        }}
-
-        .metric-value {{
-            font-size: 34px;
-            line-height: 1;
-            font-weight: 700;
-            color: {BRAND["text"]};
-        }}
-
-        .soft-note {{
-            font-size: 13px;
-            color: {BRAND["muted"]};
-            margin: 0.2rem 0 1rem 0;
-        }}
-
-        .card-shell {{
-            background: rgba(255,255,255,0.88);
-            border: 1px solid {BRAND["line"]};
-            border-radius: 28px;
-            padding: 24px;
-            margin-top: 1rem;
-            backdrop-filter: blur(8px);
-        }}
-
-        .card-title {{
-            font-size: 34px;
-            line-height: 1.08;
-            font-weight: 700;
-            color: {BRAND["text"]};
-            margin-bottom: 1rem;
-        }}
-
-        .section-title {{
-            font-size: 22px;
-            line-height: 1.15;
-            font-weight: 700;
-            color: {BRAND["text"]};
-            margin: 1rem 0 0.75rem 0;
-        }}
-
-        .body-text {{
-            font-size: 16px;
-            line-height: 1.55;
-            color: {BRAND["text"]};
-            margin: 0;
-        }}
-
-        .meta-list {{
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }}
-
-        .meta-item {{
+        .sidebar-field {
             font-size: 15px;
-            line-height: 1.45;
-            color: {BRAND["text"]};
-        }}
+            font-weight: 600;
+            margin: 0.35rem 0 0.15rem 0;
+        }
 
-        .meta-item strong {{
-            color: {BRAND["text"]};
-        }}
-
-        .tag-cloud {{
+        .tag-cloud {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-        }}
+            margin-top: 0.35rem;
+            margin-bottom: 0.35rem;
+        }
 
-        .tag-pill {{
+        .tag-pill {
             display: inline-flex;
             align-items: center;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 999px;
-            background: {BRAND["tag_bg"]};
-            border: 1px solid {BRAND["tag_border"]};
-            color: {BRAND["text"]};
-            font-size: 14px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            color: #111827;
+            font-size: 13px;
             line-height: 1.2;
-            font-weight: 500;
-        }}
+        }
 
-        .tag-pill.strong {{
-            background: linear-gradient(135deg, rgba(62,32,255,0.14) 0%, rgba(163,90,255,0.14) 100%);
-            border-color: rgba(114,91,255,0.22);
-        }}
-
-        .link-list {{
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }}
-
-        .link-pill {{
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 14px;
-            border-radius: 999px;
-            border: 1px solid {BRAND["tag_border"]};
+        .card-block {
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 20px;
             background: white;
-            color: {BRAND["blue"]} !important;
-            text-decoration: none !important;
-            font-size: 14px;
-            font-weight: 500;
-        }}
+            margin-top: 1rem;
+        }
 
-        .line {{
-            height: 1px;
-            background: {BRAND["line"]};
-            margin: 1rem 0 0.25rem 0;
-        }}
+        .card-title {
+            font-size: 28px;
+            line-height: 1.1;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
 
-        @media (max-width: 1100px) {{
-            .metric-grid {{
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }}
-        }}
+        .card-section-title {
+            font-size: 20px;
+            line-height: 1.15;
+            font-weight: 700;
+            margin: 0 0 0.6rem 0;
+        }
+
+        .card-text {
+            font-size: 16px;
+            line-height: 1.55;
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -346,7 +156,7 @@ LABELS = {
 
 
 # =========================
-# Конфиг интерфейса
+# Конфиг
 # =========================
 TEXT_SEARCH_COLUMNS = [
     "format_id",
@@ -406,6 +216,7 @@ SCORING_REVERSE_COLUMNS = {
     "ecpm_discounted",
 }
 
+# Только сравнимое — в таблицу
 TABLE_COLUMNS = [
     "score",
     "format_name",
@@ -422,6 +233,7 @@ TABLE_COLUMNS = [
     "commission",
 ]
 
+# То, что полезно в карточке
 CARD_META_FIELDS = [
     "device",
     "display",
@@ -461,7 +273,7 @@ BOOL_TEXT_COLUMNS = {
 
 
 # =========================
-# Служебные функции
+# Вспомогательные функции
 # =========================
 def label(column: str) -> str:
     return LABELS.get(column, column)
@@ -608,6 +420,21 @@ def join_unique(values: list[str]) -> str:
     return ", ".join(cleaned)
 
 
+def format_item_for_dict(dict_id: str, item_name: str, item_value, item_unit) -> str:
+    name = str(item_name).strip()
+
+    if pd.notna(item_value):
+        value_text = format_number(item_value, 2)
+
+        if dict_id == "seasonality_coeff":
+            return f"{name} ×{value_text}"
+
+        if dict_id in {"other_markup", "production"} and str(item_unit).strip() == "%":
+            return f"{name} +{value_text}%"
+
+    return name
+
+
 def normalize_series(series: pd.Series, reverse: bool = False) -> pd.Series:
     s = safe_to_numeric(series)
 
@@ -742,53 +569,6 @@ def apply_max_filter(df: pd.DataFrame, column: str, max_value: float) -> pd.Data
     return df[series.isna() | (series <= max_value)]
 
 
-def format_item_for_dict(dict_id: str, item_name: str, item_value, item_unit) -> str:
-    name = str(item_name).strip()
-
-    if pd.notna(item_value):
-        value_text = format_number(item_value, 2)
-
-        if dict_id == "seasonality_coeff":
-            return f"{name} ×{value_text}"
-
-        if dict_id in {"other_markup", "production"} and str(item_unit).strip() == "%":
-            return f"{name} +{value_text}%"
-
-    return name
-
-
-def make_tag_html(text: str, strong: bool = False) -> str:
-    safe = html.escape(text)
-    cls = "tag-pill strong" if strong else "tag-pill"
-    return f'<span class="{cls}">{safe}</span>'
-
-
-def make_tag_cloud(values: list[str], strong: bool = False) -> str:
-    if not values:
-        return ""
-    tags = "".join([make_tag_html(v, strong=strong) for v in values if str(v).strip()])
-    return f'<div class="tag-cloud">{tags}</div>'
-
-
-def render_link_pills(row: pd.Series):
-    links = [
-        ("Пример", row.get("example_url")),
-        ("Технические требования", row.get("technical_requirements_url")),
-        ("Медиакит", row.get("mediakit_url")),
-        ("Кейсы", row.get("cases_url")),
-    ]
-
-    rendered = []
-    for title, url in links:
-        if pd.notna(url) and str(url).strip():
-            rendered.append(
-                f'<a class="link-pill" href="{html.escape(str(url))}" target="_blank">{html.escape(title)}</a>'
-            )
-
-    if rendered:
-        st.markdown(f'<div class="link-list">{"".join(rendered)}</div>', unsafe_allow_html=True)
-
-
 def build_display_table(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     visible_cols = [c for c in columns if c in df.columns]
     display_df = df[visible_cols].copy()
@@ -803,134 +583,100 @@ def build_display_table(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return display_df
 
 
-def render_metric_grid(result_df: pd.DataFrame):
-    cards = [
-        ("Форматов в выдаче", str(len(result_df))),
-        ("Площадок", str(int(result_df["platform"].nunique()) if "platform" in result_df.columns else 0)),
-        (
-            "Средний eCPM со скидкой",
-            format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "",
-        ),
-        (
-            "Средний CTR",
-            format_percent(result_df["ctr_avg"].mean()) if "ctr_avg" in result_df.columns else "",
-        ),
+def make_tag_html(text: str) -> str:
+    return f'<span class="tag-pill">{html.escape(text)}</span>'
+
+
+def make_tag_cloud(values: list[str]) -> str:
+    if not values:
+        return ""
+    return f'<div class="tag-cloud">{"".join(make_tag_html(v) for v in values)}</div>'
+
+
+def render_link_buttons(row: pd.Series):
+    links = [
+        ("Пример", row.get("example_url")),
+        ("Технические требования", row.get("technical_requirements_url")),
+        ("Медиакит", row.get("mediakit_url")),
+        ("Кейсы", row.get("cases_url")),
     ]
 
-    html_cards = []
-    for title, value in cards:
-        html_cards.append(
-            f"""
-            <div class="metric-card">
-                <div class="metric-label">{html.escape(title)}</div>
-                <div class="metric-value">{html.escape(value)}</div>
-            </div>
-            """
-        )
-
-    st.markdown(f'<div class="metric-grid">{"".join(html_cards)}</div>', unsafe_allow_html=True)
+    cols = st.columns(4)
+    for idx, (title, url) in enumerate(links):
+        with cols[idx]:
+            if pd.notna(url) and str(url).strip():
+                st.link_button(title, str(url), use_container_width=True)
 
 
 def render_card(row: pd.Series):
-    title = html.escape(str(row.get("format_name", "Карточка формата")))
-    description = row.get("description")
-    description_html = html.escape(str(description)) if pd.notna(description) and str(description).strip() else ""
-
-    meta_blocks = []
-    for field in CARD_META_FIELDS:
-        values = split_tags(row.get(field))
-        if values:
-            meta_blocks.append(
-                f"""
-                <div>
-                    <div class="sidebar-field" style="color:{BRAND["muted"]}; margin:0 0 0.35rem 0;">{html.escape(label(field))}</div>
-                    {make_tag_cloud(values, strong=False)}
-                </div>
-                """
-            )
-
-    condition_blocks = []
-
-    # Верификация и исследования как плашки
-    verification_tags = []
-    if str(row.get("verification_pixel", "")).strip() == "Да":
-        verification_tags.append("Верификация пикселем")
-    if str(row.get("verification_js", "")).strip() == "Да":
-        verification_tags.append("Верификация JS-кодом")
-    if safe_scalar_to_bool(row.get("bls")):
-        verification_tags.append("BLS")
-    if safe_scalar_to_bool(row.get("sales_lift")):
-        verification_tags.append("Sales Lift")
-
-    if verification_tags:
-        condition_blocks.append(
-            f"""
-            <div>
-                <div class="sidebar-field" style="color:{BRAND["muted"]}; margin:0 0 0.35rem 0;">Обязательные параметры</div>
-                {make_tag_cloud(verification_tags, strong=True)}
-            </div>
-            """
-        )
-
-    for field in CARD_TAG_FIELDS:
-        values = split_tags(row.get(field))
-        if values:
-            condition_blocks.append(
-                f"""
-                <div>
-                    <div class="sidebar-field" style="color:{BRAND["muted"]}; margin:0 0 0.35rem 0;">{html.escape(label(field))}</div>
-                    {make_tag_cloud(values, strong=(field in {"other_markup", "production", "seasonality_coeff"}))}
-                </div>
-                """
-            )
-
-    text_blocks = []
-    for field in CARD_TEXT_FIELDS:
-        value = row.get(field)
-        if pd.notna(value) and str(value).strip():
-            text_blocks.append(
-                f"""
-                <div>
-                    <div class="sidebar-field" style="color:{BRAND["muted"]}; margin:0 0 0.35rem 0;">{html.escape(label(field))}</div>
-                    <div class="body-text">{html.escape(str(value))}</div>
-                </div>
-                """
-            )
-
+    st.markdown('<div class="card-block">', unsafe_allow_html=True)
     st.markdown(
-        f"""
-        <div class="card-shell">
-            <div class="card-title">{title}</div>
-        </div>
-        """,
+        f'<div class="card-title">{html.escape(str(row.get("format_name", "Карточка формата")))}</div>',
         unsafe_allow_html=True,
     )
 
     left, right = st.columns([1.2, 1])
 
     with left:
-        if description_html:
-            st.markdown('<div class="section-title">Описание</div>', unsafe_allow_html=True)
-            st.markdown(f'<p class="body-text">{description_html}</p>', unsafe_allow_html=True)
+        description = row.get("description")
+        if pd.notna(description) and str(description).strip():
+            st.markdown('<div class="card-section-title">Описание</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="card-text">{html.escape(str(description))}</div>', unsafe_allow_html=True)
 
-        if meta_blocks:
-            st.markdown('<div class="section-title">Параметры формата</div>', unsafe_allow_html=True)
-            for block in meta_blocks:
-                st.markdown(block, unsafe_allow_html=True)
+        meta_values = []
+        for field in CARD_META_FIELDS:
+            values = split_tags(row.get(field))
+            if values:
+                meta_values.append((label(field), values))
 
-        st.markdown('<div class="section-title">Материалы</div>', unsafe_allow_html=True)
-        render_link_pills(row)
+        if meta_values:
+            st.markdown('<div class="card-section-title">Параметры формата</div>', unsafe_allow_html=True)
+            for field_label, values in meta_values:
+                st.markdown(f"**{field_label}**", unsafe_allow_html=False)
+                st.markdown(make_tag_cloud(values), unsafe_allow_html=True)
+
+        tag_values = []
+        for field in CARD_TAG_FIELDS:
+            values = split_tags(row.get(field))
+            if values:
+                tag_values.append((label(field), values))
+
+        if tag_values:
+            st.markdown('<div class="card-section-title">Условия и надбавки</div>', unsafe_allow_html=True)
+            for field_label, values in tag_values:
+                st.markdown(f"**{field_label}**", unsafe_allow_html=False)
+                st.markdown(make_tag_cloud(values), unsafe_allow_html=True)
 
     with right:
-        if condition_blocks:
-            st.markdown('<div class="section-title">Условия и надбавки</div>', unsafe_allow_html=True)
-            for block in condition_blocks:
-                st.markdown(block, unsafe_allow_html=True)
+        status_tags = []
+        if str(row.get("verification_pixel", "")).strip() == "Да":
+            status_tags.append("Верификация пикселем")
+        if str(row.get("verification_js", "")).strip() == "Да":
+            status_tags.append("Верификация JS-кодом")
+        if safe_scalar_to_bool(row.get("bls")):
+            status_tags.append("BLS")
+        if safe_scalar_to_bool(row.get("sales_lift")):
+            status_tags.append("Sales Lift")
 
-        if text_blocks:
-            st.markdown('<div class="section-title">Уточнения</div>', unsafe_allow_html=True)
-            for block in text_blocks:
-                st.markdown(block, unsafe_allow_html=True)
+        if status_tags:
+            st.markdown('<div class="card-section-title">Обязательные параметры</div>', unsafe_allow_html=True)
+            st.markdown(make_tag_cloud(status_tags), unsafe_allow_html=True)
+
+        text_values = []
+        for field in CARD_TEXT_FIELDS:
+            value = row.get(field)
+            if pd.notna(value) and str(value).strip():
+                text_values.append((label(field), str(value)))
+
+        if text_values:
+            st.markdown('<div class="card-section-title">Уточнения</div>', unsafe_allow_html=True)
+            for field_label, value in text_values:
+                st.markdown(f"**{field_label}**")
+                st.write(value)
+
+    st.markdown('<div class="card-section-title">Материалы</div>', unsafe_allow_html=True)
+    render_link_buttons(row)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # =========================
@@ -1117,7 +863,7 @@ if df.empty:
 # =========================
 # Заголовок
 # =========================
-st.markdown('<div class="page-title">Подбор форматов</div>', unsafe_allow_html=True)
+st.title("Подбор форматов")
 
 
 # =========================
@@ -1261,7 +1007,7 @@ with st.sidebar:
         total_weights = sum(int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS)
         st.write(f"**Сумма:** {total_weights}")
 
-        c1, c2 = st.columns([1.18, 1])
+        c1, c2 = st.columns([1.15, 1])
         with c1:
             st.button("Нормализовать", use_container_width=True, on_click=normalize_weight_state)
         with c2:
@@ -1294,15 +1040,24 @@ else:
 
 
 # =========================
-# Верхние карточки
+# Метрики
 # =========================
-render_metric_grid(result_df)
+m1, m2, m3, m4 = st.columns(4)
+m1.metric("Форматов в выдаче", len(result_df))
+m2.metric("Площадок", int(result_df["platform"].nunique()) if "platform" in result_df.columns else 0)
+m3.metric(
+    "Средний eCPM со скидкой",
+    format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "",
+)
+m4.metric(
+    "Средний CTR",
+    format_percent(result_df["ctr_avg"].mean()) if "ctr_avg" in result_df.columns else "",
+)
 
 if scoring_enabled and requested_top_n is not None and available_rows < requested_top_n:
-    st.markdown(
-        f'<div class="soft-note">Показаны все доступные форматы: {available_rows}</div>',
-        unsafe_allow_html=True,
-    )
+    st.caption(f"Показаны все доступные форматы: {available_rows}")
+
+st.divider()
 
 
 # =========================
@@ -1317,7 +1072,7 @@ display_df = build_display_table(result_df, table_columns)
 column_config = {}
 for col in table_columns:
     pretty = label(col)
-    if col in {"format_name"}:
+    if col == "format_name":
         column_config[pretty] = st.column_config.TextColumn(pretty, width="large")
     elif col in {"format_type", "platform", "buy_model"}:
         column_config[pretty] = st.column_config.TextColumn(pretty, width="medium")
