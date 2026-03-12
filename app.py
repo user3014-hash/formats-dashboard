@@ -12,12 +12,13 @@ st.markdown(
     """
     <style>
         .block-container {
-            padding-top: 1.6rem;
+            padding-top: 1.4rem;
             padding-bottom: 2rem;
         }
 
         section[data-testid="stSidebar"] .block-container {
             padding-top: 1.1rem;
+            padding-bottom: 1.2rem;
         }
 
         section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
@@ -25,6 +26,7 @@ st.markdown(
         section[data-testid="stSidebar"] span,
         section[data-testid="stSidebar"] div {
             font-size: 15px !important;
+            line-height: 1.35 !important;
         }
 
         section[data-testid="stSidebar"] input,
@@ -33,21 +35,27 @@ st.markdown(
         }
 
         .sidebar-title {
-            font-size: 20px;
+            font-size: 21px;
             font-weight: 700;
-            margin: 0.3rem 0 0.8rem 0;
+            margin: 0 0 0.85rem 0;
         }
 
         .sidebar-group {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
-            margin: 1.1rem 0 0.45rem 0;
+            margin: 1rem 0 0.45rem 0;
         }
 
         .sidebar-field {
             font-size: 15px;
             font-weight: 600;
-            margin: 0.55rem 0 0.2rem 0;
+            margin: 0.45rem 0 0.15rem 0;
+        }
+
+        .sidebar-compact-note {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 0.35rem 0 0 0;
         }
     </style>
     """,
@@ -178,12 +186,12 @@ SCORING_REVERSE_COLUMNS = {
     "ecpm_discounted",
 }
 
+# Сократила набор колонок в верхней таблице
 TABLE_COLUMNS = [
     "score",
     "format_name",
     "format_type",
     "platform",
-    "device",
     "buy_model",
     "min_budget",
     "max_reach",
@@ -193,14 +201,9 @@ TABLE_COLUMNS = [
     "viewability_avg",
     "discount",
     "commission",
-    "verification_pixel",
-    "verification_js",
-    "bls",
-    "sales_lift",
 ]
 
-CARD_TAG_COLUMNS = [
-    "format_type",
+CARD_DETAIL_FIELDS = [
     "device",
     "display",
     "placement",
@@ -208,9 +211,11 @@ CARD_TAG_COLUMNS = [
     "dmp",
     "production",
     "other_markup",
+    "verification_pixel",
+    "verification_js",
 ]
 
-CARD_TEXT_COLUMNS = [
+CARD_TEXT_FIELDS = [
     "description",
     "verification_terms",
     "bls_terms",
@@ -303,30 +308,39 @@ def safe_scalar_to_bool(value) -> bool:
         return False
 
 
+def trim_decimal_string(text: str) -> str:
+    if "," not in text:
+        return text
+    text = text.rstrip("0").rstrip(",")
+    return text
+
+
 def format_number(value, digits: int = 2) -> str:
     if pd.isna(value):
-        return "—"
-    formatted = f"{value:,.{digits}f}"
+        return ""
+    formatted = f"{float(value):,.{digits}f}"
     formatted = formatted.replace(",", " ").replace(".", ",")
+    formatted = trim_decimal_string(formatted)
     return formatted
 
 
 def format_integer(value) -> str:
     if pd.isna(value):
-        return "—"
+        return ""
     return f"{int(round(float(value))):,}".replace(",", " ")
 
 
 def format_percent(value, digits: int = 2) -> str:
     if pd.isna(value):
-        return "—"
-    formatted = f"{value * 100:.{digits}f}".replace(".", ",")
+        return ""
+    formatted = f"{float(value) * 100:.{digits}f}".replace(".", ",")
+    formatted = trim_decimal_string(formatted)
     return f"{formatted}%"
 
 
 def display_value(column: str, value):
     if pd.isna(value):
-        return "—"
+        return ""
 
     if column in PERCENT_COLUMNS:
         return format_percent(value)
@@ -341,7 +355,7 @@ def display_value(column: str, value):
         return str(value)
 
     if column in ["bls", "sales_lift"]:
-        return "Да" if safe_scalar_to_bool(value) else "—"
+        return "Да" if safe_scalar_to_bool(value) else ""
 
     return value
 
@@ -468,18 +482,26 @@ def normalize_weights_to_100(weights: dict[str, int]) -> dict[str, int]:
     while diff != 0:
         if diff > 0:
             order = sorted(raw.keys(), key=lambda k: raw[k] - rounded[k], reverse=True)
+            moved = False
             for key in order:
                 if rounded[key] <= 95:
                     rounded[key] += 5
                     diff -= 5
+                    moved = True
                     break
+            if not moved:
+                break
         else:
             order = sorted(raw.keys(), key=lambda k: raw[k] - rounded[k])
+            moved = False
             for key in order:
                 if rounded[key] >= 5:
                     rounded[key] -= 5
                     diff += 5
+                    moved = True
                     break
+            if not moved:
+                break
 
     return rounded
 
@@ -525,43 +547,35 @@ def display_link(title: str, url: str):
         st.markdown(f"**{title}:** [открыть]({url})")
 
 
-def render_tag_block(title: str, value):
-    tags = split_tags(value)
-    if tags:
-        st.markdown(f"**{title}:** {', '.join(tags)}")
+def render_detail_line(field: str, value):
+    shown = display_value(field, value)
+    if shown != "":
+        st.write(f"**{label(field)}:** {shown}")
 
 
 def render_format_card(row: pd.Series):
     st.markdown("---")
     st.subheader(row.get("format_name", "Карточка формата"))
 
-    left, right = st.columns([1.3, 1])
+    left, right = st.columns([1.35, 1])
 
     with left:
-        st.write(f"**{label('format_id')}:** {display_value('format_id', row.get('format_id'))}")
-        st.write(f"**{label('platform')}:** {display_value('platform', row.get('platform'))}")
-        st.write(f"**{label('format_type')}:** {display_value('format_type', row.get('format_type'))}")
-        st.write(f"**{label('type_service')}:** {display_value('type_service', row.get('type_service'))}")
-        st.write(f"**{label('buy_model')}:** {display_value('buy_model', row.get('buy_model'))}")
+        description = row.get("description")
+        if pd.notna(description) and str(description).strip():
+            st.markdown("### Описание")
+            st.write(description)
 
-        st.markdown("### Параметры")
-        for column in CARD_TAG_COLUMNS:
-            if column in row.index:
-                render_tag_block(label(column), row.get(column))
+        st.markdown("### Дополнительно")
+        any_detail = False
+        for field in CARD_DETAIL_FIELDS:
+            if field in row.index:
+                shown = display_value(field, row.get(field))
+                if shown != "":
+                    any_detail = True
+                    st.write(f"**{label(field)}:** {shown}")
 
-        if "targeting" in row.index and split_tags(row.get("targeting")):
-            st.markdown("### Таргетинги")
-            st.write(", ".join(split_tags(row.get("targeting"))))
-
-        if "targeting_markup" in row.index and split_tags(row.get("targeting_markup")):
-            st.markdown("### Надбавки за таргетинги")
-            st.write(", ".join(split_tags(row.get("targeting_markup"))))
-
-        for column in CARD_TEXT_COLUMNS:
-            value = row.get(column)
-            if pd.notna(value) and str(value).strip():
-                st.markdown(f"### {label(column)}")
-                st.write(value)
+        if not any_detail:
+            st.write("")
 
         st.markdown("### Ссылки")
         display_link("Пример", row.get("example_url"))
@@ -570,40 +584,27 @@ def render_format_card(row: pd.Series):
         display_link("Кейсы", row.get("cases_url"))
 
     with right:
-        st.markdown("### Метрики")
+        st.markdown("### Условия")
+        any_text = False
+        for field in CARD_TEXT_FIELDS:
+            value = row.get(field)
+            if pd.notna(value) and str(value).strip():
+                any_text = True
+                st.write(f"**{label(field)}:**")
+                st.write(value)
 
-        c1, c2 = st.columns(2)
-        c1.metric(label("min_budget"), format_integer(row.get("min_budget")))
-        c2.metric(label("max_reach"), format_integer(row.get("max_reach")))
-
-        c3, c4 = st.columns(2)
-        c3.metric(label("discount"), format_percent(row.get("discount")))
-        c4.metric(label("commission"), format_percent(row.get("commission")))
-
-        c5, c6 = st.columns(2)
-        c5.metric(label("ecpm_base"), format_number(row.get("ecpm_base"), 2))
-        c6.metric(label("ecpm_discounted"), format_number(row.get("ecpm_discounted"), 2))
-
-        c7, c8 = st.columns(2)
-        c7.metric(label("ctr_avg"), format_percent(row.get("ctr_avg")))
-        c8.metric(label("vtr_avg"), format_percent(row.get("vtr_avg")))
-
-        c9, c10 = st.columns(2)
-        c9.metric(label("viewability_avg"), format_percent(row.get("viewability_avg")))
-        c10.metric(label("score"), format_percent(row.get("score")) if pd.notna(row.get("score")) else "—")
-
-        st.markdown("### Обязательные параметры")
-        st.write(f"**{label('verification_pixel')}:** {display_value('verification_pixel', row.get('verification_pixel'))}")
-        st.write(f"**{label('verification_js')}:** {display_value('verification_js', row.get('verification_js'))}")
-        st.write(f"**{label('bls')}:** {'Да' if safe_scalar_to_bool(row.get('bls')) else '—'}")
-        st.write(f"**{label('sales_lift')}:** {'Да' if safe_scalar_to_bool(row.get('sales_lift')) else '—'}")
+        if not any_text:
+            st.write("")
 
 
 # =========================
 # Коллбэки для скоринга
 # =========================
 def normalize_weight_state():
-    weights = {metric: int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS}
+    weights = {
+        metric: int(st.session_state.get(f"score_{metric}", 0))
+        for metric in SCORING_COLUMNS
+    }
     normalized = normalize_weights_to_100(weights)
     for metric, value in normalized.items():
         st.session_state[f"score_{metric}"] = value
@@ -753,6 +754,9 @@ for metric, value in defaults.items():
 if "selected_format_id" not in st.session_state:
     st.session_state["selected_format_id"] = None
 
+if "top_n" not in st.session_state:
+    st.session_state["top_n"] = 10
+
 
 # =========================
 # Основной экран
@@ -828,61 +832,72 @@ with st.sidebar:
             required = st.checkbox(label(col), value=False, key=f"required_{col}")
             filtered_df = apply_required_flag_filter(filtered_df, col, required)
 
-    st.markdown('<div class="sidebar-group">Пороговые значения</div>', unsafe_allow_html=True)
+    numeric_filter_pairs = [
+        ("min_budget", "max_reach"),
+        ("ecpm_discounted", "ctr_avg"),
+        ("vtr_avg", "viewability_avg"),
+        ("commission", "discount"),
+    ]
 
-    for col, config in FILTER_CONFIG.items():
-        if col not in filtered_df.columns:
-            continue
+    for left_col, right_col in numeric_filter_pairs:
+        c1, c2 = st.columns(2)
 
-        series = safe_to_numeric(filtered_df[col]).dropna()
-        if series.empty:
-            continue
+        for col, container in [(left_col, c1), (right_col, c2)]:
+            if col not in filtered_df.columns or col not in FILTER_CONFIG:
+                continue
 
-        min_val = float(series.min())
-        max_val = float(series.max())
+            series = safe_to_numeric(filtered_df[col]).dropna()
+            if series.empty:
+                continue
 
-        if min_val == max_val:
-            continue
+            min_val = float(series.min())
+            max_val = float(series.max())
 
-        is_percent = col in PERCENT_COLUMNS
-        ui_min = round(internal_to_percent(min_val), 2) if is_percent else min_val
-        ui_max = round(internal_to_percent(max_val), 2) if is_percent else max_val
+            if min_val == max_val:
+                continue
 
-        st.markdown(f'<div class="sidebar-field">{label(col)}</div>', unsafe_allow_html=True)
+            config = FILTER_CONFIG[col]
+            is_percent = col in PERCENT_COLUMNS
+            ui_min = round(internal_to_percent(min_val), 2) if is_percent else min_val
+            ui_max = round(internal_to_percent(max_val), 2) if is_percent else max_val
 
-        if config["mode"] == "max":
-            value = st.number_input(
-                f"{label(col)} до",
-                value=ui_max,
-                step=config["step"],
-                label_visibility="collapsed",
-                key=f"max_{col}",
-            )
-            internal = percent_to_internal(value) if is_percent else value
-            filtered_df = apply_max_filter(filtered_df, col, internal)
+            with container:
+                st.markdown(f'<div class="sidebar-field">{label(col)}</div>', unsafe_allow_html=True)
 
-        if config["mode"] == "min":
-            value = st.number_input(
-                f"{label(col)} от",
-                value=ui_min,
-                step=config["step"],
-                label_visibility="collapsed",
-                key=f"min_{col}",
-            )
-            internal = percent_to_internal(value) if is_percent else value
-            filtered_df = apply_min_filter(filtered_df, col, internal)
+                if config["mode"] == "max":
+                    value = st.number_input(
+                        f"{label(col)} до",
+                        value=ui_max,
+                        step=config["step"],
+                        label_visibility="collapsed",
+                        key=f"max_{col}",
+                    )
+                    internal = percent_to_internal(value) if is_percent else value
+                    filtered_df = apply_max_filter(filtered_df, col, internal)
+
+                if config["mode"] == "min":
+                    value = st.number_input(
+                        f"{label(col)} от",
+                        value=ui_min,
+                        step=config["step"],
+                        label_visibility="collapsed",
+                        key=f"min_{col}",
+                    )
+                    internal = percent_to_internal(value) if is_percent else value
+                    filtered_df = apply_min_filter(filtered_df, col, internal)
 
     st.markdown('<div class="sidebar-group">Скоринг</div>', unsafe_allow_html=True)
 
     scoring_enabled = st.checkbox("Включить скоринг", value=False, key="scoring_enabled")
 
     if scoring_enabled:
-        top_n = st.number_input(
+        st.markdown(f'<div class="sidebar-field">Сколько форматов показать</div>', unsafe_allow_html=True)
+        top_n_input = st.number_input(
             "Сколько форматов показать",
             min_value=1,
-            max_value=max(1, len(filtered_df)),
-            value=min(10, max(1, len(filtered_df))),
+            value=int(st.session_state.get("top_n", 10)),
             step=1,
+            label_visibility="collapsed",
             key="top_n",
         )
 
@@ -900,13 +915,11 @@ with st.sidebar:
         total_weights = sum(int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS)
         st.write(f"**Сумма:** {total_weights}")
 
-        c1, c2 = st.columns(2)
+        c1, c2 = st.columns([1.15, 1])
         with c1:
             st.button("Нормализовать", use_container_width=True, on_click=normalize_weight_state)
         with c2:
             st.button("Сбросить", use_container_width=True, on_click=reset_weight_state)
-    else:
-        top_n = len(filtered_df)
 
 
 # =========================
@@ -920,10 +933,19 @@ if scoring_enabled:
         for metric in SCORING_COLUMNS
     }
     result_df = add_scoring(result_df, current_weights)
-    result_df = result_df.sort_values(by="score", ascending=False, na_position="last").head(int(top_n))
+    result_df = result_df.sort_values(by="score", ascending=False, na_position="last")
+
+    requested_top_n = max(1, int(st.session_state.get("top_n", 10)))
+    available_rows = len(result_df)
+    actual_top_n = min(requested_top_n, available_rows)
+
+    result_df = result_df.head(actual_top_n)
 else:
     if "score" not in result_df.columns:
         result_df["score"] = np.nan
+    requested_top_n = None
+    available_rows = len(result_df)
+    actual_top_n = len(result_df)
 
 
 # =========================
@@ -934,12 +956,15 @@ m1.metric("Форматов в выдаче", len(result_df))
 m2.metric("Площадок", int(result_df["platform"].nunique()) if "platform" in result_df.columns else 0)
 m3.metric(
     "Средний eCPM со скидкой",
-    format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "—",
+    format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "",
 )
 m4.metric(
     "Средний CTR",
-    format_percent(result_df["ctr_avg"].mean()) if "ctr_avg" in result_df.columns else "—",
+    format_percent(result_df["ctr_avg"].mean()) if "ctr_avg" in result_df.columns else "",
 )
+
+if scoring_enabled and requested_top_n is not None and available_rows < requested_top_n:
+    st.caption(f"Показаны все доступные форматы: {available_rows}")
 
 st.divider()
 
