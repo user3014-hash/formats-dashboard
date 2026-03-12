@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 import streamlit as st
+from streamlit.components.v1 import html as components_html
 
 
 st.set_page_config(page_title="Подбор рекламных форматов", layout="wide")
@@ -108,11 +109,16 @@ def inject_styles() -> None:
             :root {
                 --white: #FFFFFF;
                 --soft: #F8F2FF;
-                --line: #D7B8FF;
-                --violet-2: #A35AFF;
-                --violet-3: #725BFF;
-                --violet-4: #3E20FF;
+                --line: #E7DCF9;
+                --line-strong: #D7B8FF;
+                --accent: #3E20FF;
+                --accent-soft: #725BFF;
                 --ink: #070037;
+                --muted: rgba(7, 0, 55, 0.62);
+            }
+
+            html, body, [class*="css"]  {
+                font-feature-settings: "tnum" 1, "lnum" 1;
             }
 
             .stApp,
@@ -125,7 +131,7 @@ def inject_styles() -> None:
             }
 
             .main .block-container {
-                padding-top: 1.25rem;
+                padding-top: 1.3rem;
                 padding-bottom: 3rem;
                 max-width: 1320px;
             }
@@ -166,43 +172,56 @@ def inject_styles() -> None:
             }
 
             h1 {
-                font-size: 2.1rem !important;
-                line-height: 1.1 !important;
+                font-size: 2.05rem !important;
+                line-height: 1.08 !important;
                 letter-spacing: -0.02em !important;
                 margin-bottom: 0.9rem !important;
+                font-weight: 700 !important;
             }
 
             h2 {
                 font-size: 1.25rem !important;
-                line-height: 1.25 !important;
+                line-height: 1.2 !important;
                 letter-spacing: -0.01em !important;
+                font-weight: 700 !important;
             }
 
             h3 {
-                font-size: 1rem !important;
+                font-size: 0.98rem !important;
                 line-height: 1.35 !important;
+                font-weight: 700 !important;
+            }
+
+            p, li, label, .stCaption {
+                font-size: 14px !important;
+                line-height: 1.45 !important;
             }
 
             a, a:visited {
-                color: var(--violet-4) !important;
+                color: var(--accent) !important;
                 text-decoration: none !important;
+            }
+
+            a:hover {
+                color: var(--accent-soft) !important;
             }
 
             .stButton > button,
             .stDownloadButton > button,
             button[kind="primary"] {
-                background: var(--violet-4) !important;
+                background: var(--accent) !important;
                 color: var(--white) !important;
-                border: 1px solid var(--violet-4) !important;
+                border: 1px solid var(--accent) !important;
                 border-radius: 10px !important;
                 box-shadow: none !important;
+                font-weight: 500 !important;
             }
 
             .stButton > button:hover,
             .stDownloadButton > button:hover,
             button[kind="primary"]:hover {
-                background: var(--violet-3) !important;
-                border-color: var(--violet-3) !important;
+                background: var(--accent-soft) !important;
+                border-color: var(--accent-soft) !important;
                 color: var(--white) !important;
             }
 
@@ -211,14 +230,14 @@ def inject_styles() -> None:
             .stTextArea textarea {
                 background: var(--white) !important;
                 color: var(--ink) !important;
-                border: 1px solid var(--line) !important;
+                border: 1px solid var(--line-strong) !important;
                 border-radius: 10px !important;
             }
 
             div[data-baseweb="select"] > div {
                 background: var(--white) !important;
                 color: var(--ink) !important;
-                border: 1px solid var(--line) !important;
+                border: 1px solid var(--line-strong) !important;
                 border-radius: 10px !important;
                 min-height: 42px !important;
             }
@@ -229,7 +248,7 @@ def inject_styles() -> None:
 
             [data-baseweb="tag"] {
                 background: var(--white) !important;
-                border: 1px solid var(--line) !important;
+                border: 1px solid var(--line-strong) !important;
                 border-radius: 6px !important;
                 color: var(--ink) !important;
                 padding: 0 2px !important;
@@ -258,54 +277,48 @@ def inject_styles() -> None:
             .stAlert {
                 background: var(--soft) !important;
                 color: var(--ink) !important;
-                border: 1px solid var(--line) !important;
+                border: 1px solid var(--line-strong) !important;
                 border-radius: 12px !important;
             }
 
             [data-testid="stDataEditor"] {
                 border-radius: 14px !important;
                 overflow: hidden !important;
-                border: 1px solid #ECE4FF !important;
+                border: 1px solid var(--line) !important;
+                box-shadow: none !important;
             }
 
             [data-testid="stDataEditor"] * {
                 color: var(--ink) !important;
             }
 
-            .card {
+            .dashboard-card {
                 background: var(--white);
-                border: 1px solid #ECE4FF;
+                border: 1px solid var(--line);
                 border-radius: 16px;
                 padding: 20px;
                 margin-top: 8px;
             }
 
-            .card-title {
+            .dashboard-card__title {
                 font-size: 28px;
-                line-height: 1.15;
+                line-height: 1.12;
                 font-weight: 700;
                 letter-spacing: -0.02em;
                 color: var(--ink);
-                margin: 0 0 6px 0;
+                margin: 0 0 8px 0;
             }
 
-            .card-subtitle {
+            .dashboard-card__meta {
                 font-size: 14px;
                 line-height: 1.45;
-                color: rgba(7, 0, 55, 0.72);
-                margin: 0 0 18px 0;
-            }
-
-            .meta-line {
-                font-size: 14px;
-                line-height: 1.45;
-                color: rgba(7, 0, 55, 0.82);
+                color: var(--muted);
                 margin: 0 0 16px 0;
             }
 
-            .meta-line strong {
+            .dashboard-card__meta strong {
                 color: var(--ink);
-                font-weight: 600;
+                font-weight: 500;
             }
 
             .stats-grid {
@@ -319,12 +332,13 @@ def inject_styles() -> None:
                 background: var(--soft);
                 border-radius: 12px;
                 padding: 12px 14px;
+                border: 1px solid transparent;
             }
 
             .stat-label {
                 font-size: 12px;
                 line-height: 1.25;
-                color: rgba(7, 0, 55, 0.64);
+                color: var(--muted);
                 margin-bottom: 5px;
             }
 
@@ -340,7 +354,7 @@ def inject_styles() -> None:
             }
 
             .section-title {
-                font-size: 15px;
+                font-size: 14px;
                 line-height: 1.35;
                 font-weight: 700;
                 color: var(--ink);
@@ -352,6 +366,7 @@ def inject_styles() -> None:
                 line-height: 1.55;
                 color: var(--ink);
                 margin: 0;
+                max-width: 980px;
             }
 
             .pill-group {
@@ -367,7 +382,7 @@ def inject_styles() -> None:
                 padding: 4px 8px;
                 border-radius: 6px;
                 background: var(--soft);
-                border: 1px solid var(--line);
+                border: 1px solid var(--line-strong);
                 color: var(--ink);
                 font-size: 12px;
                 line-height: 1.2;
@@ -377,7 +392,7 @@ def inject_styles() -> None:
 
             .links-list {
                 display: grid;
-                gap: 8px;
+                gap: 6px;
                 margin-top: 4px;
             }
 
@@ -395,6 +410,48 @@ def inject_styles() -> None:
         </style>
         """,
         unsafe_allow_html=True,
+    )
+
+
+def inject_dom_fixes() -> None:
+    components_html(
+        """
+        <script>
+        (function() {
+            const hideSliderTooltips = () => {
+                const selectors = [
+                    '[role="tooltip"]',
+                    '[data-baseweb="tooltip"]',
+                    '[data-baseweb="popover"]',
+                    '[data-testid="stThumbValue"]'
+                ];
+
+                selectors.forEach((selector) => {
+                    const nodes = window.parent.document.querySelectorAll(selector);
+                    nodes.forEach((node) => {
+                        const text = (node.textContent || '').trim();
+                        if (text === '0' || text === '100' || text === '5' || text === '95' || node.closest('[data-baseweb="slider"]')) {
+                            node.style.display = 'none';
+                            node.style.visibility = 'hidden';
+                            node.style.opacity = '0';
+                            node.setAttribute('hidden', 'hidden');
+                        }
+                    });
+                });
+            };
+
+            hideSliderTooltips();
+
+            const observer = new MutationObserver(() => hideSliderTooltips());
+            observer.observe(window.parent.document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true
+            });
+        })();
+        </script>
+        """,
+        height=0,
     )
 
 
@@ -1105,12 +1162,10 @@ def render_format_card(row: pd.Series) -> None:
 
     st.markdown(
         f"""
-        <div class="card">
-            <div class="card-title">{html.escape(title)}</div>
-            <div class="meta-line">
-                <strong>{html.escape(platform)}</strong> ·
-                {html.escape(service)} ·
-                {html.escape(buy_model)}
+        <div class="dashboard-card">
+            <div class="dashboard-card__title">{html.escape(title)}</div>
+            <div class="dashboard-card__meta">
+                <strong>{html.escape(platform)}</strong> · {html.escape(service)} · {html.escape(buy_model)}
             </div>
         """,
         unsafe_allow_html=True,
@@ -1138,6 +1193,8 @@ def render_format_card(row: pd.Series) -> None:
 
 def main() -> None:
     inject_styles()
+    inject_dom_fixes()
+
     st.title("Подбор рекламных форматов")
 
     try:
