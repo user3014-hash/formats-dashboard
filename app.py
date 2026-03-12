@@ -8,7 +8,9 @@ import pandas as pd
 import streamlit as st
 from streamlit.components.v1 import html as components_html
 
-
+body {
+    background: red !important;
+}
 st.set_page_config(page_title="Подбор рекламных форматов", layout="wide")
 
 APP_DIR = Path(__file__).resolve().parent
