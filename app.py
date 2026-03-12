@@ -68,13 +68,13 @@ COLUMN_LABELS = {
     "viewability_min": "Viewability, минимум",
     "viewability_max": "Viewability, максимум",
     "viewability_avg": "Viewability, среднее",
-    "verification_pixel": "Поддержка Pixel",
-    "verification_js": "Поддержка JS",
+    "verification_pixel": "Пиксель отслеживания",
+    "verification_js": "JavaScript-трекинг",
     "verification_terms": "Условия верификации",
     "commission": "Комиссия",
-    "bls": "BLS",
+    "bls": "Brand Lift",
     "sales_lift": "Sales Lift",
-    "bls_terms": "Условия BLS",
+    "bls_terms": "Условия Brand Lift",
     "sales_lift_terms": "Условия Sales Lift",
     "seasonality_terms": "Условия сезонности",
     "technical_requirements_url": "Технические требования",
@@ -83,6 +83,133 @@ COLUMN_LABELS = {
     "ecpm_discounted": "eCPM с учетом скидки",
     "score": "Скоринг",
 }
+
+
+def inject_styles() -> None:
+    st.markdown(
+        """
+        <style>
+            :root {
+                --main-bg: #FFFFFF;
+                --sidebar-bg: #D7B8FF;
+                --text-dark: #070037;
+                --text-light: #FFFFFF;
+                --accent: #3E20FF;
+            }
+
+            .stApp,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stAppViewContainer"] > .main,
+            [data-testid="stAppViewContainer"] > .main > div,
+            .main .block-container {
+                background: var(--main-bg);
+                color: var(--text-dark);
+            }
+
+            [data-testid="stSidebar"],
+            [data-testid="stSidebar"] > div,
+            [data-testid="stSidebarContent"] {
+                background: var(--sidebar-bg);
+                color: var(--text-dark);
+            }
+
+            .stApp,
+            .stApp p,
+            .stApp label,
+            .stApp div,
+            .stApp span,
+            .stApp h1,
+            .stApp h2,
+            .stApp h3,
+            .stApp h4,
+            .stApp h5,
+            .stApp h6,
+            [data-testid="stSidebar"] *,
+            [data-testid="stMarkdownContainer"] * {
+                color: var(--text-dark);
+            }
+
+            a, a:visited {
+                color: var(--accent) !important;
+            }
+
+            .stButton > button,
+            .stDownloadButton > button,
+            button[kind="primary"] {
+                background: var(--accent) !important;
+                color: var(--text-light) !important;
+                border: 1px solid var(--accent) !important;
+            }
+
+            .stButton > button:hover,
+            .stDownloadButton > button:hover,
+            button[kind="primary"]:hover {
+                background: var(--accent) !important;
+                color: var(--text-light) !important;
+                border: 1px solid var(--accent) !important;
+            }
+
+            .stCheckbox label,
+            .stRadio label,
+            .stSelectbox label,
+            .stMultiSelect label,
+            .stNumberInput label,
+            .stSlider label {
+                color: var(--text-dark) !important;
+            }
+
+            input, textarea {
+                color: var(--text-dark) !important;
+            }
+
+            .stTextInput input,
+            .stNumberInput input,
+            .stTextArea textarea {
+                background: #FFFFFF !important;
+                color: var(--text-dark) !important;
+                border-color: #B9A3F8 !important;
+            }
+
+            div[data-baseweb="select"] > div {
+                background: #FFFFFF !important;
+                color: var(--text-dark) !important;
+                border-color: #B9A3F8 !important;
+            }
+
+            div[data-baseweb="select"] input {
+                color: var(--text-dark) !important;
+            }
+
+            [data-baseweb="tag"] {
+                background: var(--accent) !important;
+                color: var(--text-light) !important;
+            }
+
+            [data-baseweb="tag"] * {
+                color: var(--text-light) !important;
+            }
+
+            .stSlider [data-baseweb="slider"] * {
+                color: var(--text-dark) !important;
+            }
+
+            .stAlert {
+                background: #F4EEFF !important;
+                color: var(--text-dark) !important;
+                border: 1px solid #CDBBFF !important;
+            }
+
+            .stDataFrame, .stTable {
+                color: var(--text-dark) !important;
+            }
+
+            [data-testid="stDataEditor"] * {
+                color: var(--text-dark) !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def find_data_file(filename: str) -> Path:
@@ -175,17 +302,18 @@ def normalize_weights(weights: Dict[str, float]) -> Dict[str, int]:
         return DEFAULT_WEIGHTS.copy()
 
     scaled = {k: (max(0.0, float(v)) / total) * 100 for k, v in weights.items()}
-    rounded = {k: int(math.floor(v)) for k, v in scaled.items()}
+    rounded = {k: int(math.floor(v / 5.0) * 5) for k, v in scaled.items()}
 
     remainder = 100 - sum(rounded.values())
     if remainder > 0:
         order = sorted(
             scaled.keys(),
-            key=lambda key: scaled[key] - math.floor(scaled[key]),
+            key=lambda key: scaled[key] - rounded[key],
             reverse=True,
         )
-        for i in range(remainder):
-            rounded[order[i % len(order)]] += 1
+        steps = remainder // 5
+        for i in range(steps):
+            rounded[order[i % len(order)]] += 5
 
     return rounded
 
@@ -390,9 +518,6 @@ def apply_filters(df: pd.DataFrame, state: Dict) -> pd.DataFrame:
         "display": state.get("filter_display", []),
         "dmp": state.get("filter_dmp", []),
         "targeting": state.get("filter_targeting", []),
-        "targeting_markup": state.get("filter_targeting_markup", []),
-        "production": state.get("filter_production", []),
-        "other_markup": state.get("filter_other_markup", []),
         "instream_pos": state.get("filter_instream_pos", []),
     }
 
@@ -487,79 +612,62 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
     filters["platforms"] = st.sidebar.multiselect(
         "Площадка",
         options=sorted(df["platform"].dropna().unique().tolist()) if "platform" in df.columns else [],
-        placeholder="",
+        placeholder="Выбрать",
     )
 
     filters["service_types"] = st.sidebar.multiselect(
         "Тип сервиса",
         options=sorted(df["type_service"].dropna().unique().tolist()) if "type_service" in df.columns else [],
-        placeholder="",
+        placeholder="Выбрать",
     )
 
     filters["buy_models"] = st.sidebar.multiselect(
         "Модель закупки",
         options=sorted(df["buy_model"].dropna().unique().tolist()) if "buy_model" in df.columns else [],
-        placeholder="",
+        placeholder="Выбрать",
     )
 
-    st.sidebar.subheader("Дополнительные требования")
-
-    filters["need_verification_pixel"] = st.sidebar.checkbox("Нужна поддержка Pixel")
-    filters["need_verification_js"] = st.sidebar.checkbox("Нужна поддержка JS")
-    filters["need_bls"] = st.sidebar.checkbox("Нужен BLS")
-    filters["need_sales_lift"] = st.sidebar.checkbox("Нужен Sales Lift")
+    filters["need_verification_pixel"] = st.sidebar.checkbox("Пиксель отслеживания")
+    filters["need_verification_js"] = st.sidebar.checkbox("JavaScript-трекинг")
+    filters["need_bls"] = st.sidebar.checkbox("Brand Lift")
+    filters["need_sales_lift"] = st.sidebar.checkbox("Sales Lift")
 
     st.sidebar.subheader("Параметры и таргетинги")
 
     filters["filter_format_type"] = st.sidebar.multiselect(
         "Тип формата",
         options=get_all_tag_values(df, "format_type"),
-        placeholder="",
+        placeholder="Выбрать",
     )
     filters["filter_device"] = st.sidebar.multiselect(
         "Устройство",
         options=get_all_tag_values(df, "device"),
-        placeholder="",
+        placeholder="Выбрать",
     )
     filters["filter_placement"] = st.sidebar.multiselect(
         "Размещение",
         options=get_all_tag_values(df, "placement"),
-        placeholder="",
+        placeholder="Выбрать",
     )
     filters["filter_display"] = st.sidebar.multiselect(
         "Показ креатива",
         options=get_all_tag_values(df, "display"),
-        placeholder="",
+        placeholder="Выбрать",
     )
     filters["filter_dmp"] = st.sidebar.multiselect(
         "Данные и сегменты",
         options=get_all_tag_values(df, "dmp"),
-        placeholder="",
+        placeholder="Выбрать",
     )
     filters["filter_targeting"] = st.sidebar.multiselect(
         "Таргетинги",
         options=get_all_tag_values(df, "targeting"),
-        placeholder="",
-    )
-    filters["filter_targeting_markup"] = st.sidebar.multiselect(
-        "Таргетинги с наценкой",
-        options=get_all_tag_values(df, "targeting_markup"),
-        placeholder="",
-    )
-    filters["filter_production"] = st.sidebar.multiselect(
-        "Продакшн",
-        options=get_all_tag_values(df, "production"),
-        placeholder="",
-    )
-    filters["filter_other_markup"] = st.sidebar.multiselect(
-        "Дополнительные наценки",
-        options=get_all_tag_values(df, "other_markup"),
-        placeholder="",
+        placeholder="Выбрать",
     )
     filters["filter_instream_pos"] = st.sidebar.multiselect(
         "Позиция в потоке",
         options=get_all_tag_values(df, "instream_pos"),
-        placeholder="",
+        placeholder="Выбрать",
     )
 
     st.sidebar.subheader("Пороговые значения")
@@ -585,7 +693,7 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
         format="%.2f",
     )
     filters["min_viewability"] = st.sidebar.number_input(
-        "Минимальный Viewability",
+        "Минимальный viewability",
         min_value=0.0,
         value=0.0,
         step=0.01,
@@ -619,12 +727,12 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
 
     init_weight_state()
 
-    st.sidebar.number_input("Вес: максимальный охват", min_value=0, max_value=100, key="weight_max_reach")
-    st.sidebar.number_input("Вес: eCPM с учетом скидки", min_value=0, max_value=100, key="weight_ecpm_discounted")
-    st.sidebar.number_input("Вес: CTR", min_value=0, max_value=100, key="weight_ctr_avg")
-    st.sidebar.number_input("Вес: VTR", min_value=0, max_value=100, key="weight_vtr_avg")
-    st.sidebar.number_input("Вес: Viewability", min_value=0, max_value=100, key="weight_viewability_avg")
-    st.sidebar.number_input("Вес: комиссия", min_value=0, max_value=100, key="weight_commission")
+    st.sidebar.slider("Максимальный охват", min_value=0, max_value=100, step=5, key="weight_max_reach")
+    st.sidebar.slider("eCPM с учетом скидки", min_value=0, max_value=100, step=5, key="weight_ecpm_discounted")
+    st.sidebar.slider("CTR", min_value=0, max_value=100, step=5, key="weight_ctr_avg")
+    st.sidebar.slider("VTR", min_value=0, max_value=100, step=5, key="weight_vtr_avg")
+    st.sidebar.slider("Viewability", min_value=0, max_value=100, step=5, key="weight_viewability_avg")
+    st.sidebar.slider("Комиссия", min_value=0, max_value=100, step=5, key="weight_commission")
 
     col1, col2 = st.sidebar.columns(2)
     with col1:
@@ -733,9 +841,9 @@ def render_format_card(row: pd.Series) -> None:
             ("CTR, среднее", format_percent(row.get("ctr_avg"))),
             ("VTR, среднее", format_percent(row.get("vtr_avg"))),
             ("Viewability, среднее", format_percent(row.get("viewability_avg"))),
-            ("Поддержка Pixel", format_bool(row.get("verification_pixel"))),
-            ("Поддержка JS", format_bool(row.get("verification_js"))),
-            ("BLS", format_bool(row.get("bls"))),
+            ("Пиксель отслеживания", format_bool(row.get("verification_pixel"))),
+            ("JavaScript-трекинг", format_bool(row.get("verification_js"))),
+            ("Brand Lift", format_bool(row.get("bls"))),
             ("Sales Lift", format_bool(row.get("sales_lift"))),
         ],
         columns=["Параметр", "Значение"],
@@ -743,16 +851,28 @@ def render_format_card(row: pd.Series) -> None:
     st.dataframe(metrics, hide_index=True, use_container_width=True)
 
     st.markdown("#### Параметры формата")
-    for dict_id, title in DICT_LABELS.items():
+    for dict_id in [
+        "format_type",
+        "device",
+        "placement",
+        "display",
+        "dmp",
+        "targeting",
+        "instream_pos",
+        "production",
+        "other_markup",
+        "targeting_markup",
+        "seasonality_coeff",
+    ]:
         if dict_id in row.index:
             values = row.get(dict_id, [])
             if isinstance(values, list) and values:
-                render_tag_line(title, values)
+                render_tag_line(DICT_LABELS.get(dict_id, dict_id), values)
 
     st.markdown("#### Условия")
     info_fields = {
         "Условия верификации": row.get("verification_terms"),
-        "Условия BLS": row.get("bls_terms"),
+        "Условия Brand Lift": row.get("bls_terms"),
         "Условия Sales Lift": row.get("sales_lift_terms"),
         "Условия сезонности": row.get("seasonality_terms"),
     }
@@ -773,8 +893,9 @@ def render_format_card(row: pd.Series) -> None:
 
 
 def main() -> None:
+    inject_styles()
+
     st.title("Подбор рекламных форматов")
-    st.caption("Фильтры применяются раньше скоринга.")
 
     try:
         formats, dict_items, format_items = load_data()
@@ -814,19 +935,6 @@ def main() -> None:
 
     if selected_row is not None:
         render_format_card(selected_row)
-    else:
-        st.info("Выберите формат в таблице, чтобы открыть карточку.")
-
-    with st.expander("Как считается eCPM"):
-        st.write(
-            """
-            - В расчете eCPM учитывается скидка.
-            - Комиссия в eCPM не входит.
-            - Для CPM используется средний CPM с учетом скидки.
-            - Для CPC используется формула: CPC × CTR × 1000 с учетом скидки.
-            - Для CPV используется формула: CPV × VTR × 1000 с учетом скидки.
-            """
-        )
 
 
 if __name__ == "__main__":
