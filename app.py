@@ -26,6 +26,8 @@ DEFAULT_WEIGHTS = {
     "commission": 10,
 }
 
+DEFAULT_TOP_N = 20
+
 DICT_LABELS = {
     "format_type": "Тип формата",
     "device": "Устройство",
@@ -112,9 +114,8 @@ def inject_styles() -> None:
                 --text-light: #FFFFFF;
                 --accent: #3E20FF;
                 --card-border: #D9CCFF;
-                --card-soft: #F5F1FF;
-                --pill-bg: #EEE9FF;
-                --pill-text: #070037;
+                --soft-bg: #F6F2FF;
+                --chip-bg: #F2EDFF;
             }
 
             .stApp,
@@ -127,7 +128,7 @@ def inject_styles() -> None:
             }
 
             .main .block-container {
-                padding-top: 1.25rem;
+                padding-top: 1.2rem;
                 padding-bottom: 3rem;
             }
 
@@ -190,7 +191,6 @@ def inject_styles() -> None:
                 background: rgba(255,255,255,0.16) !important;
                 border: 1px solid rgba(255,255,255,0.28) !important;
                 color: var(--text-light) !important;
-                backdrop-filter: blur(6px);
             }
 
             [data-testid="stSidebar"] .stButton > button:hover {
@@ -250,62 +250,63 @@ def inject_styles() -> None:
                 color: var(--text-dark) !important;
             }
 
-            [data-testid="stSidebar"] [data-testid="stDataEditor"] * {
-                color: var(--text-light) !important;
-            }
-
-            .stSlider [data-testid="stTickBarMin"],
-            .stSlider [data-testid="stTickBarMax"] {
+            /* Прячет всплывающие 0 / 100 над ползунком */
+            .stSlider [role="tooltip"],
+            .stSlider div[data-baseweb="tooltip"],
+            .stSlider div[data-baseweb="popover"],
+            .stSlider [data-testid="stThumbValue"] {
                 display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
             }
 
             .result-card {
                 background: #FFFFFF;
                 border: 1px solid var(--card-border);
-                border-radius: 24px;
-                padding: 24px;
-                box-shadow: 0 10px 30px rgba(62, 32, 255, 0.06);
+                border-radius: 22px;
+                padding: 22px;
                 margin-top: 12px;
+                box-shadow: 0 8px 24px rgba(62, 32, 255, 0.05);
             }
 
             .result-card__title {
-                font-size: 28px;
+                font-size: 26px;
                 line-height: 1.15;
                 font-weight: 700;
                 color: var(--text-dark);
-                margin: 0 0 12px 0;
+                margin: 0 0 14px 0;
             }
 
             .result-card__meta {
                 display: grid;
                 grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 12px;
-                margin: 0 0 24px 0;
+                gap: 10px;
+                margin-bottom: 18px;
             }
 
             .result-card__meta-item {
-                background: var(--card-soft);
+                background: var(--soft-bg);
                 border: 1px solid var(--card-border);
-                border-radius: 16px;
-                padding: 12px 14px;
+                border-radius: 14px;
+                padding: 10px 12px;
             }
 
             .result-card__meta-label {
                 font-size: 13px;
-                line-height: 1.25;
+                line-height: 1.3;
                 color: rgba(7, 0, 55, 0.72);
-                margin-bottom: 6px;
+                margin-bottom: 4px;
             }
 
             .result-card__meta-value {
-                font-size: 14px;
-                line-height: 1.35;
+                font-size: 13px;
+                line-height: 1.3;
                 font-weight: 600;
                 color: var(--text-dark);
             }
 
             .result-card__section {
-                margin-top: 22px;
+                margin-top: 16px;
             }
 
             .result-card__section-title {
@@ -313,11 +314,11 @@ def inject_styles() -> None:
                 line-height: 1.35;
                 font-weight: 700;
                 color: var(--text-dark);
-                margin: 0 0 12px 0;
+                margin: 0 0 8px 0;
             }
 
             .result-card__text {
-                font-size: 15px;
+                font-size: 14px;
                 line-height: 1.55;
                 color: var(--text-dark);
                 margin: 0;
@@ -326,61 +327,34 @@ def inject_styles() -> None:
             .pill-group {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 8px;
-                margin-top: 6px;
+                gap: 6px;
+                margin-top: 4px;
             }
 
             .pill {
                 display: inline-flex;
                 align-items: center;
-                padding: 9px 12px;
+                padding: 6px 10px;
                 border-radius: 999px;
-                background: var(--pill-bg);
-                color: var(--pill-text);
-                border: 1px solid var(--card-border);
-                font-size: 13px;
-                line-height: 1.25;
-                font-weight: 600;
-            }
-
-            .metric-grid {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 12px;
-            }
-
-            .metric-card {
-                background: var(--card-soft);
-                border: 1px solid var(--card-border);
-                border-radius: 16px;
-                padding: 14px;
-            }
-
-            .metric-card__label {
-                font-size: 13px;
-                line-height: 1.25;
-                color: rgba(7, 0, 55, 0.72);
-                margin-bottom: 6px;
-            }
-
-            .metric-card__value {
-                font-size: 16px;
-                line-height: 1.35;
-                font-weight: 700;
+                background: var(--chip-bg);
                 color: var(--text-dark);
+                border: 1px solid var(--card-border);
+                font-size: 12px;
+                line-height: 1.2;
+                font-weight: 600;
+                white-space: nowrap;
             }
 
             .link-list {
                 display: grid;
-                gap: 10px;
+                gap: 8px;
             }
 
             .link-item {
                 display: flex;
                 align-items: center;
-                gap: 10px;
-                padding: 12px 14px;
-                border-radius: 16px;
+                padding: 10px 12px;
+                border-radius: 14px;
                 border: 1px solid var(--card-border);
                 background: #FFFFFF;
             }
@@ -393,8 +367,7 @@ def inject_styles() -> None:
             }
 
             @media (max-width: 900px) {
-                .result-card__meta,
-                .metric-grid {
+                .result-card__meta {
                     grid-template-columns: 1fr;
                 }
             }
@@ -494,10 +467,14 @@ def format_item_badge(item: Dict) -> str:
     item_unit = item.get("item_unit")
 
     if pd.notna(item_value):
-        value_text = format_number(item_value, 0 if float(item_value).is_integer() else 2)
-        if pd.notna(item_unit) and str(item_unit).strip():
-            return f"{name} — {value_text} {str(item_unit).strip()}"
-        return f"{name} — {value_text}"
+        if isinstance(item_value, (int, float, np.integer, np.floating)):
+            numeric_value = float(item_value)
+            if pd.notna(item_unit) and str(item_unit).strip():
+                return f"{name} — {format_number(numeric_value)} {str(item_unit).strip()}"
+            if abs(numeric_value) <= 1:
+                return f"{name} — {format_percent(numeric_value)}"
+            return f"{name} — {format_number(numeric_value)}"
+        return f"{name} — {str(item_value).strip()}"
 
     return name
 
@@ -614,21 +591,51 @@ def build_dict_aggregates(format_items: pd.DataFrame, dict_items: pd.DataFrame) 
     if item_name_col is None:
         raise KeyError("В dict_items не найден столбец с названием элемента словаря")
 
-    if "item_value" in dict_df.columns:
-        dict_df["item_value"] = to_float(dict_df["item_value"])
-    else:
-        dict_df["item_value"] = np.nan
-
-    if "item_unit" not in dict_df.columns:
-        dict_df["item_unit"] = np.nan
-
     merged = fi_df.merge(
-        dict_df[["dict_id", "item_id", item_name_col, "item_value", "item_unit"]].rename(
-            columns={item_name_col: "item_name"}
-        ),
+        dict_df.rename(columns={item_name_col: "item_name"}),
         on=["dict_id", "item_id"],
         how="left",
+        suffixes=("_format", "_dict"),
     )
+
+    merged_columns_lower = {col.lower(): col for col in merged.columns}
+
+    value_candidate_cols = []
+    for col in merged.columns:
+        low = col.lower()
+        if low in {"format_id", "dict_id", "item_id", "is_active"}:
+            continue
+        if "name" in low or "title" in low:
+            continue
+        if any(token in low for token in ["markup", "percent", "coef", "coefficient", "value", "amount", "price", "rate", "surcharge"]):
+            value_candidate_cols.append(col)
+
+    unit_candidate_cols = []
+    for col in merged.columns:
+        low = col.lower()
+        if any(token in low for token in ["unit", "currency", "type_unit", "measure"]):
+            unit_candidate_cols.append(col)
+
+    def extract_item_value(row: pd.Series):
+        for col in value_candidate_cols:
+            val = row.get(col)
+            if pd.isna(val) or str(val).strip() in {"", "nan", "None"}:
+                continue
+            numeric = pd.to_numeric(pd.Series([val]), errors="coerce").iloc[0]
+            if not pd.isna(numeric):
+                return float(numeric)
+            return str(val).strip()
+        return np.nan
+
+    def extract_item_unit(row: pd.Series):
+        for col in unit_candidate_cols:
+            val = row.get(col)
+            if pd.notna(val) and str(val).strip():
+                return str(val).strip()
+        return np.nan
+
+    merged["item_value_extracted"] = merged.apply(extract_item_value, axis=1)
+    merged["item_unit_extracted"] = merged.apply(extract_item_unit, axis=1)
 
     grouped_names = (
         merged.groupby(["format_id", "dict_id"], dropna=False)["item_name"]
@@ -644,8 +651,8 @@ def build_dict_aggregates(format_items: pd.DataFrame, dict_items: pd.DataFrame) 
                 {
                     "item_id": item["item_id"],
                     "item_name": str(item["item_name"]).strip() if pd.notna(item["item_name"]) else "",
-                    "item_value": item["item_value"],
-                    "item_unit": item["item_unit"],
+                    "item_value": item["item_value_extracted"],
+                    "item_unit": item["item_unit_extracted"],
                 }
                 for _, item in group.drop_duplicates(subset=["item_id"]).iterrows()
                 if pd.notna(item["item_name"]) and str(item["item_name"]).strip()
@@ -821,6 +828,8 @@ def init_weight_state() -> None:
         session_key = f"weight_{key}"
         if session_key not in st.session_state:
             st.session_state[session_key] = value
+    if "top_n_formats" not in st.session_state:
+        st.session_state["top_n_formats"] = DEFAULT_TOP_N
 
 
 def reset_weights() -> None:
@@ -842,7 +851,7 @@ def normalize_weight_state() -> None:
         st.session_state[f"weight_{key}"] = value
 
 
-def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
+def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool, int]:
     st.sidebar.header("Фильтры")
 
     filters: Dict[str, Optional[float] | List[str] | bool] = {}
@@ -965,6 +974,14 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
 
     init_weight_state()
 
+    top_n = st.sidebar.number_input(
+        "Сколько топ форматов вывести",
+        min_value=1,
+        value=int(st.session_state["top_n_formats"]),
+        step=1,
+        key="top_n_formats",
+    )
+
     st.sidebar.slider("Максимальный охват", min_value=0, max_value=100, step=5, key="weight_max_reach")
     st.sidebar.slider("eCPM с учетом скидки", min_value=0, max_value=100, step=5, key="weight_ecpm_discounted")
     st.sidebar.slider("CTR", min_value=0, max_value=100, step=5, key="weight_ctr_avg")
@@ -989,7 +1006,7 @@ def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool]:
 
     st.sidebar.caption(f"Сумма весов: {sum(weights.values())}")
 
-    return filters, weights, scoring_enabled
+    return filters, weights, scoring_enabled, int(top_n)
 
 
 def build_table_view(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFrame:
@@ -1072,41 +1089,22 @@ def render_pills(title: str, values: List[str]) -> None:
     )
 
 
-def render_metrics(row: pd.Series) -> None:
-    metrics = [
-        ("Максимальный охват", format_number(row.get("max_reach"), 0)),
-        ("Минимальный бюджет", format_number(row.get("min_budget"), 0)),
-        ("Скидка", format_percent(row.get("discount"))),
-        ("eCPM с учетом скидки", format_number(row.get("ecpm_discounted"))),
-        ("Комиссия", format_percent(row.get("commission"))),
-        ("CTR, среднее", format_percent(row.get("ctr_avg"))),
-        ("VTR, среднее", format_percent(row.get("vtr_avg"))),
-        ("Viewability, среднее", format_percent(row.get("viewability_avg"))),
-        ("Пиксель отслеживания", format_bool(row.get("verification_pixel"))),
-        ("JavaScript-трекинг", format_bool(row.get("verification_js"))),
-        ("Brand Lift", format_bool(row.get("bls"))),
-        ("Sales Lift", format_bool(row.get("sales_lift"))),
+def render_metric_pills(row: pd.Series) -> None:
+    values = [
+        f"Максимальный охват — {format_number(row.get('max_reach'), 0)}",
+        f"Минимальный бюджет — {format_number(row.get('min_budget'), 0)}",
+        f"Скидка — {format_percent(row.get('discount'))}",
+        f"eCPM с учетом скидки — {format_number(row.get('ecpm_discounted'))}",
+        f"Комиссия — {format_percent(row.get('commission'))}",
+        f"CTR, среднее — {format_percent(row.get('ctr_avg'))}",
+        f"VTR, среднее — {format_percent(row.get('vtr_avg'))}",
+        f"Viewability, среднее — {format_percent(row.get('viewability_avg'))}",
+        f"Пиксель отслеживания — {format_bool(row.get('verification_pixel'))}",
+        f"JavaScript-трекинг — {format_bool(row.get('verification_js'))}",
+        f"Brand Lift — {format_bool(row.get('bls'))}",
+        f"Sales Lift — {format_bool(row.get('sales_lift'))}",
     ]
-
-    cards_html = "".join(
-        f"""
-        <div class="metric-card">
-            <div class="metric-card__label">{html.escape(label)}</div>
-            <div class="metric-card__value">{html.escape(value)}</div>
-        </div>
-        """
-        for label, value in metrics
-    )
-
-    st.markdown(
-        f"""
-        <div class="result-card__section">
-            <div class="result-card__section-title">Основные показатели</div>
-            <div class="metric-grid">{cards_html}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    render_pills("Основные показатели", values)
 
 
 def render_text_block(title: str, value: Optional[str]) -> None:
@@ -1182,13 +1180,12 @@ def render_format_card(row: pd.Series) -> None:
                     <div class="result-card__meta-value">{html.escape(buy_model)}</div>
                 </div>
             </div>
-        </div>
         """,
         unsafe_allow_html=True,
     )
 
     render_text_block("Описание", row.get("description"))
-    render_metrics(row)
+    render_metric_pills(row)
 
     for dict_id in PILL_GROUP_ORDER:
         rich_col = f"{dict_id}__rich"
@@ -1204,6 +1201,8 @@ def render_format_card(row: pd.Series) -> None:
     render_text_block("Условия сезонности", row.get("seasonality_terms"))
     render_links(row)
 
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
 def main() -> None:
     inject_styles()
@@ -1217,7 +1216,7 @@ def main() -> None:
         st.error(f"Ошибка загрузки данных: {e}")
         st.stop()
 
-    filters, weights, scoring_enabled = render_sidebar(df)
+    filters, weights, scoring_enabled, top_n = render_sidebar(df)
 
     filtered_df = apply_filters(df, filters)
 
@@ -1231,7 +1230,7 @@ def main() -> None:
         filtered_df = compute_score(filtered_df, weights)
         sort_columns = [col for col in ["score", "ecpm_discounted"] if col in filtered_df.columns]
         ascending = [False, True][: len(sort_columns)]
-        filtered_df = filtered_df.sort_values(by=sort_columns, ascending=ascending, na_position="last")
+        filtered_df = filtered_df.sort_values(by=sort_columns, ascending=ascending, na_position="last").head(top_n)
     else:
         sort_columns = [col for col in ["platform", "format_name"] if col in filtered_df.columns]
         if sort_columns:
