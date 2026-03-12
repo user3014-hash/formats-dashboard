@@ -322,36 +322,78 @@ st.markdown(
         /* Поля и селекты */
         [data-testid="stSidebar"] [data-baseweb="input"] > div,
         [data-testid="stSidebar"] [data-baseweb="select"] > div,
-        [data-testid="stSidebar"] [data-testid="stNumberInput"] > div {{
-            background: var(--input-bg) !important;
-            border: none !important;
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] > div {
+            background: #FFFFFF !important;
+            border: 1px solid transparent !important;
             box-shadow: none !important;
             outline: none !important;
-            border-radius: 10px !important;
+            border-radius: 8px !important;
             min-height: 44px !important;
-        }}
+            display: flex !important;
+            align-items: center !important;
+            padding: 0 !important;
+            transition: border-color 0.15s ease !important;
+        }
 
-        [data-testid="stSidebar"] input {{
-            color: var(--input-text) !important;
-            caret-color: var(--input-text) !important;
-            border: none !important;
+        [data-testid="stSidebar"] [data-baseweb="input"] > div:hover,
+        [data-testid="stSidebar"] [data-baseweb="select"] > div:hover,
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] > div:hover {
+            border: 1px solid #070037 !important;
             box-shadow: none !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-        }}
-
-        [data-testid="stSidebar"] input::placeholder {{
-            color: rgba(7, 0, 55, 0.55) !important;
-        }}
+            outline: none !important;
+            background: #FFFFFF !important;
+        }
 
         [data-testid="stSidebar"] [data-baseweb="input"] > div:focus-within,
         [data-testid="stSidebar"] [data-baseweb="select"] > div:focus-within,
-        [data-testid="stSidebar"] [data-testid="stNumberInput"] > div:focus-within {{
-            border: none !important;
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] > div:focus-within {
+            border: 1px solid #070037 !important;
             box-shadow: none !important;
             outline: none !important;
-            background: var(--soft) !important;
-        }}
+            background: #FFFFFF !important;
+        }
+
+        [data-testid="stSidebar"] [data-baseweb="input"] input,
+        [data-testid="stSidebar"] [data-baseweb="select"] input,
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] input {
+            font-size: 18px !important;
+            font-weight: 400 !important;
+            color: #070037 !important;
+            caret-color: #070037 !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            height: 44px !important;
+            line-height: 44px !important;
+            padding: 0 12px !important;
+            margin: 0 !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+        }
+
+        [data-testid="stSidebar"] [data-baseweb="input"] input:focus,
+        [data-testid="stSidebar"] [data-baseweb="input"] input:focus-visible,
+        [data-testid="stSidebar"] [data-baseweb="input"] input:active,
+        [data-testid="stSidebar"] [data-baseweb="select"] input:focus,
+        [data-testid="stSidebar"] [data-baseweb="select"] input:focus-visible,
+        [data-testid="stSidebar"] [data-baseweb="select"] input:active,
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] input:focus,
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] input:focus-visible,
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] input:active {
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        [data-testid="stSidebar"] input::placeholder {
+            color: rgba(7, 0, 55, 0.55) !important;
+        }
+
+        [data-testid="stSidebar"] input::selection {
+            background: #D7B8FF !important;
+            color: #070037 !important;
+        }
 
         [data-testid="stSidebar"] [data-baseweb="input"] > div:hover,
         [data-testid="stSidebar"] [data-baseweb="select"] > div:hover,
