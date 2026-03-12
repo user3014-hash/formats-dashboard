@@ -142,22 +142,6 @@ SCORING_REVERSE_COLUMNS = {
     "ecpm_discounted",
 }
 
-TABLE_COLUMNS = [
-    "score",
-    "format_name",
-    "format_type",
-    "platform",
-    "buy_model",
-    "min_budget",
-    "max_reach",
-    "ecpm_discounted",
-    "ctr_avg",
-    "vtr_avg",
-    "viewability_avg",
-    "discount",
-    "commission",
-]
-
 TABLE_RATIOS = [
     1.0,
     1.2,
@@ -320,51 +304,44 @@ st.markdown(
             margin: 16px 0 0 0;
         }}
 
-        /* Поля и селекты */
+        /* Единый стиль белых полей слева */
         [data-testid="stSidebar"] [data-baseweb="input"] > div,
         [data-testid="stSidebar"] [data-baseweb="select"] > div,
         [data-testid="stSidebar"] [data-testid="stNumberInput"] > div {{
             background: #FFFFFF !important;
-            border: 1px solid transparent !important;
-            box-shadow: none !important;
+            border: none !important;
             outline: none !important;
+            box-shadow: none !important;
             border-radius: 8px !important;
             min-height: 44px !important;
             display: flex !important;
             align-items: center !important;
             padding: 0 !important;
-            transition: border-color 0.15s ease !important;
         }}
 
         [data-testid="stSidebar"] [data-baseweb="input"] > div:hover,
         [data-testid="stSidebar"] [data-baseweb="select"] > div:hover,
-        [data-testid="stSidebar"] [data-testid="stNumberInput"] > div:hover {{
-            border: 1px solid #070037 !important;
-            box-shadow: none !important;
-            outline: none !important;
-            background: #FFFFFF !important;
-        }}
-
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] > div:hover,
         [data-testid="stSidebar"] [data-baseweb="input"] > div:focus-within,
         [data-testid="stSidebar"] [data-baseweb="select"] > div:focus-within,
         [data-testid="stSidebar"] [data-testid="stNumberInput"] > div:focus-within {{
-            border: 1px solid #070037 !important;
-            box-shadow: none !important;
+            background: #F8F2FF !important;
+            border: none !important;
             outline: none !important;
-            background: #FFFFFF !important;
+            box-shadow: none !important;
         }}
 
         [data-testid="stSidebar"] [data-baseweb="input"] input,
         [data-testid="stSidebar"] [data-baseweb="select"] input,
         [data-testid="stSidebar"] [data-testid="stNumberInput"] input {{
-            font-size: 18px !important;
-            font-weight: 400 !important;
-            color: #070037 !important;
-            caret-color: #070037 !important;
             background: transparent !important;
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
+            color: #070037 !important;
+            caret-color: #070037 !important;
+            font-size: 18px !important;
+            font-weight: 400 !important;
             height: 44px !important;
             line-height: 44px !important;
             padding: 0 12px !important;
@@ -382,18 +359,45 @@ st.markdown(
         [data-testid="stSidebar"] [data-testid="stNumberInput"] input:focus,
         [data-testid="stSidebar"] [data-testid="stNumberInput"] input:focus-visible,
         [data-testid="stSidebar"] [data-testid="stNumberInput"] input:active {{
+            border: none !important;
             outline: none !important;
             box-shadow: none !important;
-            border: none !important;
         }}
 
         [data-testid="stSidebar"] input::placeholder {{
-            color: rgba(7, 0, 55, 0.55) !important;
+            color: rgba(7, 0, 55, 0.45) !important;
         }}
 
         [data-testid="stSidebar"] input::selection {{
             background: #D7B8FF !important;
             color: #070037 !important;
+        }}
+
+        /* Убираем внутренние серые подложки */
+        [data-testid="stSidebar"] [data-baseweb="select"] > div > div,
+        [data-testid="stSidebar"] [data-baseweb="input"] > div > div,
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] > div > div {{
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border: none !important;
+        }}
+
+        /* Иконки в полях */
+        [data-testid="stSidebar"] [data-baseweb="select"] svg,
+        [data-testid="stSidebar"] [data-baseweb="input"] svg,
+        [data-testid="stSidebar"] [data-testid="stNumberInput"] svg {{
+            opacity: 1 !important;
+            color: #070037 !important;
+            fill: #070037 !important;
+            stroke: #070037 !important;
+        }}
+
+        /* Убираем пунктир и служебные рамки */
+        [data-testid="stSidebar"] *:focus,
+        [data-testid="stSidebar"] *:focus-visible {{
+            outline: none !important;
+            box-shadow: none !important;
         }}
 
         /* Выпадающие меню */
@@ -404,20 +408,28 @@ st.markdown(
         }}
 
         [data-baseweb="popover"] * {{
-            color: var(--text) !important;
+            color: #070037 !important;
             font-size: 18px !important;
+            outline: none !important;
+            box-shadow: none !important;
         }}
 
         [data-baseweb="popover"] [role="option"] {{
             background: #FFFFFF !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
         }}
 
-        [data-baseweb="popover"] [role="option"]:hover {{
-            background: var(--soft) !important;
+        [data-baseweb="popover"] [role="option"]:hover,
+        [data-baseweb="popover"] [role="option"][aria-selected="true"] {{
+            background: #F8F2FF !important;
         }}
 
+        /* Убираем Select all и No results */
         [data-baseweb="popover"] [aria-label="Select all"],
-        [data-baseweb="popover"] div:has(> [aria-label="Select all"]) {{
+        [data-baseweb="popover"] div:has(> [aria-label="Select all"]),
+        [data-baseweb="popover"] [aria-disabled="true"] {{
             display: none !important;
         }}
 
@@ -431,8 +443,15 @@ st.markdown(
         }}
 
         [data-testid="stSidebar"] [data-baseweb="tag"]:hover {{
-            background: var(--soft) !important;
-            color: var(--text) !important;
+            background: var(--tag-hover) !important;
+            color: #FFFFFF !important;
+        }}
+
+        [data-testid="stSidebar"] [data-baseweb="tag"] svg {{
+            opacity: 1 !important;
+            color: #FFFFFF !important;
+            fill: #FFFFFF !important;
+            stroke: #FFFFFF !important;
         }}
 
         /* Чекбоксы */
@@ -554,13 +573,6 @@ st.markdown(
             color: var(--text) !important;
         }}
 
-        .metrics-grid {{
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }}
-
         .metric-card {{
             background: #FFFFFF;
             border: 1px solid var(--border);
@@ -570,6 +582,7 @@ st.markdown(
         }}
 
         .metric-label {{
+            font-size: 18px;
             font-weight: 500;
             color: var(--text);
             margin-bottom: 10px;
@@ -690,12 +703,6 @@ st.markdown(
             font-weight: 400;
             margin: 6px 0 0 0;
             font-size: 18px;
-        }}
-
-        @media (max-width: 1100px) {{
-            .metrics-grid {{
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }}
         }}
     </style>
     """,
@@ -1067,7 +1074,7 @@ def render_results_table(result_df: pd.DataFrame):
         with col:
             render_table_cell(title, header=True)
 
-    for idx, row in result_df.iterrows():
+    for _, row in result_df.iterrows():
         selected = st.session_state.get("selected_format_id") == row["format_id"]
         row_cols = st.columns(TABLE_RATIOS)
 
@@ -1511,8 +1518,6 @@ with st.sidebar:
     st.markdown('<div class="sidebar-group">Скоринг</div>', unsafe_allow_html=True)
 
     scoring_enabled = st.checkbox("Включить скоринг", value=False, key="scoring_enabled")
-
-    total_weights = sum(int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS)
 
     if scoring_enabled:
         st.markdown('<div class="sidebar-field">Сколько форматов показать</div>', unsafe_allow_html=True)
