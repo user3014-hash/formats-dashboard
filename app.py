@@ -1,3 +1,4 @@
+import html
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -6,57 +7,275 @@ st.set_page_config(page_title="Подбор форматов", layout="wide")
 
 
 # =========================
-# Стили
+# Фирменные цвета
+# =========================
+BRAND = {
+    "indigo": "#070037",
+    "blue": "#3E20FF",
+    "lavender": "#725BFF",
+    "lilac": "#A35AFF",
+    "pale_lilac": "#D7B8FF",
+    "light_violet": "#F8F2FF",
+    "white": "#FFFFFF",
+    "text": "#24184A",
+    "muted": "#6F66A8",
+    "line": "#DED4FF",
+    "tag_bg": "#F2ECFF",
+    "tag_border": "#D7C2FF",
+    "success_bg": "#EEF9F3",
+    "success_text": "#1E7A4D",
+}
+
+
+# =========================
+# Глобальные стили
 # =========================
 st.markdown(
-    """
+    f"""
     <style>
-        .block-container {
-            padding-top: 1.4rem;
+        :root {{
+            --bg: {BRAND["light_violet"]};
+            --panel: {BRAND["white"]};
+            --panel-soft: {BRAND["tag_bg"]};
+            --text: {BRAND["text"]};
+            --muted: {BRAND["muted"]};
+            --line: {BRAND["line"]};
+            --blue: {BRAND["blue"]};
+            --lavender: {BRAND["lavender"]};
+            --lilac: {BRAND["lilac"]};
+            --indigo: {BRAND["indigo"]};
+            --tag-bg: {BRAND["tag_bg"]};
+            --tag-border: {BRAND["tag_border"]};
+        }}
+
+        html, body, [data-testid="stAppViewContainer"] {{
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+        }}
+
+        [data-testid="stHeader"] {{
+            background: rgba(0, 0, 0, 0);
+        }}
+
+        .block-container {{
+            padding-top: 1.25rem;
             padding-bottom: 2rem;
-        }
+        }}
 
-        section[data-testid="stSidebar"] .block-container {
-            padding-top: 1.1rem;
-            padding-bottom: 1.2rem;
-        }
+        section[data-testid="stSidebar"] {{
+            background: linear-gradient(180deg, {BRAND["blue"]} 0%, {BRAND["lavender"]} 54%, {BRAND["lilac"]} 100%);
+            border-right: 1px solid rgba(255,255,255,0.16);
+        }}
 
-        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+        section[data-testid="stSidebar"] .block-container {{
+            padding-top: 1rem;
+            padding-bottom: 1.25rem;
+        }}
+
         section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
         section[data-testid="stSidebar"] span,
-        section[data-testid="stSidebar"] div {
+        section[data-testid="stSidebar"] div {{
+            color: white !important;
             font-size: 15px !important;
             line-height: 1.35 !important;
-        }
+        }}
 
-        section[data-testid="stSidebar"] input,
-        section[data-testid="stSidebar"] textarea {
-            font-size: 15px !important;
-        }
+        section[data-testid="stSidebar"] input {{
+            color: white !important;
+        }}
 
-        .sidebar-title {
-            font-size: 21px;
+        section[data-testid="stSidebar"] [data-baseweb="select"] > div,
+        section[data-testid="stSidebar"] [data-baseweb="input"] > div,
+        section[data-testid="stSidebar"] [data-testid="stNumberInput"] > div,
+        section[data-testid="stSidebar"] [data-baseweb="tag"] {{
+            background: rgba(7, 0, 55, 0.35) !important;
+            border: 1px solid rgba(255,255,255,0.16) !important;
+            border-radius: 18px !important;
+            box-shadow: none !important;
+            color: white !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="tag"] span {{
+            color: white !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-testid="stNumberInput"] button {{
+            color: white !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-testid="stCheckbox"] {{
+            margin-bottom: 0.18rem;
+        }}
+
+        .sidebar-title {{
+            font-size: 22px;
             font-weight: 700;
-            margin: 0 0 0.85rem 0;
-        }
+            margin: 0 0 0.8rem 0;
+            color: white;
+        }}
 
-        .sidebar-group {
+        .sidebar-group {{
             font-size: 17px;
             font-weight: 700;
-            margin: 1rem 0 0.45rem 0;
-        }
+            margin: 1rem 0 0.4rem 0;
+            color: white;
+        }}
 
-        .sidebar-field {
-            font-size: 15px;
+        .sidebar-field {{
+            font-size: 14px;
             font-weight: 600;
-            margin: 0.45rem 0 0.15rem 0;
-        }
+            margin: 0.32rem 0 0.12rem 0;
+            color: rgba(255,255,255,0.95);
+        }}
 
-        .sidebar-compact-note {
+        .page-title {{
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.05;
+            margin: 0 0 1rem 0;
+            color: {BRAND["text"]};
+        }}
+
+        .metric-grid {{
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin: 0.2rem 0 1rem 0;
+        }}
+
+        .metric-card {{
+            background: rgba(255,255,255,0.82);
+            border: 1px solid {BRAND["line"]};
+            border-radius: 22px;
+            padding: 18px 18px 16px 18px;
+            backdrop-filter: blur(8px);
+        }}
+
+        .metric-label {{
             font-size: 13px;
-            color: #6b7280;
-            margin: 0.35rem 0 0 0;
-        }
+            line-height: 1.3;
+            color: {BRAND["muted"]};
+            margin-bottom: 8px;
+        }}
+
+        .metric-value {{
+            font-size: 34px;
+            line-height: 1;
+            font-weight: 700;
+            color: {BRAND["text"]};
+        }}
+
+        .soft-note {{
+            font-size: 13px;
+            color: {BRAND["muted"]};
+            margin: 0.2rem 0 1rem 0;
+        }}
+
+        .card-shell {{
+            background: rgba(255,255,255,0.88);
+            border: 1px solid {BRAND["line"]};
+            border-radius: 28px;
+            padding: 24px;
+            margin-top: 1rem;
+            backdrop-filter: blur(8px);
+        }}
+
+        .card-title {{
+            font-size: 34px;
+            line-height: 1.08;
+            font-weight: 700;
+            color: {BRAND["text"]};
+            margin-bottom: 1rem;
+        }}
+
+        .section-title {{
+            font-size: 22px;
+            line-height: 1.15;
+            font-weight: 700;
+            color: {BRAND["text"]};
+            margin: 1rem 0 0.75rem 0;
+        }}
+
+        .body-text {{
+            font-size: 16px;
+            line-height: 1.55;
+            color: {BRAND["text"]};
+            margin: 0;
+        }}
+
+        .meta-list {{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }}
+
+        .meta-item {{
+            font-size: 15px;
+            line-height: 1.45;
+            color: {BRAND["text"]};
+        }}
+
+        .meta-item strong {{
+            color: {BRAND["text"]};
+        }}
+
+        .tag-cloud {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }}
+
+        .tag-pill {{
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: {BRAND["tag_bg"]};
+            border: 1px solid {BRAND["tag_border"]};
+            color: {BRAND["text"]};
+            font-size: 14px;
+            line-height: 1.2;
+            font-weight: 500;
+        }}
+
+        .tag-pill.strong {{
+            background: linear-gradient(135deg, rgba(62,32,255,0.14) 0%, rgba(163,90,255,0.14) 100%);
+            border-color: rgba(114,91,255,0.22);
+        }}
+
+        .link-list {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }}
+
+        .link-pill {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid {BRAND["tag_border"]};
+            background: white;
+            color: {BRAND["blue"]} !important;
+            text-decoration: none !important;
+            font-size: 14px;
+            font-weight: 500;
+        }}
+
+        .line {{
+            height: 1px;
+            background: {BRAND["line"]};
+            margin: 1rem 0 0.25rem 0;
+        }}
+
+        @media (max-width: 1100px) {{
+            .metric-grid {{
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }}
+        }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -81,7 +300,7 @@ FORMAT_ITEMS_CANDIDATES = [
 
 
 # =========================
-# Названия полей
+# Подписи
 # =========================
 LABELS = {
     "format_id": "ID формата",
@@ -97,6 +316,7 @@ LABELS = {
     "dmp": "DMP",
     "production": "Продакшн",
     "other_markup": "Прочие надбавки",
+    "seasonality_coeff": "Сезонные коэффициенты",
     "targeting": "Таргетинги",
     "targeting_markup": "Надбавки за таргетинги",
     "description": "Описание",
@@ -186,7 +406,6 @@ SCORING_REVERSE_COLUMNS = {
     "ecpm_discounted",
 }
 
-# Сократила набор колонок в верхней таблице
 TABLE_COLUMNS = [
     "score",
     "format_name",
@@ -203,20 +422,23 @@ TABLE_COLUMNS = [
     "commission",
 ]
 
-CARD_DETAIL_FIELDS = [
+CARD_META_FIELDS = [
     "device",
     "display",
     "placement",
     "instream_pos",
     "dmp",
+]
+
+CARD_TAG_FIELDS = [
     "production",
     "other_markup",
-    "verification_pixel",
-    "verification_js",
+    "seasonality_coeff",
+    "targeting",
+    "targeting_markup",
 ]
 
 CARD_TEXT_FIELDS = [
-    "description",
     "verification_terms",
     "bls_terms",
     "sales_lift_terms",
@@ -239,7 +461,7 @@ BOOL_TEXT_COLUMNS = {
 
 
 # =========================
-# Вспомогательные функции
+# Служебные функции
 # =========================
 def label(column: str) -> str:
     return LABELS.get(column, column)
@@ -298,10 +520,8 @@ def clean_yes_no(series: pd.Series) -> pd.Series:
 def safe_scalar_to_bool(value) -> bool:
     if pd.isna(value):
         return False
-
     if isinstance(value, str):
         return value.strip().lower() in {"да", "true", "1", "yes"}
-
     try:
         return float(value) > 0
     except Exception:
@@ -311,8 +531,7 @@ def safe_scalar_to_bool(value) -> bool:
 def trim_decimal_string(text: str) -> str:
     if "," not in text:
         return text
-    text = text.rstrip("0").rstrip(",")
-    return text
+    return text.rstrip("0").rstrip(",")
 
 
 def format_number(value, digits: int = 2) -> str:
@@ -320,8 +539,7 @@ def format_number(value, digits: int = 2) -> str:
         return ""
     formatted = f"{float(value):,.{digits}f}"
     formatted = formatted.replace(",", " ").replace(".", ",")
-    formatted = trim_decimal_string(formatted)
-    return formatted
+    return trim_decimal_string(formatted)
 
 
 def format_integer(value) -> str:
@@ -334,8 +552,7 @@ def format_percent(value, digits: int = 2) -> str:
     if pd.isna(value):
         return ""
     formatted = f"{float(value) * 100:.{digits}f}".replace(".", ",")
-    formatted = trim_decimal_string(formatted)
-    return f"{formatted}%"
+    return f"{trim_decimal_string(formatted)}%"
 
 
 def display_value(column: str, value):
@@ -371,8 +588,6 @@ def internal_to_percent(value: float) -> float:
 def split_tags(value) -> list[str]:
     if pd.isna(value):
         return []
-    if isinstance(value, list):
-        return value
     text = str(value).strip()
     if not text:
         return []
@@ -386,66 +601,11 @@ def join_unique(values: list[str]) -> str:
         if pd.isna(value):
             continue
         text = str(value).strip()
-        if not text:
+        if not text or text in seen:
             continue
-        if text not in seen:
-            seen.add(text)
-            cleaned.append(text)
+        seen.add(text)
+        cleaned.append(text)
     return ", ".join(cleaned)
-
-
-def apply_text_search(df: pd.DataFrame, query: str) -> pd.DataFrame:
-    if not query.strip():
-        return df
-
-    q = query.strip()
-    search_cols = [c for c in TEXT_SEARCH_COLUMNS if c in df.columns]
-
-    if not search_cols:
-        return df
-
-    mask = pd.Series(False, index=df.index)
-    for col in search_cols:
-        mask = mask | df[col].astype(str).str.contains(q, case=False, na=False)
-
-    return df[mask]
-
-
-def apply_categorical_filter(df: pd.DataFrame, column: str, selected_values: list[str]) -> pd.DataFrame:
-    if column not in df.columns or not selected_values:
-        return df
-
-    def has_any_match(cell):
-        values = split_tags(cell)
-        return any(v in values for v in selected_values)
-
-    return df[df[column].apply(has_any_match)]
-
-
-def apply_required_flag_filter(df: pd.DataFrame, column: str, required: bool) -> pd.DataFrame:
-    if column not in df.columns or not required:
-        return df
-
-    if df[column].dtype == "object":
-        normalized = df[column].astype(str).str.strip().str.lower()
-        return df[normalized.isin({"да", "true", "1", "yes"})]
-
-    numeric = safe_to_numeric(df[column]).fillna(0)
-    return df[numeric > 0]
-
-
-def apply_min_filter(df: pd.DataFrame, column: str, min_value: float) -> pd.DataFrame:
-    if column not in df.columns:
-        return df
-    series = safe_to_numeric(df[column])
-    return df[series.isna() | (series >= min_value)]
-
-
-def apply_max_filter(df: pd.DataFrame, column: str, max_value: float) -> pd.DataFrame:
-    if column not in df.columns:
-        return df
-    series = safe_to_numeric(df[column])
-    return df[series.isna() | (series <= max_value)]
 
 
 def normalize_series(series: pd.Series, reverse: bool = False) -> pd.Series:
@@ -528,6 +688,107 @@ def add_scoring(df: pd.DataFrame, weights: dict[str, int]) -> pd.DataFrame:
     return scored
 
 
+def apply_text_search(df: pd.DataFrame, query: str) -> pd.DataFrame:
+    if not query.strip():
+        return df
+
+    q = query.strip()
+    search_cols = [c for c in TEXT_SEARCH_COLUMNS if c in df.columns]
+
+    if not search_cols:
+        return df
+
+    mask = pd.Series(False, index=df.index)
+    for col in search_cols:
+        mask = mask | df[col].astype(str).str.contains(q, case=False, na=False)
+
+    return df[mask]
+
+
+def apply_categorical_filter(df: pd.DataFrame, column: str, selected_values: list[str]) -> pd.DataFrame:
+    if column not in df.columns or not selected_values:
+        return df
+
+    def has_any_match(cell):
+        values = split_tags(cell)
+        return any(v in values for v in selected_values)
+
+    return df[df[column].apply(has_any_match)]
+
+
+def apply_required_flag_filter(df: pd.DataFrame, column: str, required: bool) -> pd.DataFrame:
+    if column not in df.columns or not required:
+        return df
+
+    if df[column].dtype == "object":
+        normalized = df[column].astype(str).str.strip().str.lower()
+        return df[normalized.isin({"да", "true", "1", "yes"})]
+
+    numeric = safe_to_numeric(df[column]).fillna(0)
+    return df[numeric > 0]
+
+
+def apply_min_filter(df: pd.DataFrame, column: str, min_value: float) -> pd.DataFrame:
+    if column not in df.columns:
+        return df
+    series = safe_to_numeric(df[column])
+    return df[series.isna() | (series >= min_value)]
+
+
+def apply_max_filter(df: pd.DataFrame, column: str, max_value: float) -> pd.DataFrame:
+    if column not in df.columns:
+        return df
+    series = safe_to_numeric(df[column])
+    return df[series.isna() | (series <= max_value)]
+
+
+def format_item_for_dict(dict_id: str, item_name: str, item_value, item_unit) -> str:
+    name = str(item_name).strip()
+
+    if pd.notna(item_value):
+        value_text = format_number(item_value, 2)
+
+        if dict_id == "seasonality_coeff":
+            return f"{name} ×{value_text}"
+
+        if dict_id in {"other_markup", "production"} and str(item_unit).strip() == "%":
+            return f"{name} +{value_text}%"
+
+    return name
+
+
+def make_tag_html(text: str, strong: bool = False) -> str:
+    safe = html.escape(text)
+    cls = "tag-pill strong" if strong else "tag-pill"
+    return f'<span class="{cls}">{safe}</span>'
+
+
+def make_tag_cloud(values: list[str], strong: bool = False) -> str:
+    if not values:
+        return ""
+    tags = "".join([make_tag_html(v, strong=strong) for v in values if str(v).strip()])
+    return f'<div class="tag-cloud">{tags}</div>'
+
+
+def render_link_pills(row: pd.Series):
+    links = [
+        ("Пример", row.get("example_url")),
+        ("Технические требования", row.get("technical_requirements_url")),
+        ("Медиакит", row.get("mediakit_url")),
+        ("Кейсы", row.get("cases_url")),
+    ]
+
+    rendered = []
+    for title, url in links:
+        if pd.notna(url) and str(url).strip():
+            rendered.append(
+                f'<a class="link-pill" href="{html.escape(str(url))}" target="_blank">{html.escape(title)}</a>'
+            )
+
+    if rendered:
+        st.markdown(f'<div class="link-list">{"".join(rendered)}</div>', unsafe_allow_html=True)
+
+
 def build_display_table(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     visible_cols = [c for c in columns if c in df.columns]
     display_df = df[visible_cols].copy()
@@ -542,69 +803,141 @@ def build_display_table(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return display_df
 
 
-def display_link(title: str, url: str):
-    if pd.notna(url) and str(url).strip():
-        st.markdown(f"**{title}:** [открыть]({url})")
+def render_metric_grid(result_df: pd.DataFrame):
+    cards = [
+        ("Форматов в выдаче", str(len(result_df))),
+        ("Площадок", str(int(result_df["platform"].nunique()) if "platform" in result_df.columns else 0)),
+        (
+            "Средний eCPM со скидкой",
+            format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "",
+        ),
+        (
+            "Средний CTR",
+            format_percent(result_df["ctr_avg"].mean()) if "ctr_avg" in result_df.columns else "",
+        ),
+    ]
+
+    html_cards = []
+    for title, value in cards:
+        html_cards.append(
+            f"""
+            <div class="metric-card">
+                <div class="metric-label">{html.escape(title)}</div>
+                <div class="metric-value">{html.escape(value)}</div>
+            </div>
+            """
+        )
+
+    st.markdown(f'<div class="metric-grid">{"".join(html_cards)}</div>', unsafe_allow_html=True)
 
 
-def render_detail_line(field: str, value):
-    shown = display_value(field, value)
-    if shown != "":
-        st.write(f"**{label(field)}:** {shown}")
+def render_card(row: pd.Series):
+    title = html.escape(str(row.get("format_name", "Карточка формата")))
+    description = row.get("description")
+    description_html = html.escape(str(description)) if pd.notna(description) and str(description).strip() else ""
 
+    meta_blocks = []
+    for field in CARD_META_FIELDS:
+        values = split_tags(row.get(field))
+        if values:
+            meta_blocks.append(
+                f"""
+                <div>
+                    <div class="sidebar-field" style="color:{BRAND["muted"]}; margin:0 0 0.35rem 0;">{html.escape(label(field))}</div>
+                    {make_tag_cloud(values, strong=False)}
+                </div>
+                """
+            )
 
-def render_format_card(row: pd.Series):
-    st.markdown("---")
-    st.subheader(row.get("format_name", "Карточка формата"))
+    condition_blocks = []
 
-    left, right = st.columns([1.35, 1])
+    # Верификация и исследования как плашки
+    verification_tags = []
+    if str(row.get("verification_pixel", "")).strip() == "Да":
+        verification_tags.append("Верификация пикселем")
+    if str(row.get("verification_js", "")).strip() == "Да":
+        verification_tags.append("Верификация JS-кодом")
+    if safe_scalar_to_bool(row.get("bls")):
+        verification_tags.append("BLS")
+    if safe_scalar_to_bool(row.get("sales_lift")):
+        verification_tags.append("Sales Lift")
+
+    if verification_tags:
+        condition_blocks.append(
+            f"""
+            <div>
+                <div class="sidebar-field" style="color:{BRAND["muted"]}; margin:0 0 0.35rem 0;">Обязательные параметры</div>
+                {make_tag_cloud(verification_tags, strong=True)}
+            </div>
+            """
+        )
+
+    for field in CARD_TAG_FIELDS:
+        values = split_tags(row.get(field))
+        if values:
+            condition_blocks.append(
+                f"""
+                <div>
+                    <div class="sidebar-field" style="color:{BRAND["muted"]}; margin:0 0 0.35rem 0;">{html.escape(label(field))}</div>
+                    {make_tag_cloud(values, strong=(field in {"other_markup", "production", "seasonality_coeff"}))}
+                </div>
+                """
+            )
+
+    text_blocks = []
+    for field in CARD_TEXT_FIELDS:
+        value = row.get(field)
+        if pd.notna(value) and str(value).strip():
+            text_blocks.append(
+                f"""
+                <div>
+                    <div class="sidebar-field" style="color:{BRAND["muted"]}; margin:0 0 0.35rem 0;">{html.escape(label(field))}</div>
+                    <div class="body-text">{html.escape(str(value))}</div>
+                </div>
+                """
+            )
+
+    st.markdown(
+        f"""
+        <div class="card-shell">
+            <div class="card-title">{title}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    left, right = st.columns([1.2, 1])
 
     with left:
-        description = row.get("description")
-        if pd.notna(description) and str(description).strip():
-            st.markdown("### Описание")
-            st.write(description)
+        if description_html:
+            st.markdown('<div class="section-title">Описание</div>', unsafe_allow_html=True)
+            st.markdown(f'<p class="body-text">{description_html}</p>', unsafe_allow_html=True)
 
-        st.markdown("### Дополнительно")
-        any_detail = False
-        for field in CARD_DETAIL_FIELDS:
-            if field in row.index:
-                shown = display_value(field, row.get(field))
-                if shown != "":
-                    any_detail = True
-                    st.write(f"**{label(field)}:** {shown}")
+        if meta_blocks:
+            st.markdown('<div class="section-title">Параметры формата</div>', unsafe_allow_html=True)
+            for block in meta_blocks:
+                st.markdown(block, unsafe_allow_html=True)
 
-        if not any_detail:
-            st.write("")
-
-        st.markdown("### Ссылки")
-        display_link("Пример", row.get("example_url"))
-        display_link("Технические требования", row.get("technical_requirements_url"))
-        display_link("Медиакит", row.get("mediakit_url"))
-        display_link("Кейсы", row.get("cases_url"))
+        st.markdown('<div class="section-title">Материалы</div>', unsafe_allow_html=True)
+        render_link_pills(row)
 
     with right:
-        st.markdown("### Условия")
-        any_text = False
-        for field in CARD_TEXT_FIELDS:
-            value = row.get(field)
-            if pd.notna(value) and str(value).strip():
-                any_text = True
-                st.write(f"**{label(field)}:**")
-                st.write(value)
+        if condition_blocks:
+            st.markdown('<div class="section-title">Условия и надбавки</div>', unsafe_allow_html=True)
+            for block in condition_blocks:
+                st.markdown(block, unsafe_allow_html=True)
 
-        if not any_text:
-            st.write("")
+        if text_blocks:
+            st.markdown('<div class="section-title">Уточнения</div>', unsafe_allow_html=True)
+            for block in text_blocks:
+                st.markdown(block, unsafe_allow_html=True)
 
 
 # =========================
-# Коллбэки для скоринга
+# Коллбэки скоринга
 # =========================
 def normalize_weight_state():
-    weights = {
-        metric: int(st.session_state.get(f"score_{metric}", 0))
-        for metric in SCORING_COLUMNS
-    }
+    weights = {metric: int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS}
     normalized = normalize_weights_to_100(weights)
     for metric, value in normalized.items():
         st.session_state[f"score_{metric}"] = value
@@ -624,7 +957,7 @@ def reset_weight_state():
 
 
 # =========================
-# Загрузка и сборка данных
+# Загрузка данных
 # =========================
 @st.cache_data
 def load_data() -> pd.DataFrame:
@@ -683,7 +1016,7 @@ def load_data() -> pd.DataFrame:
             formats[col] = clean_yes_no(formats[col])
 
     merged_items = format_items.merge(
-        dict_items[["dict_id", "item_id", "item_name"]],
+        dict_items[["dict_id", "item_id", "item_name", "item_value", "item_unit"]],
         on=["dict_id", "item_id"],
         how="left",
     )
@@ -692,10 +1025,19 @@ def load_data() -> pd.DataFrame:
     for dict_id in merged_items["dict_id"].dropna().unique():
         grouped = (
             merged_items[merged_items["dict_id"] == dict_id]
-            .groupby("format_id")["item_name"]
+            .assign(display_item=lambda x: x.apply(
+                lambda row: format_item_for_dict(
+                    row["dict_id"],
+                    row["item_name"],
+                    row["item_value"],
+                    row["item_unit"],
+                ),
+                axis=1,
+            ))
+            .groupby("format_id")["display_item"]
             .apply(lambda s: join_unique(sorted(pd.unique(s.dropna()))))
             .reset_index()
-            .rename(columns={"item_name": dict_id})
+            .rename(columns={"display_item": dict_id})
         )
         pivot_dict[dict_id] = grouped
 
@@ -736,7 +1078,7 @@ def load_data() -> pd.DataFrame:
 
 
 # =========================
-# Инициализация состояния
+# Состояние
 # =========================
 defaults = {
     "max_reach": 20,
@@ -759,10 +1101,8 @@ if "top_n" not in st.session_state:
 
 
 # =========================
-# Основной экран
+# Данные
 # =========================
-st.title("Подбор форматов")
-
 try:
     df = load_data()
 except Exception as e:
@@ -772,6 +1112,12 @@ except Exception as e:
 if df.empty:
     st.warning("В данных нет строк.")
     st.stop()
+
+
+# =========================
+# Заголовок
+# =========================
+st.markdown('<div class="page-title">Подбор форматов</div>', unsafe_allow_html=True)
 
 
 # =========================
@@ -891,8 +1237,8 @@ with st.sidebar:
     scoring_enabled = st.checkbox("Включить скоринг", value=False, key="scoring_enabled")
 
     if scoring_enabled:
-        st.markdown(f'<div class="sidebar-field">Сколько форматов показать</div>', unsafe_allow_html=True)
-        top_n_input = st.number_input(
+        st.markdown('<div class="sidebar-field">Сколько форматов показать</div>', unsafe_allow_html=True)
+        st.number_input(
             "Сколько форматов показать",
             min_value=1,
             value=int(st.session_state.get("top_n", 10)),
@@ -915,7 +1261,7 @@ with st.sidebar:
         total_weights = sum(int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS)
         st.write(f"**Сумма:** {total_weights}")
 
-        c1, c2 = st.columns([1.15, 1])
+        c1, c2 = st.columns([1.18, 1])
         with c1:
             st.button("Нормализовать", use_container_width=True, on_click=normalize_weight_state)
         with c2:
@@ -938,7 +1284,6 @@ if scoring_enabled:
     requested_top_n = max(1, int(st.session_state.get("top_n", 10)))
     available_rows = len(result_df)
     actual_top_n = min(requested_top_n, available_rows)
-
     result_df = result_df.head(actual_top_n)
 else:
     if "score" not in result_df.columns:
@@ -949,24 +1294,15 @@ else:
 
 
 # =========================
-# Верхние метрики
+# Верхние карточки
 # =========================
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Форматов в выдаче", len(result_df))
-m2.metric("Площадок", int(result_df["platform"].nunique()) if "platform" in result_df.columns else 0)
-m3.metric(
-    "Средний eCPM со скидкой",
-    format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "",
-)
-m4.metric(
-    "Средний CTR",
-    format_percent(result_df["ctr_avg"].mean()) if "ctr_avg" in result_df.columns else "",
-)
+render_metric_grid(result_df)
 
 if scoring_enabled and requested_top_n is not None and available_rows < requested_top_n:
-    st.caption(f"Показаны все доступные форматы: {available_rows}")
-
-st.divider()
+    st.markdown(
+        f'<div class="soft-note">Показаны все доступные форматы: {available_rows}</div>',
+        unsafe_allow_html=True,
+    )
 
 
 # =========================
@@ -978,10 +1314,21 @@ if not scoring_enabled and "score" in table_columns:
 
 display_df = build_display_table(result_df, table_columns)
 
+column_config = {}
+for col in table_columns:
+    pretty = label(col)
+    if col in {"format_name"}:
+        column_config[pretty] = st.column_config.TextColumn(pretty, width="large")
+    elif col in {"format_type", "platform", "buy_model"}:
+        column_config[pretty] = st.column_config.TextColumn(pretty, width="medium")
+    else:
+        column_config[pretty] = st.column_config.TextColumn(pretty, width="small")
+
 event = st.dataframe(
     display_df,
     use_container_width=True,
     hide_index=True,
+    column_config=column_config,
     on_select="rerun",
     selection_mode="single-row",
     key="formats_table",
@@ -996,7 +1343,6 @@ if selected_rows:
 # Карточка
 # =========================
 selected_format_id = st.session_state.get("selected_format_id")
-
 if selected_format_id is not None and selected_format_id in result_df["format_id"].values:
     selected_row = result_df.loc[result_df["format_id"] == selected_format_id].iloc[0]
-    render_format_card(selected_row)
+    render_card(selected_row)
