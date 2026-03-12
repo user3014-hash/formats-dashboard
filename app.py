@@ -1,4 +1,6 @@
 import html
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -7,94 +9,25 @@ st.set_page_config(page_title="Подбор форматов", layout="wide")
 
 
 # =========================
-# Спокойные стили
+# Константы
 # =========================
-st.markdown(
-    """
-    <style>
-        .block-container {
-            padding-top: 1.4rem;
-            padding-bottom: 2rem;
-        }
+COLORS = {
+    "sidebar_bg": "#3E20FF",
+    "bg": "#FFFFFF",
+    "text": "#070037",
+    "table_header_bg": "#3E20FF",
+    "table_header_text": "#FFFFFF",
+    "hover_row": "#F8F2FF",
+    "border": "#D7B8FF",
+    "tag_bg": "#725BFF",
+    "tag_text": "#FFFFFF",
+    "tag_hover": "#3E20FF",
+    "input_bg": "#FFFFFF",
+    "input_text": "#070037",
+}
 
-        section[data-testid="stSidebar"] .block-container {
-            padding-top: 1rem;
-            padding-bottom: 1.2rem;
-        }
+FONT_FAMILY = 'Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif'
 
-        .sidebar-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 0 0 0.85rem 0;
-        }
-
-        .sidebar-group {
-            font-size: 17px;
-            font-weight: 700;
-            margin: 1rem 0 0.45rem 0;
-        }
-
-        .sidebar-field {
-            font-size: 15px;
-            font-weight: 600;
-            margin: 0.35rem 0 0.15rem 0;
-        }
-
-        .tag-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 0.35rem;
-            margin-bottom: 0.35rem;
-        }
-
-        .tag-pill {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            color: #111827;
-            font-size: 13px;
-            line-height: 1.2;
-        }
-
-        .card-block {
-            border: 1px solid #e5e7eb;
-            border-radius: 20px;
-            padding: 20px;
-            background: white;
-            margin-top: 1rem;
-        }
-
-        .card-title {
-            font-size: 28px;
-            line-height: 1.1;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-        }
-
-        .card-section-title {
-            font-size: 20px;
-            line-height: 1.15;
-            font-weight: 700;
-            margin: 0 0 0.6rem 0;
-        }
-
-        .card-text {
-            font-size: 16px;
-            line-height: 1.55;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# =========================
-# Файлы
-# =========================
 FORMATS_CANDIDATES = [
     "DataLens - formats.csv",
 ]
@@ -108,10 +41,6 @@ FORMAT_ITEMS_CANDIDATES = [
     "DataLens - format_items.csv",
 ]
 
-
-# =========================
-# Подписи
-# =========================
 LABELS = {
     "format_id": "ID формата",
     "format_name": "Название формата",
@@ -154,10 +83,6 @@ LABELS = {
     "score": "Скоринг",
 }
 
-
-# =========================
-# Конфиг
-# =========================
 TEXT_SEARCH_COLUMNS = [
     "format_id",
     "format_name",
@@ -216,7 +141,6 @@ SCORING_REVERSE_COLUMNS = {
     "ecpm_discounted",
 }
 
-# Только сравнимое — в таблицу
 TABLE_COLUMNS = [
     "score",
     "format_name",
@@ -233,7 +157,22 @@ TABLE_COLUMNS = [
     "commission",
 ]
 
-# То, что полезно в карточке
+COLUMN_WIDTHS = {
+    "score": 120,
+    "format_name": 260,
+    "format_type": 140,
+    "platform": 140,
+    "buy_model": 140,
+    "min_budget": 120,
+    "max_reach": 120,
+    "ecpm_discounted": 120,
+    "ctr_avg": 120,
+    "vtr_avg": 120,
+    "viewability_avg": 120,
+    "discount": 120,
+    "commission": 120,
+}
+
 CARD_META_FIELDS = [
     "device",
     "display",
@@ -273,6 +212,227 @@ BOOL_TEXT_COLUMNS = {
 
 
 # =========================
+# Стили
+# =========================
+st.markdown(
+    f"""
+    <style>
+        html, body, [class*="css"], [data-testid="stAppViewContainer"] {{
+            font-family: {FONT_FAMILY};
+        }}
+
+        [data-testid="stAppViewContainer"] {{
+            background: {COLORS["bg"]};
+        }}
+
+        [data-testid="stHeader"] {{
+            background: transparent;
+        }}
+
+        .block-container {{
+            padding-top: 1.4rem;
+            padding-bottom: 2rem;
+        }}
+
+        section[data-testid="stSidebar"] {{
+            background: {COLORS["sidebar_bg"]};
+        }}
+
+        section[data-testid="stSidebar"] .block-container {{
+            padding-top: 1rem;
+            padding-bottom: 1.2rem;
+        }}
+
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+        section[data-testid="stSidebar"] span,
+        section[data-testid="stSidebar"] div {{
+            color: #FFFFFF !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="select"] > div,
+        section[data-testid="stSidebar"] [data-baseweb="input"] > div,
+        section[data-testid="stSidebar"] [data-testid="stNumberInput"] > div {{
+            background: {COLORS["input_bg"]} !important;
+            border: 1px solid rgba(255,255,255,0.18) !important;
+            border-radius: 10px !important;
+            box-shadow: none !important;
+            color: {COLORS["input_text"]} !important;
+            min-height: 48px !important;
+        }}
+
+        section[data-testid="stSidebar"] input {{
+            color: {COLORS["input_text"]} !important;
+            font-size: 14px !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="select"] * {{
+            color: {COLORS["input_text"]} !important;
+            font-size: 14px !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-testid="stNumberInput"] input {{
+            padding-right: 48px !important;
+            padding-left: 14px !important;
+            color: {COLORS["input_text"]} !important;
+            font-size: 14px !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-testid="stNumberInput"] button {{
+            color: {COLORS["input_text"]} !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="tag"] {{
+            background: {COLORS["tag_bg"]} !important;
+            border: 1px solid {COLORS["tag_bg"]} !important;
+            border-radius: 6px !important;
+            color: {COLORS["tag_text"]} !important;
+        }}
+
+        section[data-testid="stSidebar"] [data-baseweb="tag"]:hover {{
+            background: {COLORS["tag_hover"]} !important;
+            border-color: {COLORS["tag_hover"]} !important;
+        }}
+
+        .sidebar-title {{
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin: 0 0 16px 0;
+        }}
+
+        .sidebar-group {{
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin: 32px 0 16px 0;
+        }}
+
+        .sidebar-field {{
+            font-size: 14px;
+            font-weight: 500;
+            color: #FFFFFF;
+            margin: 20px 0 8px 0;
+        }}
+
+        .page-title {{
+            font-size: 32px;
+            font-weight: 700;
+            color: {COLORS["text"]};
+            margin: 0 0 24px 0;
+            line-height: 1.1;
+        }}
+
+        .divider {{
+            height: 1px;
+            background: {COLORS["border"]};
+            margin: 32px 0;
+        }}
+
+        .metrics-grid {{
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }}
+
+        .metric-card {{
+            background: #FFFFFF;
+            border: 1px solid {COLORS["border"]};
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 112px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }}
+
+        .metric-label {{
+            font-size: 14px;
+            font-weight: 500;
+            color: {COLORS["text"]};
+            opacity: 0.85;
+            line-height: 1.3;
+        }}
+
+        .metric-value {{
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+            color: {COLORS["text"]};
+        }}
+
+        .card-block {{
+            border: 1px solid {COLORS["border"]};
+            border-radius: 16px;
+            padding: 24px;
+            background: #FFFFFF;
+            margin-top: 32px;
+        }}
+
+        .card-title {{
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.1;
+            color: {COLORS["text"]};
+            margin-bottom: 24px;
+        }}
+
+        .card-section-title {{
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.2;
+            color: {COLORS["text"]};
+            margin: 0 0 16px 0;
+        }}
+
+        .card-text {{
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.65;
+            color: {COLORS["text"]};
+        }}
+
+        .tag-cloud {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 8px 0 20px 0;
+        }}
+
+        .tag-pill {{
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: {COLORS["tag_bg"]};
+            color: {COLORS["tag_text"]};
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.2;
+            transition: background 0.15s ease;
+        }}
+
+        .tag-pill:hover {{
+            background: {COLORS["tag_hover"]};
+        }}
+
+        .table-wrap {{
+            width: 100%;
+        }}
+
+        @media (max-width: 1100px) {{
+            .metrics-grid {{
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }}
+        }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# =========================
 # Вспомогательные функции
 # =========================
 def label(column: str) -> str:
@@ -281,11 +441,8 @@ def label(column: str) -> str:
 
 def find_existing_file(candidates: list[str]) -> str:
     for filename in candidates:
-        try:
-            with open(filename, "r", encoding="utf-8"):
-                return filename
-        except FileNotFoundError:
-            continue
+        if Path(filename).exists():
+            return filename
     raise FileNotFoundError(f"Не найден ни один файл из списка: {candidates}")
 
 
@@ -593,6 +750,34 @@ def make_tag_cloud(values: list[str]) -> str:
     return f'<div class="tag-cloud">{"".join(make_tag_html(v) for v in values)}</div>'
 
 
+def render_metrics(result_df: pd.DataFrame):
+    cards = [
+        ("Форматов в выдаче", str(len(result_df))),
+        ("Площадок", str(int(result_df["platform"].nunique()) if "platform" in result_df.columns else 0)),
+        (
+            "Средний eCPM со скидкой",
+            format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "",
+        ),
+        (
+            "Средний CTR",
+            format_percent(result_df["ctr_avg"].mean()) if "ctr_avg" in result_df.columns else "",
+        ),
+    ]
+
+    html_cards = []
+    for title, value in cards:
+        html_cards.append(
+            f"""
+            <div class="metric-card">
+                <div class="metric-label">{html.escape(title)}</div>
+                <div class="metric-value">{html.escape(value)}</div>
+            </div>
+            """
+        )
+
+    st.markdown(f'<div class="metrics-grid">{"".join(html_cards)}</div>', unsafe_allow_html=True)
+
+
 def render_link_buttons(row: pd.Series):
     links = [
         ("Пример", row.get("example_url")),
@@ -601,11 +786,14 @@ def render_link_buttons(row: pd.Series):
         ("Кейсы", row.get("cases_url")),
     ]
 
-    cols = st.columns(4)
-    for idx, (title, url) in enumerate(links):
+    active_links = [(title, url) for title, url in links if pd.notna(url) and str(url).strip()]
+    if not active_links:
+        return
+
+    cols = st.columns(len(active_links))
+    for idx, (title, url) in enumerate(active_links):
         with cols[idx]:
-            if pd.notna(url) and str(url).strip():
-                st.link_button(title, str(url), use_container_width=True)
+            st.link_button(title, str(url), use_container_width=True)
 
 
 def render_card(row: pd.Series):
@@ -632,7 +820,7 @@ def render_card(row: pd.Series):
         if meta_values:
             st.markdown('<div class="card-section-title">Параметры формата</div>', unsafe_allow_html=True)
             for field_label, values in meta_values:
-                st.markdown(f"**{field_label}**", unsafe_allow_html=False)
+                st.markdown(f"**{field_label}**")
                 st.markdown(make_tag_cloud(values), unsafe_allow_html=True)
 
         tag_values = []
@@ -644,7 +832,7 @@ def render_card(row: pd.Series):
         if tag_values:
             st.markdown('<div class="card-section-title">Условия и надбавки</div>', unsafe_allow_html=True)
             for field_label, values in tag_values:
-                st.markdown(f"**{field_label}**", unsafe_allow_html=False)
+                st.markdown(f"**{field_label}**")
                 st.markdown(make_tag_cloud(values), unsafe_allow_html=True)
 
     with right:
@@ -680,7 +868,7 @@ def render_card(row: pd.Series):
 
 
 # =========================
-# Коллбэки скоринга
+# Коллбэки
 # =========================
 def normalize_weight_state():
     weights = {metric: int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS}
@@ -771,15 +959,17 @@ def load_data() -> pd.DataFrame:
     for dict_id in merged_items["dict_id"].dropna().unique():
         grouped = (
             merged_items[merged_items["dict_id"] == dict_id]
-            .assign(display_item=lambda x: x.apply(
-                lambda row: format_item_for_dict(
-                    row["dict_id"],
-                    row["item_name"],
-                    row["item_value"],
-                    row["item_unit"],
-                ),
-                axis=1,
-            ))
+            .assign(
+                display_item=lambda x: x.apply(
+                    lambda row: format_item_for_dict(
+                        row["dict_id"],
+                        row["item_name"],
+                        row["item_value"],
+                        row["item_unit"],
+                    ),
+                    axis=1,
+                )
+            )
             .groupby("format_id")["display_item"]
             .apply(lambda s: join_unique(sorted(pd.unique(s.dropna()))))
             .reset_index()
@@ -863,21 +1053,24 @@ if df.empty:
 # =========================
 # Заголовок
 # =========================
-st.title("Подбор форматов")
+st.markdown('<div class="page-title">Подбор форматов</div>', unsafe_allow_html=True)
 
 
 # =========================
-# Sidebar
+# Левая панель
 # =========================
 with st.sidebar:
-    st.markdown('<div class="sidebar-title">Фильтры</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">Поиск</div>', unsafe_allow_html=True)
 
     search_query = st.text_input(
         "Поиск",
         placeholder="Название, площадка, описание",
+        label_visibility="collapsed",
     )
 
     filtered_df = apply_text_search(df, search_query)
+
+    st.markdown('<div class="sidebar-group">Фильтры</div>', unsafe_allow_html=True)
 
     for col in MAIN_CATEGORY_FILTERS:
         if col in filtered_df.columns:
@@ -921,7 +1114,8 @@ with st.sidebar:
 
     for col in BOOLEAN_REQUIRE_COLUMNS:
         if col in filtered_df.columns:
-            required = st.checkbox(label(col), value=False, key=f"required_{col}")
+            st.markdown(f'<div class="sidebar-field">{label(col)}</div>', unsafe_allow_html=True)
+            required = st.checkbox(label(col), value=False, key=f"required_{col}", label_visibility="collapsed")
             filtered_df = apply_required_flag_filter(filtered_df, col, required)
 
     numeric_filter_pairs = [
@@ -944,7 +1138,6 @@ with st.sidebar:
 
             min_val = float(series.min())
             max_val = float(series.max())
-
             if min_val == max_val:
                 continue
 
@@ -1005,7 +1198,7 @@ with st.sidebar:
             )
 
         total_weights = sum(int(st.session_state.get(f"score_{metric}", 0)) for metric in SCORING_COLUMNS)
-        st.write(f"**Сумма:** {total_weights}")
+        st.markdown(f'<div class="sidebar-field">Сумма: {total_weights}</div>', unsafe_allow_html=True)
 
         c1, c2 = st.columns([1.15, 1])
         with c1:
@@ -1036,33 +1229,18 @@ else:
         result_df["score"] = np.nan
     requested_top_n = None
     available_rows = len(result_df)
-    actual_top_n = len(result_df)
 
 
 # =========================
-# Метрики
+# Правая панель
 # =========================
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Форматов в выдаче", len(result_df))
-m2.metric("Площадок", int(result_df["platform"].nunique()) if "platform" in result_df.columns else 0)
-m3.metric(
-    "Средний eCPM со скидкой",
-    format_number(result_df["ecpm_discounted"].mean(), 2) if "ecpm_discounted" in result_df.columns else "",
-)
-m4.metric(
-    "Средний CTR",
-    format_percent(result_df["ctr_avg"].mean()) if "ctr_avg" in result_df.columns else "",
-)
+render_metrics(result_df)
 
 if scoring_enabled and requested_top_n is not None and available_rows < requested_top_n:
     st.caption(f"Показаны все доступные форматы: {available_rows}")
 
-st.divider()
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
-
-# =========================
-# Таблица
-# =========================
 table_columns = [c for c in TABLE_COLUMNS if c in result_df.columns]
 if not scoring_enabled and "score" in table_columns:
     table_columns.remove("score")
@@ -1072,12 +1250,14 @@ display_df = build_display_table(result_df, table_columns)
 column_config = {}
 for col in table_columns:
     pretty = label(col)
-    if col == "format_name":
-        column_config[pretty] = st.column_config.TextColumn(pretty, width="large")
-    elif col in {"format_type", "platform", "buy_model"}:
-        column_config[pretty] = st.column_config.TextColumn(pretty, width="medium")
+    width_px = COLUMN_WIDTHS.get(col, 120)
+    if width_px >= 240:
+        width = "large"
+    elif width_px >= 140:
+        width = "medium"
     else:
-        column_config[pretty] = st.column_config.TextColumn(pretty, width="small")
+        width = "small"
+    column_config[pretty] = st.column_config.TextColumn(pretty, width=width)
 
 event = st.dataframe(
     display_df,
@@ -1093,10 +1273,6 @@ selected_rows = event.selection.rows if event and event.selection else []
 if selected_rows:
     st.session_state["selected_format_id"] = result_df.iloc[selected_rows[0]]["format_id"]
 
-
-# =========================
-# Карточка
-# =========================
 selected_format_id = st.session_state.get("selected_format_id")
 if selected_format_id is not None and selected_format_id in result_df["format_id"].values:
     selected_row = result_df.loc[result_df["format_id"] == selected_format_id].iloc[0]
