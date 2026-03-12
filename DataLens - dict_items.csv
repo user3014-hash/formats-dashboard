@@ -1,0 +1,88 @@
+dict_id,item_id,item_name,item_type,item_value,item_unit,item_order,parent_item_id,is_active,valid_from,valid_to,comment
+format_type,FT001,Видео,text,,,,,TRUE,,,из format_type.type
+format_type,FT002,Баннер,text,,,,,TRUE,,,из format_type.type
+device,DEV001,Desktop,text,,,,,TRUE,,,из format_device.device
+device,DEV002,Mobile Web,text,,,,,TRUE,,,из format_device.device
+device,DEV003,In-App,text,,,,,TRUE,,,из format_device.device
+device,DEV004,Smart TV,text,,,,,TRUE,,,из format_device.device
+display,DSP001,Статичный,text,,,,,TRUE,,,из format_display.display
+display,DSP002,Анимационный,text,,,,,TRUE,,,из format_display.display
+display,DSP003,Интерактивный,text,,,,,TRUE,,,из format_display.display
+placement,PLC001,In-stream,text,,,,,TRUE,,,из format_placement.placement
+placement,PLC002,Out-stream,text,,,,,TRUE,,,из format_placement.placement
+placement,PLC003,Smart TV,text,,,,,TRUE,,,из format_placement.placement
+instream_pos,ISP001,Pre-roll,text,,,,,TRUE,,,из format_instream_pos.instream_pos
+dmp,DMP001,AiData,text,,,,,TRUE,,,из format_dmp.dmp
+dmp,DMP002,МТС Big Data,text,,,,,TRUE,,,из format_dmp.dmp
+production,PR001,Производство 20% (бесплатно от 500 000 ₽),percent,20,%,,,TRUE,,,"Если бюджет по формату >= 500000, производство бесплатно; иначе применяется 20% наценка на производство"
+production,PR002,Производство бесплатно,free,0,,,,TRUE,,,Всегда бесплатно
+production,PR003,Производство по запросу,condition,,,,,TRUE,,,Пусто/по запросу — оставляем как условие текстом
+other_markup,OM001,Частота,percent,10,%,,,TRUE,,,Наценка за частоту (frequency)
+seasonality_coeff,SC001,Январь,coefficient,0.8,x,,,TRUE,,,seasonality_period=jan
+seasonality_coeff,SC002,Февраль,coefficient,1,x,,,TRUE,,,seasonality_period=feb; не указано у подрядчика → считаем 1
+seasonality_coeff,SC003,Март,coefficient,1.2,x,,,TRUE,,,seasonality_period=mar
+seasonality_coeff,SC004,Апрель,coefficient,1.2,x,,,TRUE,,,seasonality_period=apr
+seasonality_coeff,SC005,Май,coefficient,1,x,,,TRUE,,,seasonality_period=may; не указано у подрядчика → считаем 1
+seasonality_coeff,SC006,Июнь,coefficient,1,x,,,TRUE,,,seasonality_period=jun; не указано у подрядчика → считаем 1
+seasonality_coeff,SC007,Июль,coefficient,1,x,,,TRUE,,,seasonality_period=jul; не указано у подрядчика → считаем 1
+seasonality_coeff,SC008,Август,coefficient,1,x,,,TRUE,,,seasonality_period=aug; не указано у подрядчика → считаем 1
+seasonality_coeff,SC009,Сентябрь,coefficient,1.25,x,,,TRUE,,,seasonality_period=sep
+seasonality_coeff,SC010,Октябрь,coefficient,1.25,x,,,TRUE,,,seasonality_period=oct
+seasonality_coeff,SC011,Ноябрь,coefficient,1.25,x,,,TRUE,,,seasonality_period=nov
+seasonality_coeff,SC012,Декабрь,coefficient,1.25,x,,,TRUE,,,seasonality_period=dec
+targeting,TG001,Пол,text,,,,,TRUE,,,из dim_targeting
+targeting,TG002,Возраст,text,,,,,TRUE,,,из dim_targeting
+targeting,TG003,Семейное положение,text,,,,,TRUE,,,из dim_targeting
+targeting,TG004,Доход,text,,,,,TRUE,,,из dim_targeting
+targeting,TG005,Страна,text,,,,,TRUE,,,из dim_targeting
+targeting,TG006,Регион,text,,,,,TRUE,,,из dim_targeting
+targeting,TG007,Город,text,,,,,TRUE,,,из dim_targeting
+targeting,TG008,Интересы,text,,,,,TRUE,,,из dim_targeting
+targeting,TG009,Покупательские намерения,text,,,,,TRUE,,,из dim_targeting
+targeting,TG010,Поведенческий таргетинг,text,,,,,TRUE,,,из dim_targeting
+targeting,TG011,Ретаргетинг,text,,,,,TRUE,,,из dim_targeting
+targeting,TG012,Look-alike,text,,,,,TRUE,,,из dim_targeting
+targeting,TG013,Установленные приложения,text,,,,,TRUE,,,из dim_targeting
+targeting,TG014,Посещаемые сайты,text,,,,,TRUE,,,из dim_targeting
+targeting,TG015,Устройство,text,,,,,TRUE,,,из dim_targeting
+targeting,TG016,Модель устройства,text,,,,,TRUE,,,из dim_targeting
+targeting,TG017,Операционная система,text,,,,,TRUE,,,из dim_targeting
+targeting,TG018,Браузер,text,,,,,TRUE,,,из dim_targeting
+targeting,TG019,Тип связи,text,,,,,TRUE,,,из dim_targeting
+targeting,TG020,Мобильный оператор,text,,,,,TRUE,,,из dim_targeting
+targeting,TG021,День недели,text,,,,,TRUE,,,из dim_targeting
+targeting,TG022,Время суток,text,,,,,TRUE,,,из dim_targeting
+targeting,TG023,Ключевые фразы,text,,,,,TRUE,,,из dim_targeting
+targeting,TG024,Контекстуальный таргетинг,text,,,,,TRUE,,,из dim_targeting
+targeting,TG025,Жанр контента,text,,,,,TRUE,,,из dim_targeting
+targeting,TG026,Сторонние данные,text,,,,,TRUE,,,из dim_targeting
+targeting,TG027,Погода,text,,,,,TRUE,,,из dim_targeting
+targeting,TG028,Заболеваемость,text,,,,,TRUE,,,из dim_targeting
+targeting_markup,MU001,Гео,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU002,Геотаргетинг по точкам,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU003,Пол,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU004,Возраст,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU005,Доход,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU006,Интересы,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU007,Покупательские намерения,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU008,Поведенческий таргетинг,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU009,Ретаргетинг,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU010,Устройство,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU011,Модель устройства,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU012,Операционная система,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU013,Браузер,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU014,Мобильный оператор,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU015,Погода,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU016,Заболеваемость,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU017,Интересы (сторонние данные),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU018,Поведенческий таргетинг (сторонние данные),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU019,Демография (сторонние данные),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU020,Интересы (AiData),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU021,Покупательские намерения (AiData),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU022,Доход (AiData),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU023,Ретаргетинг (AiData),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU024,Интересы (МТС Big Data),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU025,Покупательские намерения (МТС Big Data),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU026,Доход (МТС Big Data),text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU027,Гео: Москва и Санкт-Петербург,text,,,,,TRUE,,,из targeting_markup_dict
+targeting_markup,MU028,Гео: регионы РФ без Москвы и Санкт-Петербурга,text,,,,,TRUE,,,из targeting_markup_dict
