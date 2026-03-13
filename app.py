@@ -1,4 +1,3 @@
-import html
 import math
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -6,12 +5,13 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 import streamlit as st
-from streamlit.components.v1 import html as components_html
 
-body {
-    background: red !important;
-}
-st.set_page_config(page_title="Подбор рекламных форматов", layout="wide")
+
+st.set_page_config(
+    page_title="Подбор рекламных форматов",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 APP_DIR = Path(__file__).resolve().parent
 
@@ -28,7 +28,6 @@ DEFAULT_WEIGHTS = {
     "viewability_avg": 10,
     "commission": 10,
 }
-DEFAULT_TOP_N = 20
 
 DICT_LABELS = {
     "format_type": "Тип формата",
@@ -88,590 +87,6 @@ COLUMN_LABELS = {
     "ecpm_discounted": "eCPM с учетом скидки",
     "score": "Скоринг",
 }
-
-PILL_GROUP_ORDER = [
-    "format_type",
-    "device",
-    "placement",
-    "display",
-    "dmp",
-    "targeting",
-    "instream_pos",
-    "production",
-    "other_markup",
-    "targeting_markup",
-    "seasonality_coeff",
-]
-
-
-def inject_styles() -> None:
-    st.markdown(
-        """
-        <style>
-            :root {
-                --bg: #F8F2FF;
-                --surface: #FFFFFF;
-                --text: #070037;
-                --accent: #3E20FF;
-                --accent-2: #A35AFF;
-                --soft-accent: #D7B8FF;
-                --secondary: #725BFF;
-                --line: rgba(7, 0, 55, 0.08);
-                --line-strong: rgba(62, 32, 255, 0.18);
-                --muted: rgba(7, 0, 55, 0.62);
-                --muted-2: rgba(7, 0, 55, 0.46);
-                --soft-fill: rgba(215, 184, 255, 0.18);
-                --soft-fill-2: rgba(62, 32, 255, 0.06);
-                --radius: 18px;
-                --radius-sm: 12px;
-            }
-
-            html, body, [class*="css"] {
-                font-feature-settings: "tnum" 1, "lnum" 1;
-            }
-
-            .stApp,
-            [data-testid="stAppViewContainer"],
-            [data-testid="stAppViewContainer"] > .main,
-            [data-testid="stAppViewContainer"] > .main > div,
-            .main .block-container {
-                background: var(--bg);
-                color: var(--text);
-            }
-
-            .main .block-container {
-                max-width: 1360px;
-                padding-top: 1.4rem;
-                padding-bottom: 3rem;
-            }
-
-            [data-testid="stSidebar"] {
-                background: var(--bg);
-                border-right: 1px solid var(--line);
-            }
-
-            [data-testid="stSidebar"] > div,
-            [data-testid="stSidebarContent"] {
-                background: var(--bg);
-            }
-
-            [data-testid="stSidebar"] *,
-            [data-testid="stSidebar"] label,
-            [data-testid="stSidebar"] p,
-            [data-testid="stSidebar"] div,
-            [data-testid="stSidebar"] span,
-            [data-testid="stSidebar"] h1,
-            [data-testid="stSidebar"] h2,
-            [data-testid="stSidebar"] h3,
-            [data-testid="stSidebar"] h4 {
-                color: var(--text) !important;
-            }
-
-            .stApp,
-            .stApp p,
-            .stApp label,
-            .stApp div,
-            .stApp span,
-            .stApp h1,
-            .stApp h2,
-            .stApp h3,
-            .stApp h4,
-            .stApp h5,
-            .stApp h6,
-            [data-testid="stMarkdownContainer"] * {
-                color: var(--text);
-            }
-
-            h1 {
-                font-size: 31px !important;
-                line-height: 1.08 !important;
-                letter-spacing: -0.03em !important;
-                font-weight: 700 !important;
-                margin-bottom: 0.35rem !important;
-            }
-
-            h2 {
-                font-size: 18px !important;
-                line-height: 1.25 !important;
-                font-weight: 700 !important;
-                letter-spacing: -0.01em !important;
-            }
-
-            h3 {
-                font-size: 16px !important;
-                line-height: 1.3 !important;
-                font-weight: 700 !important;
-            }
-
-            p, li, label, .stCaption {
-                font-size: 14px !important;
-                line-height: 1.45 !important;
-            }
-
-            a, a:visited {
-                color: var(--accent) !important;
-                text-decoration: none !important;
-            }
-
-            a:hover {
-                color: var(--accent-2) !important;
-            }
-
-            .stButton > button,
-            .stDownloadButton > button,
-            button[kind="primary"] {
-                background: var(--accent) !important;
-                color: #FFFFFF !important;
-                border: 1px solid var(--accent) !important;
-                border-radius: 10px !important;
-                box-shadow: none !important;
-                font-weight: 500 !important;
-            }
-
-            .stButton > button:hover,
-            .stDownloadButton > button:hover,
-            button[kind="primary"]:hover {
-                background: var(--accent-2) !important;
-                border-color: var(--accent-2) !important;
-                color: #FFFFFF !important;
-            }
-
-            .stTextInput input,
-            .stNumberInput input,
-            .stTextArea textarea {
-                background: var(--surface) !important;
-                color: var(--text) !important;
-                border: 1px solid var(--line-strong) !important;
-                border-radius: 10px !important;
-            }
-
-            div[data-baseweb="select"] > div {
-                background: var(--surface) !important;
-                color: var(--text) !important;
-                border: 1px solid var(--line-strong) !important;
-                border-radius: 10px !important;
-                min-height: 42px !important;
-            }
-
-            div[data-baseweb="select"] input {
-                color: var(--text) !important;
-            }
-
-            [data-baseweb="tag"] {
-                background: var(--surface) !important;
-                border: 1px solid var(--line-strong) !important;
-                border-radius: 7px !important;
-                color: var(--text) !important;
-                padding: 0 2px !important;
-            }
-
-            [data-baseweb="tag"] * {
-                color: var(--text) !important;
-                font-size: 12px !important;
-                line-height: 1.2 !important;
-                font-weight: 500 !important;
-            }
-
-            .stCheckbox {
-                margin-bottom: 0.12rem !important;
-            }
-
-            .stSlider [role="tooltip"],
-            .stSlider div[data-baseweb="tooltip"],
-            .stSlider div[data-baseweb="popover"],
-            .stSlider [data-testid="stThumbValue"] {
-                display: none !important;
-                opacity: 0 !important;
-                visibility: hidden !important;
-            }
-
-            .stAlert {
-                background: var(--surface) !important;
-                color: var(--text) !important;
-                border: 1px solid var(--line-strong) !important;
-                border-radius: 14px !important;
-            }
-
-            [data-testid="stDataEditor"] {
-                border-radius: 16px !important;
-                overflow: hidden !important;
-                border: 1px solid var(--line) !important;
-                box-shadow: none !important;
-                background: var(--surface) !important;
-            }
-
-            [data-testid="stDataEditor"] * {
-                color: var(--text) !important;
-            }
-
-            .sidebar-section {
-                background: var(--surface);
-                border: 1px solid var(--line);
-                border-radius: 16px;
-                padding: 14px 14px 12px 14px;
-                margin-bottom: 12px;
-            }
-
-            .sidebar-section__title {
-                font-size: 13px;
-                line-height: 1.25;
-                letter-spacing: 0.02em;
-                text-transform: uppercase;
-                color: var(--muted);
-                margin-bottom: 10px;
-                font-weight: 600;
-            }
-
-            .hero {
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                gap: 18px;
-                margin-bottom: 16px;
-            }
-
-            .hero__copy {
-                min-width: 0;
-            }
-
-            .hero__eyebrow {
-                font-size: 13px;
-                line-height: 1.3;
-                color: var(--secondary);
-                margin-bottom: 8px;
-                font-weight: 600;
-            }
-
-            .hero__desc {
-                font-size: 14px;
-                line-height: 1.5;
-                color: var(--muted);
-                margin: 0;
-                max-width: 760px;
-            }
-
-            .hero__status {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-                justify-content: flex-end;
-                align-items: center;
-                min-width: 260px;
-            }
-
-            .status-pill {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                padding: 8px 12px;
-                border-radius: 999px;
-                border: 1px solid var(--line);
-                background: var(--surface);
-                font-size: 12px;
-                line-height: 1.2;
-                font-weight: 500;
-                color: var(--text);
-            }
-
-            .status-pill--accent {
-                border-color: rgba(62, 32, 255, 0.16);
-                background: rgba(62, 32, 255, 0.06);
-                color: var(--accent);
-            }
-
-            .surface {
-                background: var(--surface);
-                border: 1px solid var(--line);
-                border-radius: var(--radius);
-                padding: 18px;
-            }
-
-            .kpi-grid {
-                display: grid;
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-                gap: 12px;
-                margin-bottom: 14px;
-            }
-
-            .kpi-card {
-                background: var(--surface);
-                border: 1px solid var(--line);
-                border-radius: 16px;
-                padding: 14px 16px;
-            }
-
-            .kpi-label {
-                font-size: 12px;
-                line-height: 1.25;
-                color: var(--muted);
-                margin-bottom: 8px;
-                font-weight: 500;
-            }
-
-            .kpi-value {
-                font-size: 26px;
-                line-height: 1.05;
-                letter-spacing: -0.02em;
-                font-weight: 700;
-                color: var(--text);
-            }
-
-            .kpi-note {
-                margin-top: 6px;
-                font-size: 12px;
-                line-height: 1.3;
-                color: var(--muted-2);
-            }
-
-            .top-grid {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 12px;
-                margin-bottom: 16px;
-            }
-
-            .top-card {
-                background: var(--surface);
-                border: 1px solid var(--line);
-                border-radius: 16px;
-                padding: 16px;
-                min-height: 158px;
-            }
-
-            .top-card__rank {
-                display: inline-flex;
-                align-items: center;
-                padding: 4px 8px;
-                border-radius: 999px;
-                font-size: 11px;
-                font-weight: 600;
-                line-height: 1.2;
-                color: var(--accent);
-                background: rgba(62, 32, 255, 0.06);
-                margin-bottom: 12px;
-            }
-
-            .top-card__title {
-                font-size: 17px;
-                line-height: 1.2;
-                font-weight: 700;
-                letter-spacing: -0.01em;
-                color: var(--text);
-                margin-bottom: 6px;
-            }
-
-            .top-card__meta {
-                font-size: 13px;
-                line-height: 1.4;
-                color: var(--muted);
-                margin-bottom: 12px;
-            }
-
-            .top-card__stats {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 8px 10px;
-            }
-
-            .mini-stat__label {
-                font-size: 11px;
-                line-height: 1.2;
-                color: var(--muted-2);
-                margin-bottom: 2px;
-            }
-
-            .mini-stat__value {
-                font-size: 13px;
-                line-height: 1.3;
-                font-weight: 600;
-                color: var(--text);
-            }
-
-            .table-shell {
-                background: var(--surface);
-                border: 1px solid var(--line);
-                border-radius: var(--radius);
-                padding: 12px;
-                margin-top: 6px;
-            }
-
-            .table-shell__title {
-                font-size: 14px;
-                line-height: 1.35;
-                font-weight: 700;
-                color: var(--text);
-                margin: 0 0 10px 2px;
-            }
-
-            .dashboard-card {
-                background: var(--surface);
-                border: 1px solid var(--line);
-                border-radius: 20px;
-                padding: 22px;
-                margin-top: 8px;
-            }
-
-            .dashboard-card__title {
-                font-size: 30px;
-                line-height: 1.08;
-                font-weight: 700;
-                letter-spacing: -0.025em;
-                color: var(--text);
-                margin: 0 0 8px 0;
-            }
-
-            .dashboard-card__meta {
-                font-size: 14px;
-                line-height: 1.45;
-                color: var(--muted);
-                margin: 0 0 18px 0;
-            }
-
-            .dashboard-card__meta strong {
-                color: var(--text);
-                font-weight: 600;
-            }
-
-            .stats-grid {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 10px;
-                margin-top: 6px;
-            }
-
-            .stat {
-                background: var(--soft-fill);
-                border-radius: 14px;
-                padding: 12px 14px;
-                border: 1px solid transparent;
-            }
-
-            .stat-label {
-                font-size: 12px;
-                line-height: 1.25;
-                color: var(--muted);
-                margin-bottom: 5px;
-            }
-
-            .stat-value {
-                font-size: 14px;
-                line-height: 1.3;
-                font-weight: 600;
-                color: var(--text);
-            }
-
-            .section {
-                margin-top: 18px;
-            }
-
-            .section-title {
-                font-size: 15px;
-                line-height: 1.35;
-                font-weight: 700;
-                color: var(--text);
-                margin: 0 0 8px 0;
-            }
-
-            .section-text {
-                font-size: 14px;
-                line-height: 1.55;
-                color: var(--text);
-                margin: 0;
-                max-width: 980px;
-            }
-
-            .pill-group {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
-                margin-top: 4px;
-            }
-
-            .pill {
-                display: inline-flex;
-                align-items: center;
-                padding: 4px 8px;
-                border-radius: 7px;
-                background: var(--soft-fill);
-                border: 1px solid var(--line-strong);
-                color: var(--text);
-                font-size: 12px;
-                line-height: 1.2;
-                font-weight: 500;
-                white-space: nowrap;
-            }
-
-            .links-list {
-                display: grid;
-                gap: 6px;
-                margin-top: 4px;
-            }
-
-            .links-list a {
-                font-size: 14px;
-                line-height: 1.4;
-                font-weight: 500;
-            }
-
-            @media (max-width: 1100px) {
-                .kpi-grid,
-                .top-grid,
-                .stats-grid {
-                    grid-template-columns: 1fr;
-                }
-
-                .hero {
-                    flex-direction: column;
-                }
-
-                .hero__status {
-                    justify-content: flex-start;
-                    min-width: 0;
-                }
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def inject_dom_fixes() -> None:
-    components_html(
-        """
-        <script>
-        (function() {
-            const hideSliderTooltips = () => {
-                const selectors = [
-                    '[role="tooltip"]',
-                    '[data-baseweb="tooltip"]',
-                    '[data-baseweb="popover"]',
-                    '[data-testid="stThumbValue"]'
-                ];
-                selectors.forEach((selector) => {
-                    const nodes = window.parent.document.querySelectorAll(selector);
-                    nodes.forEach((node) => {
-                        const text = (node.textContent || '').trim();
-                        if (text === '0' || text === '100' || text === '5' || text === '95' || node.closest('[data-baseweb="slider"]')) {
-                            node.style.display = 'none';
-                            node.style.visibility = 'hidden';
-                            node.style.opacity = '0';
-                            node.setAttribute('hidden', 'hidden');
-                        }
-                    });
-                });
-            };
-            hideSliderTooltips();
-            const observer = new MutationObserver(() => hideSliderTooltips());
-            observer.observe(window.parent.document.body, {
-                childList: true,
-                subtree: true,
-                attributes: true
-            });
-        })();
-        </script>
-        """,
-        height=0,
-    )
 
 
 def find_data_file(filename: str) -> Path:
@@ -1004,16 +419,6 @@ def enrich_formats(formats: pd.DataFrame, dict_items: pd.DataFrame, format_items
     return df
 
 
-def get_all_tag_values(df: pd.DataFrame, column_name: str) -> List[str]:
-    if column_name not in df.columns:
-        return []
-    values = set()
-    for items in df[column_name]:
-        if isinstance(items, list):
-            values.update([str(x) for x in items if str(x).strip()])
-    return sorted(values)
-
-
 def apply_filters(df: pd.DataFrame, state: Dict) -> pd.DataFrame:
     result = df.copy()
 
@@ -1104,7 +509,9 @@ def init_weight_state() -> None:
         if session_key not in st.session_state:
             st.session_state[session_key] = value
     if "top_n_formats" not in st.session_state:
-        st.session_state["top_n_formats"] = DEFAULT_TOP_N
+        st.session_state["top_n_formats"] = 20
+    if "selected_format_id" not in st.session_state:
+        st.session_state["selected_format_id"] = None
 
 
 def reset_weights() -> None:
@@ -1124,120 +531,6 @@ def normalize_weight_state() -> None:
     normalized = normalize_weights(current)
     for key, value in normalized.items():
         st.session_state[f"weight_{key}"] = value
-
-
-def render_sidebar(df: pd.DataFrame) -> Tuple[Dict, Dict[str, int], bool, int]:
-    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
-    st.sidebar.markdown('<div class="sidebar-section__title">Базовые фильтры</div>', unsafe_allow_html=True)
-    platforms = st.sidebar.multiselect(
-        "Площадка",
-        options=sorted(df["platform"].dropna().unique().tolist()) if "platform" in df.columns else [],
-        placeholder="Выбрать",
-    )
-    service_types = st.sidebar.multiselect(
-        "Тип сервиса",
-        options=sorted(df["type_service"].dropna().unique().tolist()) if "type_service" in df.columns else [],
-        placeholder="Выбрать",
-    )
-    buy_models = st.sidebar.multiselect(
-        "Модель закупки",
-        options=sorted(df["buy_model"].dropna().unique().tolist()) if "buy_model" in df.columns else [],
-        placeholder="Выбрать",
-    )
-    st.sidebar.markdown("</div>", unsafe_allow_html=True)
-
-    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
-    st.sidebar.markdown('<div class="sidebar-section__title">Требования</div>', unsafe_allow_html=True)
-    need_verification_pixel = st.sidebar.checkbox("Пиксель отслеживания")
-    need_verification_js = st.sidebar.checkbox("JavaScript-трекинг")
-    need_bls = st.sidebar.checkbox("Brand Lift")
-    need_sales_lift = st.sidebar.checkbox("Sales Lift")
-    st.sidebar.markdown("</div>", unsafe_allow_html=True)
-
-    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
-    st.sidebar.markdown('<div class="sidebar-section__title">Параметры формата</div>', unsafe_allow_html=True)
-    filter_format_type = st.sidebar.multiselect("Тип формата", get_all_tag_values(df, "format_type"), placeholder="Выбрать")
-    filter_device = st.sidebar.multiselect("Устройство", get_all_tag_values(df, "device"), placeholder="Выбрать")
-    filter_placement = st.sidebar.multiselect("Размещение", get_all_tag_values(df, "placement"), placeholder="Выбрать")
-    filter_display = st.sidebar.multiselect("Показ креатива", get_all_tag_values(df, "display"), placeholder="Выбрать")
-    filter_dmp = st.sidebar.multiselect("Данные и сегменты", get_all_tag_values(df, "dmp"), placeholder="Выбрать")
-    filter_targeting = st.sidebar.multiselect("Таргетинги", get_all_tag_values(df, "targeting"), placeholder="Выбрать")
-    filter_instream_pos = st.sidebar.multiselect("Позиция в потоке", get_all_tag_values(df, "instream_pos"), placeholder="Выбрать")
-    st.sidebar.markdown("</div>", unsafe_allow_html=True)
-
-    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
-    st.sidebar.markdown('<div class="sidebar-section__title">Пороговые значения</div>', unsafe_allow_html=True)
-    min_reach = st.sidebar.number_input("Минимальный охват", min_value=0, value=0, step=10000)
-    min_ctr = st.sidebar.number_input("Минимальный CTR", min_value=0.0, value=0.0, step=0.001, format="%.3f")
-    min_vtr = st.sidebar.number_input("Минимальный VTR", min_value=0.0, value=0.0, step=0.01, format="%.2f")
-    min_viewability = st.sidebar.number_input("Минимальный viewability", min_value=0.0, value=0.0, step=0.01, format="%.2f")
-    max_ecpm = st.sidebar.number_input("Максимальный eCPM", min_value=0.0, value=0.0, step=10.0, format="%.2f")
-    max_commission = st.sidebar.number_input("Максимальная комиссия", min_value=0.0, value=0.0, step=0.01, format="%.2f")
-    st.sidebar.markdown("</div>", unsafe_allow_html=True)
-
-    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
-    st.sidebar.markdown('<div class="sidebar-section__title">Скоринг</div>', unsafe_allow_html=True)
-    scoring_enabled = st.sidebar.checkbox("Включить скоринг", value=True)
-
-    init_weight_state()
-
-    top_n = st.sidebar.number_input(
-        "Сколько топ форматов вывести",
-        min_value=1,
-        value=int(st.session_state["top_n_formats"]),
-        step=1,
-        key="top_n_formats",
-    )
-
-    st.sidebar.slider("Максимальный охват", min_value=0, max_value=100, step=5, key="weight_max_reach")
-    st.sidebar.slider("eCPM с учетом скидки", min_value=0, max_value=100, step=5, key="weight_ecpm_discounted")
-    st.sidebar.slider("CTR", min_value=0, max_value=100, step=5, key="weight_ctr_avg")
-    st.sidebar.slider("VTR", min_value=0, max_value=100, step=5, key="weight_vtr_avg")
-    st.sidebar.slider("Viewability", min_value=0, max_value=100, step=5, key="weight_viewability_avg")
-    st.sidebar.slider("Комиссия", min_value=0, max_value=100, step=5, key="weight_commission")
-
-    col1, col2 = st.sidebar.columns(2)
-    with col1:
-        st.button("Нормализовать", key="normalize_weights_btn", on_click=normalize_weight_state)
-    with col2:
-        st.button("Сбросить", key="reset_weights_btn", on_click=reset_weights)
-
-    weights = {
-        "max_reach": int(st.session_state["weight_max_reach"]),
-        "ecpm_discounted": int(st.session_state["weight_ecpm_discounted"]),
-        "ctr_avg": int(st.session_state["weight_ctr_avg"]),
-        "vtr_avg": int(st.session_state["weight_vtr_avg"]),
-        "viewability_avg": int(st.session_state["weight_viewability_avg"]),
-        "commission": int(st.session_state["weight_commission"]),
-    }
-
-    st.sidebar.caption(f"Сумма весов: {sum(weights.values())}")
-    st.sidebar.markdown("</div>", unsafe_allow_html=True)
-
-    filters: Dict[str, Optional[float] | List[str] | bool] = {
-        "platforms": platforms,
-        "service_types": service_types,
-        "buy_models": buy_models,
-        "need_verification_pixel": need_verification_pixel,
-        "need_verification_js": need_verification_js,
-        "need_bls": need_bls,
-        "need_sales_lift": need_sales_lift,
-        "filter_format_type": filter_format_type,
-        "filter_device": filter_device,
-        "filter_placement": filter_placement,
-        "filter_display": filter_display,
-        "filter_dmp": filter_dmp,
-        "filter_targeting": filter_targeting,
-        "filter_instream_pos": filter_instream_pos,
-        "min_reach": None if min_reach == 0 else min_reach,
-        "min_ctr": None if min_ctr == 0 else min_ctr,
-        "min_vtr": None if min_vtr == 0 else min_vtr,
-        "min_viewability": None if min_viewability == 0 else min_viewability,
-        "max_ecpm": None if max_ecpm == 0 else max_ecpm,
-        "max_commission": None if max_commission == 0 else max_commission,
-    }
-
-    return filters, weights, scoring_enabled, int(top_n)
 
 
 def build_table_view(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFrame:
@@ -1260,57 +553,905 @@ def build_table_view(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFrame:
 
     existing_columns = [col for col in columns if col in df.columns]
     table_df = df[existing_columns].copy()
-    table_df.insert(0, "Выбрать", False)
 
     rename_map = {col: get_label(col) for col in existing_columns}
     return table_df.rename(columns=rename_map)
 
 
-def render_table_selection(table_df: pd.DataFrame, source_df: pd.DataFrame) -> Optional[pd.Series]:
-    disabled_columns = [col for col in table_df.columns if col != "Выбрать"]
+def get_top_formats(df: pd.DataFrame, scoring_applied: bool, n: int = 3) -> pd.DataFrame:
+    if df.empty:
+        return df.copy()
 
-    edited = st.data_editor(
-        table_df,
-        hide_index=True,
-        use_container_width=True,
-        disabled=disabled_columns,
-        column_config={"Выбрать": st.column_config.CheckboxColumn("Выбрать")},
-    )
+    base = df.copy()
+    if scoring_applied and "score" in base.columns:
+        return base.sort_values(by=["score", "ecpm_discounted"], ascending=[False, True], na_position="last").head(n)
 
-    selected_rows = edited[edited["Выбрать"] == True]
-    if selected_rows.empty:
+    sort_cols = [col for col in ["max_reach", "ctr_avg"] if col in base.columns]
+    if sort_cols:
+        return base.sort_values(by=sort_cols, ascending=[False] * len(sort_cols), na_position="last").head(n)
+
+    return base.head(n)
+
+
+def get_selected_format_by_id(df: pd.DataFrame, format_id) -> Optional[pd.Series]:
+    if "format_id" not in df.columns:
         return None
-
-    format_id_label = get_label("format_id")
-    selected_format_id = selected_rows.iloc[0][format_id_label]
-
-    match = source_df[source_df["format_id"] == selected_format_id]
+    match = df[df["format_id"] == format_id]
     if match.empty:
         return None
     return match.iloc[0]
 
 
-def render_header(found_count: int, scoring_enabled: bool, scoring_applied: bool) -> None:
-    scoring_text = "Скоринг включен" if scoring_enabled else "Скоринг выключен"
-    if scoring_enabled and not scoring_applied:
-        scoring_text = "Скоринг не применен"
+def build_format_card_data(row: pd.Series) -> Dict:
+    data = {
+        "title": str(row.get("format_name", "Без названия")),
+        "meta": {
+            "platform": str(row.get("platform", "—")),
+            "type_service": str(row.get("type_service", "—")),
+            "buy_model": str(row.get("buy_model", "—")),
+        },
+        "stats": {
+            "max_reach": format_number(row.get("max_reach"), 0),
+            "min_budget": format_number(row.get("min_budget"), 0),
+            "ecpm_discounted": format_number(row.get("ecpm_discounted")),
+            "commission": format_percent(row.get("commission")),
+            "ctr_avg": format_percent(row.get("ctr_avg")),
+            "viewability_avg": format_percent(row.get("viewability_avg")),
+            "discount": format_percent(row.get("discount")),
+            "vtr_avg": format_percent(row.get("vtr_avg")),
+            "verification_pixel": format_bool(row.get("verification_pixel")),
+            "verification_js": format_bool(row.get("verification_js")),
+            "bls": format_bool(row.get("bls")),
+            "sales_lift": format_bool(row.get("sales_lift")),
+        },
+        "description": row.get("description"),
+        "dict_groups": {},
+        "conditions": {
+            "verification_terms": row.get("verification_terms"),
+            "bls_terms": row.get("bls_terms"),
+            "sales_lift_terms": row.get("sales_lift_terms"),
+            "seasonality_terms": row.get("seasonality_terms"),
+        },
+        "links": {
+            "example_url": row.get("example_url"),
+            "technical_requirements_url": row.get("technical_requirements_url"),
+            "mediakit_url": row.get("mediakit_url"),
+            "cases_url": row.get("cases_url"),
+        },
+    }
 
-    scoring_class = "status-pill status-pill--accent" if scoring_applied else "status-pill"
+    for dict_id, label in DICT_LABELS.items():
+        rich_col = f"{dict_id}__rich"
+        if rich_col in row.index and isinstance(row.get(rich_col), list) and row.get(rich_col):
+            values = [format_item_badge(item) for item in row.get(rich_col)]
+            data["dict_groups"][label] = values
+        elif dict_id in row.index and isinstance(row.get(dict_id), list) and row.get(dict_id):
+            data["dict_groups"][label] = row.get(dict_id)
 
+    return data
+
+
+def inject_styles() -> None:
+    st.markdown(
+        """
+        <style>
+        :root {
+            --bg: #F8F2FF;
+            --card: #FFFFFF;
+            --text: #070037;
+            --muted: rgba(7, 0, 55, 0.62);
+            --accent: #3E20FF;
+            --accent-hover: #A35AFF;
+            --soft: #D7B8FF;
+            --soft-bg: #F8F2FF;
+            --line: rgba(215, 184, 255, 0.8);
+            --line-soft: rgba(215, 184, 255, 0.55);
+            --radius-card: 16px;
+            --radius-card-lg: 18px;
+            --radius-input: 10px;
+            --radius-mini: 12px;
+            --radius-pill: 999px;
+        }
+
+        html, body, [class*="css"] {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stApp {
+            background: var(--bg);
+        }
+
+        .block-container {
+            max-width: 1320px;
+            padding-top: 24px;
+            padding-bottom: 48px;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        section[data-testid="stSidebar"] {
+            background: var(--bg);
+            border-right: 1px solid #D7B8FF;
+        }
+
+        section[data-testid="stSidebar"] > div {
+            padding-top: 20px;
+            padding-bottom: 20px;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        section[data-testid="stSidebar"] .stMarkdown p,
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] .stCheckbox label span {
+            color: var(--text) !important;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text);
+            margin: 0 0 16px 0;
+        }
+
+        .sidebar-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: var(--text);
+            margin: 16px 0 10px 0;
+        }
+
+        .sidebar-note {
+            font-size: 12px;
+            line-height: 1.45;
+            color: var(--muted);
+            margin: 8px 0 0 0;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(215, 184, 255, 0.7);
+            margin: 14px 0 14px 0;
+        }
+
+        div[data-baseweb="select"] > div,
+        div[data-baseweb="input"] > div,
+        .stNumberInput > div > div,
+        .stTextInput > div > div {
+            min-height: 42px !important;
+            background: #FFFFFF !important;
+            border: 1px solid #D7B8FF !important;
+            border-radius: 10px !important;
+            box-shadow: none !important;
+        }
+
+        div[data-baseweb="select"] > div:hover,
+        div[data-baseweb="input"] > div:hover,
+        .stNumberInput > div > div:hover,
+        .stTextInput > div > div:hover {
+            border-color: #A35AFF !important;
+        }
+
+        div[data-baseweb="select"] *:focus,
+        div[data-baseweb="input"] *:focus,
+        .stNumberInput *:focus,
+        .stTextInput *:focus {
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        div[data-baseweb="tag"] {
+            border-radius: 999px !important;
+            background: #F8F2FF !important;
+            border: 1px solid #D7B8FF !important;
+            color: #070037 !important;
+        }
+
+        .stCheckbox label {
+            font-size: 14px !important;
+        }
+
+        div[data-testid="stSlider"] [data-baseweb="slider"] > div > div:nth-child(1) {
+            background: #D7B8FF !important;
+            height: 4px !important;
+        }
+
+        div[data-testid="stSlider"] [data-baseweb="slider"] > div > div:nth-child(2) {
+            background: #3E20FF !important;
+            height: 4px !important;
+        }
+
+        div[data-testid="stSlider"] [role="slider"] {
+            width: 16px !important;
+            height: 16px !important;
+            background: #3E20FF !important;
+            border: 2px solid #FFFFFF !important;
+            box-shadow: none !important;
+        }
+
+        div[data-testid="stSlider"] [data-testid="stThumbValue"] {
+            display: none !important;
+        }
+
+        .stButton > button,
+        .stDownloadButton > button {
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #3E20FF;
+            background: #3E20FF;
+            color: #FFFFFF;
+            font-weight: 600;
+            box-shadow: none;
+        }
+
+        .stButton > button:hover,
+        .stDownloadButton > button:hover {
+            background: #A35AFF;
+            border-color: #A35AFF;
+            color: #FFFFFF;
+        }
+
+        .stButton > button:focus,
+        .stDownloadButton > button:focus {
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        .ghost-btn button {
+            background: #FFFFFF !important;
+            color: #3E20FF !important;
+            border: 1px solid #D7B8FF !important;
+        }
+
+        .ghost-btn button:hover {
+            border-color: #A35AFF !important;
+            color: #A35AFF !important;
+        }
+
+        .ui-gap {
+            height: 20px;
+        }
+
+        .header-card,
+        .white-card,
+        .format-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(215, 184, 255, 0.8);
+            border-radius: 16px;
+        }
+
+        .header-card {
+            padding: 24px;
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.08;
+            letter-spacing: -0.02em;
+            color: #070037;
+        }
+
+        .page-subtitle {
+            margin: 8px 0 0 0;
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(7, 0, 55, 0.62);
+            max-width: 760px;
+        }
+
+        .status-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 999px;
+            border: 1px solid #D7B8FF;
+            background: #FFFFFF;
+            color: #070037;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(215, 184, 255, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 116px;
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            line-height: 1.35;
+            font-weight: 600;
+            color: rgba(7, 0, 55, 0.62);
+            margin-bottom: 14px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            line-height: 1.08;
+            font-weight: 700;
+            color: #070037;
+            letter-spacing: -0.02em;
+        }
+
+        .section-title-row {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            line-height: 1.2;
+            font-weight: 700;
+            color: #070037;
+            margin: 0;
+        }
+
+        .section-hint {
+            font-size: 13px;
+            line-height: 1.4;
+            color: rgba(7, 0, 55, 0.62);
+            margin: 0;
+        }
+
+        .top-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .top-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(215, 184, 255, 0.9);
+            border-radius: 16px;
+            padding: 18px;
+            min-height: 168px;
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .top-card:hover {
+            border-color: #A35AFF;
+            background: #FFFFFF;
+        }
+
+        .top-card-header {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .top-card-title {
+            font-size: 22px;
+            line-height: 1.15;
+            font-weight: 700;
+            color: #070037;
+            margin: 0;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 64px;
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 999px;
+            background: #F8F2FF;
+            border: 1px solid #D7B8FF;
+            color: #3E20FF;
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .top-descriptor {
+            font-size: 13px;
+            line-height: 1.45;
+            color: rgba(7, 0, 55, 0.62);
+            margin: 0 0 14px 0;
+        }
+
+        .mini-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 12px;
+        }
+
+        .mini-stat {
+            background: #F8F2FF;
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .mini-stat-label {
+            font-size: 12px;
+            line-height: 1.35;
+            color: rgba(7, 0, 55, 0.62);
+            margin-bottom: 6px;
+        }
+
+        .mini-stat-value {
+            font-size: 16px;
+            line-height: 1.2;
+            font-weight: 700;
+            color: #070037;
+        }
+
+        .table-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(215, 184, 255, 0.8);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 20px 14px 20px;
+            border-bottom: 1px solid rgba(215, 184, 255, 0.55);
+        }
+
+        .table-title {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.2;
+            font-weight: 700;
+            color: #070037;
+        }
+
+        .table-note {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.4;
+            color: rgba(7, 0, 55, 0.62);
+        }
+
+        div[data-testid="stDataFrame"] {
+            border: none !important;
+        }
+
+        div[data-testid="stDataFrame"] [role="table"] {
+            border: none !important;
+        }
+
+        div[data-testid="stDataFrame"] [data-testid="stDataFrameResizable"] {
+            border: none !important;
+        }
+
+        .format-card-wrap {
+            margin-top: 4px;
+        }
+
+        .format-card-title {
+            margin: 0 0 14px 0;
+            font-size: 18px;
+            line-height: 1.2;
+            font-weight: 700;
+            color: #070037;
+        }
+
+        .format-card {
+            border-radius: 18px;
+            padding: 24px;
+            border: 1px solid rgba(215, 184, 255, 0.85);
+        }
+
+        .format-name {
+            margin: 0 0 10px 0;
+            font-size: 30px;
+            line-height: 1.08;
+            letter-spacing: -0.02em;
+            font-weight: 700;
+            color: #070037;
+        }
+
+        .meta-row {
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(7, 0, 55, 0.62);
+            margin-bottom: 20px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-box {
+            background: #F8F2FF;
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .metric-box-label {
+            font-size: 12px;
+            line-height: 1.35;
+            color: rgba(7, 0, 55, 0.62);
+            margin-bottom: 6px;
+        }
+
+        .metric-box-value {
+            font-size: 18px;
+            line-height: 1.2;
+            font-weight: 700;
+            color: #070037;
+        }
+
+        .subsection {
+            margin-top: 18px;
+        }
+
+        .subsection-title {
+            font-size: 14px;
+            line-height: 1.35;
+            font-weight: 700;
+            color: #070037;
+            margin: 0 0 10px 0;
+        }
+
+        .body-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #070037;
+            margin: 0;
+        }
+
+        .muted-empty {
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(7, 0, 55, 0.62);
+            margin: 0;
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #F8F2FF;
+            border: 1px solid #D7B8FF;
+            color: #070037;
+            font-size: 12px;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+
+        .link-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .link-list a {
+            font-size: 14px;
+            line-height: 1.5;
+            font-weight: 600;
+            color: #3E20FF;
+            text-decoration: none;
+        }
+
+        .link-list a:hover {
+            color: #A35AFF;
+            text-decoration: none;
+        }
+
+        .empty-state {
+            background: #FFFFFF;
+            border: 1px dashed #D7B8FF;
+            border-radius: 16px;
+            padding: 20px;
+            color: rgba(7, 0, 55, 0.62);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1180px) {
+            .kpi-grid,
+            .top-grid,
+            .metrics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .header-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-pills {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .kpi-grid,
+            .top-grid,
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title,
+            .format-name {
+                font-size: 24px;
+            }
+
+            .kpi-value {
+                font-size: 26px;
+            }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_sidebar_title() -> None:
+    st.sidebar.markdown('<div class="sidebar-title">Панель управления</div>', unsafe_allow_html=True)
+
+
+def render_sidebar_section_title(title: str) -> None:
+    st.sidebar.markdown(f'<div class="sidebar-section-title">{title}</div>', unsafe_allow_html=True)
+
+
+def render_sidebar_divider() -> None:
+    st.sidebar.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+
+def unique_options(df: pd.DataFrame, column: str) -> List:
+    if column not in df.columns:
+        return []
+    values = df[column].dropna().astype(str)
+    return sorted(values.unique().tolist())
+
+
+def unique_tag_options(df: pd.DataFrame, column: str) -> List[str]:
+    if column not in df.columns:
+        return []
+    values = set()
+    for items in df[column]:
+        if isinstance(items, list):
+            for item in items:
+                text = str(item).strip()
+                if text:
+                    values.add(text)
+    return sorted(values)
+
+
+def build_sidebar_state(df: pd.DataFrame) -> Tuple[Dict, bool, Dict[str, int]]:
+    render_sidebar_title()
+
+    render_sidebar_section_title("Фильтры")
+    platforms = st.sidebar.multiselect(
+        "Площадка",
+        options=unique_options(df, "platform"),
+        placeholder="Все площадки",
+    )
+    service_types = st.sidebar.multiselect(
+        "Тип сервиса",
+        options=unique_options(df, "type_service"),
+        placeholder="Все типы",
+    )
+    buy_models = st.sidebar.multiselect(
+        "Модель закупки",
+        options=unique_options(df, "buy_model"),
+        placeholder="Все модели",
+    )
+
+    need_verification_pixel = st.sidebar.checkbox("Нужен пиксель отслеживания", value=False)
+    need_verification_js = st.sidebar.checkbox("Нужен JavaScript-трекинг", value=False)
+    need_bls = st.sidebar.checkbox("Требуется Brand Lift", value=False)
+    need_sales_lift = st.sidebar.checkbox("Требуется Sales Lift", value=False)
+
+    render_sidebar_divider()
+
+    render_sidebar_section_title("Параметры и таргетинги")
+    filter_format_type = st.sidebar.multiselect(
+        "Тип формата",
+        options=unique_tag_options(df, "format_type"),
+        placeholder="Все значения",
+    )
+    filter_device = st.sidebar.multiselect(
+        "Устройство",
+        options=unique_tag_options(df, "device"),
+        placeholder="Все значения",
+    )
+    filter_placement = st.sidebar.multiselect(
+        "Размещение",
+        options=unique_tag_options(df, "placement"),
+        placeholder="Все значения",
+    )
+    filter_display = st.sidebar.multiselect(
+        "Показ креатива",
+        options=unique_tag_options(df, "display"),
+        placeholder="Все значения",
+    )
+    filter_dmp = st.sidebar.multiselect(
+        "Данные и сегменты",
+        options=unique_tag_options(df, "dmp"),
+        placeholder="Все значения",
+    )
+    filter_targeting = st.sidebar.multiselect(
+        "Таргетинги",
+        options=unique_tag_options(df, "targeting"),
+        placeholder="Все значения",
+    )
+    filter_instream_pos = st.sidebar.multiselect(
+        "Позиция в потоке",
+        options=unique_tag_options(df, "instream_pos"),
+        placeholder="Все значения",
+    )
+
+    render_sidebar_divider()
+
+    render_sidebar_section_title("Пороговые значения")
+    min_reach = st.sidebar.number_input("Минимальный охват", min_value=0.0, value=0.0, step=1000.0)
+    min_ctr = st.sidebar.number_input("Минимальный CTR", min_value=0.0, value=0.0, step=0.01, format="%.4f")
+    min_vtr = st.sidebar.number_input("Минимальный VTR", min_value=0.0, value=0.0, step=0.01, format="%.4f")
+    min_viewability = st.sidebar.number_input("Минимальный Viewability", min_value=0.0, value=0.0, step=0.01, format="%.4f")
+    max_ecpm_value = float(df["ecpm_discounted"].dropna().max()) if "ecpm_discounted" in df.columns and not df["ecpm_discounted"].dropna().empty else 1000.0
+    max_commission_value = float(df["commission"].dropna().max()) if "commission" in df.columns and not df["commission"].dropna().empty else 1.0
+    max_ecpm = st.sidebar.number_input("Максимальный eCPM", min_value=0.0, value=max_ecpm_value, step=10.0)
+    max_commission = st.sidebar.number_input("Максимальная комиссия", min_value=0.0, value=max_commission_value, step=0.01, format="%.4f")
+
+    render_sidebar_divider()
+
+    render_sidebar_section_title("Скоринг")
+    scoring_applied = st.sidebar.toggle("Использовать скоринг", value=True)
+
+    st.sidebar.slider(
+        "Вес охвата",
+        min_value=0,
+        max_value=100,
+        step=5,
+        key="weight_max_reach",
+    )
+    st.sidebar.slider(
+        "Вес eCPM",
+        min_value=0,
+        max_value=100,
+        step=5,
+        key="weight_ecpm_discounted",
+    )
+    st.sidebar.slider(
+        "Вес CTR",
+        min_value=0,
+        max_value=100,
+        step=5,
+        key="weight_ctr_avg",
+    )
+    st.sidebar.slider(
+        "Вес VTR",
+        min_value=0,
+        max_value=100,
+        step=5,
+        key="weight_vtr_avg",
+    )
+    st.sidebar.slider(
+        "Вес Viewability",
+        min_value=0,
+        max_value=100,
+        step=5,
+        key="weight_viewability_avg",
+    )
+    st.sidebar.slider(
+        "Вес комиссии",
+        min_value=0,
+        max_value=100,
+        step=5,
+        key="weight_commission",
+    )
+
+    weights_col1, weights_col2 = st.sidebar.columns(2)
+    with weights_col1:
+        if st.button("Нормализовать", use_container_width=True):
+            normalize_weight_state()
+    with weights_col2:
+        st.markdown('<div class="ghost-btn">', unsafe_allow_html=True)
+        if st.button("Сбросить", use_container_width=True):
+            reset_weights()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    current_weights = {
+        "max_reach": st.session_state.get("weight_max_reach", DEFAULT_WEIGHTS["max_reach"]),
+        "ecpm_discounted": st.session_state.get("weight_ecpm_discounted", DEFAULT_WEIGHTS["ecpm_discounted"]),
+        "ctr_avg": st.session_state.get("weight_ctr_avg", DEFAULT_WEIGHTS["ctr_avg"]),
+        "vtr_avg": st.session_state.get("weight_vtr_avg", DEFAULT_WEIGHTS["vtr_avg"]),
+        "viewability_avg": st.session_state.get("weight_viewability_avg", DEFAULT_WEIGHTS["viewability_avg"]),
+        "commission": st.session_state.get("weight_commission", DEFAULT_WEIGHTS["commission"]),
+    }
+
+    st.sidebar.markdown(
+        f'<div class="sidebar-note">Сумма весов: <strong>{sum(current_weights.values())}</strong></div>',
+        unsafe_allow_html=True,
+    )
+
+    state = {
+        "platforms": platforms,
+        "service_types": service_types,
+        "buy_models": buy_models,
+        "need_verification_pixel": need_verification_pixel,
+        "need_verification_js": need_verification_js,
+        "need_bls": need_bls,
+        "need_sales_lift": need_sales_lift,
+        "filter_format_type": filter_format_type,
+        "filter_device": filter_device,
+        "filter_placement": filter_placement,
+        "filter_display": filter_display,
+        "filter_dmp": filter_dmp,
+        "filter_targeting": filter_targeting,
+        "filter_instream_pos": filter_instream_pos,
+        "min_reach": None if min_reach == 0 else min_reach,
+        "min_ctr": None if min_ctr == 0 else min_ctr,
+        "min_vtr": None if min_vtr == 0 else min_vtr,
+        "min_viewability": None if min_viewability == 0 else min_viewability,
+        "max_ecpm": None if max_ecpm == max_ecpm_value else max_ecpm,
+        "max_commission": None if max_commission == max_commission_value else max_commission,
+    }
+
+    return state, scoring_applied, current_weights
+
+
+def render_header(found_count: int, scoring_applied: bool) -> None:
+    status_text = "Скоринг включен" if scoring_applied else "Скоринг выключен"
     st.markdown(
         f"""
-        <div class="hero">
-            <div class="hero__copy">
-                <div class="hero__eyebrow">Decision tool</div>
-                <h1>Подбор рекламных форматов</h1>
-                <p class="hero__desc">
-                    Сначала задайте фильтры и ограничения, затем настройте веса скоринга.
-                    Интерфейс помогает быстро сравнить форматы, выбрать сильные варианты и открыть детальную карточку.
-                </p>
-            </div>
-            <div class="hero__status">
-                <div class="status-pill">Найдено форматов: {found_count}</div>
-                <div class="{scoring_class}">{html.escape(scoring_text)}</div>
+        <div class="header-card">
+            <div class="header-grid">
+                <div>
+                    <h1 class="page-title">Подбор рекламных форматов</h1>
+                    <p class="page-subtitle">
+                        Интерфейс для выбора оптимального формата: от фильтрации и настройки весов
+                        до ранжирования вариантов и детального просмотра карточки выбранного размещения.
+                    </p>
+                </div>
+                <div class="status-pills">
+                    <div class="status-pill">Найдено форматов: {found_count}</div>
+                    <div class="status-pill">{status_text}</div>
+                </div>
             </div>
         </div>
         """,
@@ -1318,267 +1459,324 @@ def render_header(found_count: int, scoring_enabled: bool, scoring_applied: bool
     )
 
 
-def render_quick_insights(df: pd.DataFrame, scoring_applied: bool) -> None:
-    best_score = df["score"].max() if scoring_applied and "score" in df.columns and not df.empty else np.nan
-    max_reach = df["max_reach"].max() if "max_reach" in df.columns and not df.empty else np.nan
-    min_ecpm = df["ecpm_discounted"].min() if "ecpm_discounted" in df.columns and not df.empty else np.nan
-    min_commission = df["commission"].min() if "commission" in df.columns and not df.empty else np.nan
+def render_kpi_row(df: pd.DataFrame, scoring_applied: bool) -> None:
+    found_count = len(df)
+    best_score = format_number(df["score"].max()) if scoring_applied and "score" in df.columns and not df.empty else "—"
+    max_reach = format_number(df["max_reach"].max(), 0) if "max_reach" in df.columns and not df.empty else "—"
+    min_ecpm = format_number(df["ecpm_discounted"].min()) if "ecpm_discounted" in df.columns and not df.empty else "—"
 
-    cards = [
-        ("Найдено форматов", str(len(df)), "После всех фильтров"),
-        ("Лучший score", format_number(best_score), "Доступно при включенном скоринге"),
-        ("Максимальный охват", format_number(max_reach, 0), "Лучшее значение в выборке"),
-        ("Минимальный eCPM / комиссия", f"{format_number(min_ecpm)} / {format_percent(min_commission)}", "Для быстрого сравнения"),
-    ]
-
-    cards_html = "".join(
+    st.markdown(
         f"""
-        <div class="kpi-card">
-            <div class="kpi-label">{html.escape(label)}</div>
-            <div class="kpi-value">{html.escape(value)}</div>
-            <div class="kpi-note">{html.escape(note)}</div>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Найдено форматов</div>
+                <div class="kpi-value">{found_count}</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Лучший скоринг</div>
+                <div class="kpi-value">{best_score}</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Максимальный охват</div>
+                <div class="kpi-value">{max_reach}</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Минимальный eCPM</div>
+                <div class="kpi-value">{min_ecpm}</div>
+            </div>
         </div>
-        """
-        for label, value, note in cards
+        """,
+        unsafe_allow_html=True,
     )
 
-    st.markdown(f'<div class="kpi-grid">{cards_html}</div>', unsafe_allow_html=True)
 
+def render_top_formats(top_df: pd.DataFrame, scoring_applied: bool) -> None:
+    st.markdown(
+        """
+        <div class="section-title-row">
+            <h2 class="section-title">Топ форматы</h2>
+            <p class="section-hint">Краткий срез лучших вариантов до основной таблицы</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-def render_top_formats(df: pd.DataFrame, scoring_applied: bool) -> None:
-    if df.empty:
+    if top_df.empty:
+        st.markdown('<div class="empty-state">Нет данных для отображения топа форматов.</div>', unsafe_allow_html=True)
         return
 
-    base = df.copy()
-    if scoring_applied and "score" in base.columns:
-        top_df = base.sort_values(by=["score", "ecpm_discounted"], ascending=[False, True], na_position="last").head(3)
-    else:
-        sort_cols = [col for col in ["max_reach", "ctr_avg"] if col in base.columns]
-        if sort_cols:
-            top_df = base.sort_values(by=sort_cols, ascending=[False] * len(sort_cols), na_position="last").head(3)
-        else:
-            top_df = base.head(3)
-
     cards = []
-    for idx, (_, row) in enumerate(top_df.iterrows(), start=1):
-        cards.append(
-            f"""
-            <div class="top-card">
-                <div class="top-card__rank">Топ {idx}</div>
-                <div class="top-card__title">{html.escape(str(row.get("format_name", "Без названия")))}</div>
-                <div class="top-card__meta">{html.escape(str(row.get("platform", "—")))} · {html.escape(str(row.get("buy_model", "—")))}</div>
-                <div class="top-card__stats">
-                    <div>
-                        <div class="mini-stat__label">Score</div>
-                        <div class="mini-stat__value">{html.escape(format_number(row.get("score")))}</div>
-                    </div>
-                    <div>
-                        <div class="mini-stat__label">Охват</div>
-                        <div class="mini-stat__value">{html.escape(format_number(row.get("max_reach"), 0))}</div>
-                    </div>
-                    <div>
-                        <div class="mini-stat__label">CTR</div>
-                        <div class="mini-stat__value">{html.escape(format_percent(row.get("ctr_avg")))}</div>
-                    </div>
-                    <div>
-                        <div class="mini-stat__label">eCPM</div>
-                        <div class="mini-stat__value">{html.escape(format_number(row.get("ecpm_discounted")))}</div>
-                    </div>
+    for _, row in top_df.iterrows():
+        title = str(row.get("format_name", "Без названия"))
+        score = format_number(row.get("score")) if scoring_applied and "score" in row.index else "—"
+        descriptor_parts = [
+            str(row.get("platform", "")).strip(),
+            str(row.get("type_service", "")).strip(),
+            str(row.get("buy_model", "")).strip(),
+        ]
+        descriptor = " · ".join([x for x in descriptor_parts if x and x != "nan"]) or "Без дополнительных атрибутов"
+
+        card_html = f"""
+        <div class="top-card">
+            <div class="top-card-header">
+                <h3 class="top-card-title">{title}</h3>
+                <div class="score-badge">{score}</div>
+            </div>
+            <p class="top-descriptor">{descriptor}</p>
+            <div class="mini-stats-grid">
+                <div class="mini-stat">
+                    <div class="mini-stat-label">Охват</div>
+                    <div class="mini-stat-value">{format_number(row.get("max_reach"), 0)}</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="mini-stat-label">eCPM</div>
+                    <div class="mini-stat-value">{format_number(row.get("ecpm_discounted"))}</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="mini-stat-label">CTR</div>
+                    <div class="mini-stat-value">{format_percent(row.get("ctr_avg"))}</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="mini-stat-label">Viewability</div>
+                    <div class="mini-stat-value">{format_percent(row.get("viewability_avg"))}</div>
                 </div>
             </div>
-            """
-        )
+        </div>
+        """
+        cards.append(card_html)
 
     st.markdown(f'<div class="top-grid">{"".join(cards)}</div>', unsafe_allow_html=True)
 
 
-def render_pills(title: str, values: List[str]) -> None:
-    clean_values = [str(v).strip() for v in values if str(v).strip()]
-    if not clean_values:
-        return
+def prepare_display_table(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFrame:
+    table = build_table_view(df, scoring_applied).copy()
 
-    pills_html = "".join(f'<span class="pill">{html.escape(value)}</span>' for value in clean_values)
+    numeric_source_map = {
+        "Скоринг": "score",
+        "Максимальный охват": "max_reach",
+        "eCPM с учетом скидки": "ecpm_discounted",
+        "CTR, среднее": "ctr_avg",
+        "VTR, среднее": "vtr_avg",
+        "Viewability, среднее": "viewability_avg",
+        "Комиссия": "commission",
+    }
 
+    for display_col, source_col in numeric_source_map.items():
+        if display_col in table.columns and source_col in df.columns:
+            if source_col in {"ctr_avg", "vtr_avg", "viewability_avg", "commission"}:
+                table[display_col] = df[source_col].apply(format_percent)
+            elif source_col in {"max_reach"}:
+                table[display_col] = df[source_col].apply(lambda x: format_number(x, 0))
+            else:
+                table[display_col] = df[source_col].apply(format_number)
+
+    return table
+
+
+def render_results_table(df: pd.DataFrame, scoring_applied: bool) -> None:
     st.markdown(
-        f"""
-        <div class="section">
-            <div class="section-title">{html.escape(title)}</div>
-            <div class="pill-group">{pills_html}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def render_stats(row: pd.Series) -> None:
-    stats = [
-        ("Максимальный охват", format_number(row.get("max_reach"), 0)),
-        ("Минимальный бюджет", format_number(row.get("min_budget"), 0)),
-        ("eCPM с учетом скидки", format_number(row.get("ecpm_discounted"))),
-        ("Комиссия", format_percent(row.get("commission"))),
-        ("CTR, среднее", format_percent(row.get("ctr_avg"))),
-        ("Viewability, среднее", format_percent(row.get("viewability_avg"))),
-    ]
-
-    stats_html = "".join(
-        f"""
-        <div class="stat">
-            <div class="stat-label">{html.escape(label)}</div>
-            <div class="stat-value">{html.escape(value)}</div>
-        </div>
         """
-        for label, value in stats
-    )
-
-    st.markdown(
-        f"""
-        <div class="section">
-            <div class="section-title">Ключевые показатели</div>
-            <div class="stats-grid">{stats_html}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    aux_values = [
-        f"Скидка — {format_percent(row.get('discount'))}",
-        f"VTR, среднее — {format_percent(row.get('vtr_avg'))}",
-        f"Пиксель отслеживания — {format_bool(row.get('verification_pixel'))}",
-        f"JavaScript-трекинг — {format_bool(row.get('verification_js'))}",
-        f"Brand Lift — {format_bool(row.get('bls'))}",
-        f"Sales Lift — {format_bool(row.get('sales_lift'))}",
-    ]
-    render_pills("Дополнительно", aux_values)
-
-
-def render_text_block(title: str, value: Optional[str]) -> None:
-    if pd.isna(value) or not str(value).strip():
-        return
-
-    st.markdown(
-        f"""
-        <div class="section">
-            <div class="section-title">{html.escape(title)}</div>
-            <p class="section-text">{html.escape(str(value).strip())}</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def render_links(row: pd.Series) -> None:
-    links = [
-        ("Пример размещения", row.get("example_url")),
-        ("Технические требования", row.get("technical_requirements_url")),
-        ("Медиакит", row.get("mediakit_url")),
-        ("Кейсы", row.get("cases_url")),
-    ]
-
-    link_items = [
-        f'<a href="{html.escape(str(url))}" target="_blank">{html.escape(title)}</a>'
-        for title, url in links
-        if pd.notna(url) and str(url).strip()
-    ]
-
-    if not link_items:
-        return
-
-    st.markdown(
-        f"""
-        <div class="section">
-            <div class="section-title">Полезные ссылки</div>
-            <div class="links-list">{''.join(link_items)}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def render_format_card(row: pd.Series) -> None:
-    st.subheader("Карточка формата")
-
-    title = str(row.get("format_name", "Без названия"))
-    platform = str(row.get("platform", "—"))
-    service = str(row.get("type_service", "—"))
-    buy_model = str(row.get("buy_model", "—"))
-
-    st.markdown(
-        f"""
-        <div class="dashboard-card">
-            <div class="dashboard-card__title">{html.escape(title)}</div>
-            <div class="dashboard-card__meta">
-                <strong>{html.escape(platform)}</strong> · {html.escape(service)} · {html.escape(buy_model)}
+        <div class="table-card">
+            <div class="table-title-row">
+                <h2 class="table-title">Результаты</h2>
+                <p class="table-note">Выберите один формат для просмотра карточки</p>
             </div>
+        </div>
         """,
         unsafe_allow_html=True,
     )
 
-    render_stats(row)
-    render_text_block("Описание", row.get("description"))
+    if df.empty:
+        st.markdown('<div class="empty-state">По текущим фильтрам форматы не найдены.</div>', unsafe_allow_html=True)
+        return
 
-    for dict_id in PILL_GROUP_ORDER:
-        rich_col = f"{dict_id}__rich"
-        if rich_col in row.index and isinstance(row.get(rich_col), list) and row.get(rich_col):
-            values = [format_item_badge(item) for item in row.get(rich_col)]
-            render_pills(DICT_LABELS.get(dict_id, dict_id), values)
-        elif dict_id in row.index and isinstance(row.get(dict_id), list) and row.get(dict_id):
-            render_pills(DICT_LABELS.get(dict_id, dict_id), row.get(dict_id))
+    render_df = prepare_display_table(df, scoring_applied)
 
-    render_text_block("Условия верификации", row.get("verification_terms"))
-    render_text_block("Условия Brand Lift", row.get("bls_terms"))
-    render_text_block("Условия Sales Lift", row.get("sales_lift_terms"))
-    render_text_block("Условия сезонности", row.get("seasonality_terms"))
-    render_links(row)
+    selection_event = st.dataframe(
+        render_df,
+        use_container_width=True,
+        hide_index=True,
+        on_select="rerun",
+        selection_mode="single-row",
+        height=min(44 * (len(render_df) + 1), 620),
+    )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    selected_rows = []
+    if isinstance(selection_event, dict):
+        selected_rows = selection_event.get("selection", {}).get("rows", [])
+    else:
+        try:
+            selected_rows = selection_event.selection.rows
+        except Exception:
+            selected_rows = []
+
+    if selected_rows:
+        selected_idx = selected_rows[0]
+        if 0 <= selected_idx < len(df):
+            st.session_state["selected_format_id"] = df.iloc[selected_idx]["format_id"]
+    elif st.session_state.get("selected_format_id") is None and not df.empty:
+        st.session_state["selected_format_id"] = df.iloc[0]["format_id"]
+
+
+def render_pill_group(values: List[str]) -> None:
+    if not values:
+        st.markdown('<p class="muted-empty">Нет данных</p>', unsafe_allow_html=True)
+        return
+    pills = "".join([f'<span class="pill">{value}</span>' for value in values])
+    st.markdown(f'<div class="pill-group">{pills}</div>', unsafe_allow_html=True)
+
+
+def render_text_block(title: str, text: Optional[str]) -> None:
+    if pd.isna(text) or text is None or str(text).strip() == "":
+        return
+    st.markdown(
+        f"""
+        <div class="subsection">
+            <h3 class="subsection-title">{title}</h3>
+            <p class="body-text">{str(text).strip()}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_selected_format_card(row: Optional[pd.Series]) -> None:
+    st.markdown('<div class="format-card-wrap"><h2 class="format-card-title">Карточка формата</h2></div>', unsafe_allow_html=True)
+
+    if row is None:
+        st.markdown('<div class="empty-state">Выберите формат в таблице, чтобы открыть карточку.</div>', unsafe_allow_html=True)
+        return
+
+    data = build_format_card_data(row)
+    meta_text = " · ".join(
+        [
+            data["meta"].get("platform", "—"),
+            data["meta"].get("type_service", "—"),
+            data["meta"].get("buy_model", "—"),
+        ]
+    )
+
+    st.markdown(
+        f"""
+        <div class="format-card">
+            <h2 class="format-name">{data["title"]}</h2>
+            <div class="meta-row">{meta_text}</div>
+            <div class="subsection">
+                <h3 class="subsection-title">Основные показатели</h3>
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <div class="metric-box-label">Максимальный охват</div>
+                        <div class="metric-box-value">{data["stats"]["max_reach"]}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-box-label">Минимальный бюджет</div>
+                        <div class="metric-box-value">{data["stats"]["min_budget"]}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-box-label">eCPM с учетом скидки</div>
+                        <div class="metric-box-value">{data["stats"]["ecpm_discounted"]}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-box-label">Комиссия</div>
+                        <div class="metric-box-value">{data["stats"]["commission"]}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-box-label">CTR, среднее</div>
+                        <div class="metric-box-value">{data["stats"]["ctr_avg"]}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-box-label">Viewability, среднее</div>
+                        <div class="metric-box-value">{data["stats"]["viewability_avg"]}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    additional_values = [
+        f"Скидка: {data['stats']['discount']}",
+        f"VTR: {data['stats']['vtr_avg']}",
+        f"Пиксель: {data['stats']['verification_pixel']}",
+        f"JS-трекинг: {data['stats']['verification_js']}",
+        f"Brand Lift: {data['stats']['bls']}",
+        f"Sales Lift: {data['stats']['sales_lift']}",
+    ]
+    st.markdown('<div class="subsection"><h3 class="subsection-title">Дополнительно</h3></div>', unsafe_allow_html=True)
+    render_pill_group(additional_values)
+
+    render_text_block("Описание", data.get("description"))
+    render_text_block("Условия верификации", data["conditions"].get("verification_terms"))
+    render_text_block("Условия Brand Lift", data["conditions"].get("bls_terms"))
+    render_text_block("Условия Sales Lift", data["conditions"].get("sales_lift_terms"))
+    render_text_block("Условия сезонности", data["conditions"].get("seasonality_terms"))
+
+    if data["dict_groups"]:
+        for label, values in data["dict_groups"].items():
+            st.markdown(f'<div class="subsection"><h3 class="subsection-title">{label}</h3></div>', unsafe_allow_html=True)
+            render_pill_group(values)
+
+    links_map = {
+        "Пример размещения": data["links"].get("example_url"),
+        "Технические требования": data["links"].get("technical_requirements_url"),
+        "Медиакит": data["links"].get("mediakit_url"),
+        "Кейсы": data["links"].get("cases_url"),
+    }
+    valid_links = {label: url for label, url in links_map.items() if pd.notna(url) and str(url).strip()}
+    if valid_links:
+        links_html = "".join(
+            [f'<a href="{str(url).strip()}" target="_blank">{label}</a>' for label, url in valid_links.items()]
+        )
+        st.markdown(
+            f"""
+            <div class="subsection">
+                <h3 class="subsection-title">Ссылки</h3>
+                <div class="link-list">{links_html}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 def main() -> None:
     inject_styles()
-    inject_dom_fixes()
+    init_weight_state()
 
-    try:
-        formats, dict_items, format_items = load_data()
-        df = enrich_formats(formats, dict_items, format_items)
-    except Exception as e:
-        st.error(f"Ошибка загрузки данных: {e}")
-        st.stop()
+    formats, dict_items, format_items = load_data()
+    df = enrich_formats(formats, dict_items, format_items)
 
-    filters, weights, scoring_enabled, top_n = render_sidebar(df)
-    filtered_df = apply_filters(df, filters)
+    filter_state, scoring_applied, weights = build_sidebar_state(df)
 
-    weights_total = sum(weights.values())
-    scoring_applied = scoring_enabled and weights_total == 100
-
-    if scoring_enabled and weights_total != 100:
-        st.warning("Скоринг не применен. Сумма весов должна быть равна 100.")
+    filtered = apply_filters(df, filter_state)
 
     if scoring_applied:
-        filtered_df = compute_score(filtered_df, weights)
-        sort_columns = [col for col in ["score", "ecpm_discounted"] if col in filtered_df.columns]
-        ascending = [False, True][: len(sort_columns)]
-        filtered_df = filtered_df.sort_values(by=sort_columns, ascending=ascending, na_position="last").head(top_n)
+        scored = compute_score(filtered, weights)
+        result_df = scored.sort_values(by=["score", "ecpm_discounted"], ascending=[False, True], na_position="last")
     else:
-        sort_columns = [col for col in ["platform", "format_name"] if col in filtered_df.columns]
-        if sort_columns:
-            filtered_df = filtered_df.sort_values(by=sort_columns, ascending=True, na_position="last")
+        result_df = filtered.copy()
+        sort_cols = [col for col in ["max_reach", "ctr_avg"] if col in result_df.columns]
+        if sort_cols:
+            result_df = result_df.sort_values(by=sort_cols, ascending=[False] * len(sort_cols), na_position="last")
 
-    render_header(len(filtered_df), scoring_enabled, scoring_applied)
+    if not result_df.empty and st.session_state.get("selected_format_id") not in set(result_df["format_id"].tolist()):
+        st.session_state["selected_format_id"] = result_df.iloc[0]["format_id"]
 
-    if filtered_df.empty:
-        st.info("По заданным условиям ничего не найдено.")
-        return
+    render_header(len(result_df), scoring_applied)
+    st.markdown('<div class="ui-gap"></div>', unsafe_allow_html=True)
 
-    render_quick_insights(filtered_df, scoring_applied)
-    render_top_formats(filtered_df, scoring_applied)
+    render_kpi_row(result_df, scoring_applied)
+    st.markdown('<div class="ui-gap"></div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="table-shell"><div class="table-shell__title">Список форматов</div>', unsafe_allow_html=True)
-    table_df = build_table_view(filtered_df, scoring_applied=scoring_applied)
-    selected_row = render_table_selection(table_df, filtered_df)
-    st.markdown("</div>", unsafe_allow_html=True)
+    top_df = get_top_formats(result_df, scoring_applied, n=3)
+    render_top_formats(top_df, scoring_applied)
+    st.markdown('<div class="ui-gap"></div>', unsafe_allow_html=True)
 
-    if selected_row is not None:
-        render_format_card(selected_row)
+    render_results_table(result_df, scoring_applied)
+    st.markdown('<div class="ui-gap"></div>', unsafe_allow_html=True)
+
+    selected_row = get_selected_format_by_id(result_df, st.session_state.get("selected_format_id"))
+    render_selected_format_card(selected_row)
 
 
 if __name__ == "__main__":
