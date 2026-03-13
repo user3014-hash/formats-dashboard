@@ -12,124 +12,151 @@ st.set_page_config(
 # ─── STYLES ───────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
 
-html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
-
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background: #F7F7F5;
-    border-right: 1px solid #E8E8E3;
+:root {
+    --white:   #FFFFFF;
+    --bg:      #F8F2FF;
+    --lavender:#D7B8FF;
+    --violet:  #A35AFF;
+    --indigo:  #725BFF;
+    --blue:    #3E20FF;
+    --dark:    #070037;
+    --mid:     #4A3080;
+    --muted:   #8B6FB5;
+    --border:  #E4D6F7;
+    --row-hover: #F3EBFF;
 }
-section[data-testid="stSidebar"] .block-container { padding-top: 1.5rem; }
 
-/* Main */
-.main .block-container { padding: 1.5rem 2rem; max-width: 1400px; }
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--dark);
+}
 
-/* Header */
+section[data-testid="stSidebar"] {
+    background: var(--white);
+    border-right: 1px solid var(--border);
+}
+section[data-testid="stSidebar"] .block-container { padding-top: 1.2rem; }
+section[data-testid="stSidebar"] > div { padding: 0 1rem; }
+
+.main { background: var(--bg); }
+.main .block-container { padding: 1.5rem 2rem; max-width: 1440px; }
+
 .page-header {
     display: flex; align-items: baseline; gap: 12px;
-    margin-bottom: 1.5rem; padding-bottom: 1rem;
-    border-bottom: 1px solid #E8E8E3;
+    margin-bottom: 1.4rem; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
 }
-.page-header h1 { font-size: 1.35rem; font-weight: 600; color: #1A1A1A; margin: 0; }
-.page-header span { font-size: 0.8rem; color: #999; font-family: 'DM Mono', monospace; }
+.page-header h1 { font-size: 1.3rem; font-weight: 600; color: var(--dark); margin: 0; }
+.page-header span { font-size: 0.78rem; color: var(--muted); font-family: 'DM Mono', monospace; }
 
-/* Section labels */
 .section-label {
-    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em;
-    text-transform: uppercase; color: #999; margin-bottom: 0.6rem; margin-top: 1.2rem;
+    font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 0.5rem; margin-top: 1.1rem;
+}
+.section-label-main {
+    font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 0.6rem; margin-top: 1.4rem;
 }
 
-/* KPI cards */
-.kpi-row { display: flex; gap: 12px; margin-bottom: 1.2rem; }
 .kpi-card {
-    flex: 1; background: white; border: 1px solid #E8E8E3;
-    border-radius: 10px; padding: 14px 16px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; height: 100%;
 }
-.kpi-label { font-size: 0.7rem; color: #888; font-weight: 500; margin-bottom: 4px; }
-.kpi-value { font-size: 1.45rem; font-weight: 600; color: #1A1A1A; font-family: 'DM Mono', monospace; }
-.kpi-sub { font-size: 0.7rem; color: #AAA; margin-top: 2px; }
+.kpi-label { font-size: 0.69rem; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+.kpi-value { font-size: 1.4rem; font-weight: 600; color: var(--dark); font-family: 'DM Mono', monospace; }
+.kpi-sub { font-size: 0.69rem; color: var(--muted); margin-top: 3px; }
 
-/* Score badge */
 .score-pill {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px; border-radius: 20px;
-    font-size: 0.72rem; font-weight: 600; font-family: 'DM Mono', monospace;
+    display: inline-flex; align-items: center;
+    padding: 2px 9px; border-radius: 20px;
+    font-size: 0.71rem; font-weight: 600; font-family: 'DM Mono', monospace;
 }
-.score-high { background: #EDFAF3; color: #1A7A4A; }
-.score-mid  { background: #FFF8EC; color: #B45309; }
-.score-low  { background: #FEF2F2; color: #B91C1C; }
+.score-high { background: #EEF; color: var(--blue); border: 1px solid var(--lavender); }
+.score-mid  { background: var(--bg); color: var(--violet); border: 1px solid var(--lavender); }
+.score-low  { background: #FBF0FF; color: var(--muted); border: 1px solid var(--border); }
 
-/* Table */
-.format-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+.format-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; background: var(--white); border-radius: 10px; overflow: hidden; }
 .format-table th {
-    text-align: left; padding: 8px 12px;
-    background: #F7F7F5; border-bottom: 2px solid #E8E8E3;
-    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
-    text-transform: uppercase; color: #888; white-space: nowrap;
+    text-align: left; padding: 9px 12px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--muted); white-space: nowrap;
 }
 .format-table td {
-    padding: 10px 12px; border-bottom: 1px solid #F0F0EC;
-    vertical-align: top; color: #2A2A2A;
+    padding: 10px 12px; border-bottom: 1px solid #F3EBF8;
+    vertical-align: middle; color: var(--dark);
 }
-.format-table tr:hover td { background: #FAFAF8; cursor: pointer; }
-.format-name { font-weight: 500; color: #1A1A1A; }
-.format-id { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: #AAA; }
+.format-table tr:last-child td { border-bottom: none; }
+.format-table tr:hover td { background: var(--row-hover); cursor: pointer; }
+.format-name { font-weight: 500; color: var(--dark); }
+.format-id { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+
 .tag {
-    display: inline-block; padding: 2px 8px; border-radius: 4px;
-    font-size: 0.67rem; font-weight: 500; margin: 1px 2px 1px 0;
-    background: #F0F0EC; color: #555;
+    display: inline-block; padding: 2px 7px; border-radius: 4px;
+    font-size: 0.66rem; font-weight: 500; margin: 1px 2px 1px 0;
+    background: var(--bg); color: var(--mid);
 }
-.tag-video { background: #EEF2FF; color: #4338CA; }
-.tag-banner { background: #F0FDF4; color: #166534; }
-.tag-cpm { background: #FFF7ED; color: #C2410C; }
-.tag-cpc { background: #EFF6FF; color: #1D4ED8; }
+.tag-video  { background: #EEF; color: var(--blue); }
+.tag-banner { background: #F3EBF8; color: var(--violet); }
+.tag-cpm    { background: var(--bg); color: var(--mid); border: 1px solid var(--border); }
+.tag-cpc    { background: #EEF; color: var(--blue); border: 1px solid var(--lavender); }
 
-/* Metric bar */
-.metric-bar-wrap { display: flex; align-items: center; gap: 8px; }
-.metric-bar-bg { height: 5px; background: #EEE; border-radius: 3px; flex: 1; min-width: 60px; }
-.metric-bar-fill { height: 5px; border-radius: 3px; background: #4F46E5; }
-.metric-val { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: #333; min-width: 44px; text-align: right; }
+.metric-bar-wrap { display: flex; align-items: center; gap: 7px; }
+.metric-bar-bg { height: 4px; background: var(--border); border-radius: 3px; flex: 1; min-width: 50px; }
+.metric-bar-fill { height: 4px; border-radius: 3px; background: var(--violet); }
+.metric-val { font-family: 'DM Mono', monospace; font-size: 0.76rem; color: var(--dark); min-width: 42px; text-align: right; }
 
-/* Modal overlay */
+hr.light { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+
 .card-overlay {
-    background: white; border: 1px solid #E8E8E3; border-radius: 12px;
-    padding: 20px; margin-top: 12px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px; margin-top: 10px;
 }
-.card-title { font-size: 1.1rem; font-weight: 600; color: #1A1A1A; margin-bottom: 4px; }
-.card-id { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: #AAA; margin-bottom: 12px; }
-.card-desc { font-size: 0.82rem; color: #555; line-height: 1.6; margin-bottom: 14px; padding: 10px 12px; background: #FAFAF8; border-radius: 8px; }
-.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-.card-metric { background: #F7F7F5; border-radius: 8px; padding: 10px 12px; }
-.card-metric-label { font-size: 0.65rem; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
-.card-metric-value { font-size: 1rem; font-weight: 600; color: #1A1A1A; font-family: 'DM Mono', monospace; }
-.card-section { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #AAA; margin: 10px 0 6px; }
+.card-title { font-size: 1.1rem; font-weight: 600; color: var(--dark); margin-bottom: 3px; }
+.card-id { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 12px; }
+.card-desc {
+    font-size: 0.81rem; color: var(--mid); line-height: 1.65;
+    margin-bottom: 14px; padding: 10px 12px;
+    background: var(--bg); border-radius: 8px;
+}
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 14px; }
+.card-metric { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+.card-metric-label { font-size: 0.63rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+.card-metric-value { font-size: 1rem; font-weight: 600; color: var(--dark); font-family: 'DM Mono', monospace; }
+.card-section { font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 12px 0 6px; }
 .tags-row { display: flex; flex-wrap: wrap; gap: 4px; }
 .info-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.8rem; }
-.info-label { color: #888; min-width: 130px; }
-.info-val { color: #1A1A1A; font-weight: 500; }
+.info-label { color: var(--muted); min-width: 160px; }
+.info-val { color: var(--dark); font-weight: 500; }
+.bool-yes { color: var(--violet); font-weight: 600; }
+.bool-no  { color: #CCC; }
 
-/* Scoring panel */
-.weight-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.weight-label { font-size: 0.78rem; color: #444; min-width: 100px; }
-.weight-total { font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 600; }
-.weight-ok { color: #1A7A4A; }
-.weight-bad { color: #B91C1C; }
-
-/* Divider */
-hr.light { border: none; border-top: 1px solid #E8E8E3; margin: 1rem 0; }
-
-/* Streamlit overrides */
-div[data-testid="stSlider"] label { font-size: 0.78rem !important; color: #555 !important; }
-div[data-testid="stMultiSelect"] label { font-size: 0.78rem !important; color: #555 !important; }
-div[data-testid="stSelectbox"] label { font-size: 0.78rem !important; color: #555 !important; }
-.stButton > button {
-    background: #1A1A1A; color: white; border: none; border-radius: 8px;
-    font-family: 'DM Sans'; font-size: 0.8rem; font-weight: 500;
-    padding: 6px 14px; transition: opacity 0.15s;
+.weight-total-wrap {
+    display: inline-block;
+    font-size: 0.78rem; font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    padding: 4px 12px; border-radius: 6px;
+    margin-bottom: 0.5rem;
 }
-.stButton > button:hover { opacity: 0.8; }
+.weight-ok  { background: #EEF; color: var(--blue); }
+.weight-bad { background: var(--bg); color: var(--violet); }
+
+.no-results {
+    text-align: center; padding: 40px 20px;
+    color: var(--muted); font-size: 0.88rem;
+    background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+}
+
+div[data-testid="stSlider"] label,
+div[data-testid="stMultiSelect"] label,
+div[data-testid="stSelectbox"] label,
+div[data-testid="stCheckbox"] label {
+    font-size: 0.78rem !important; color: var(--mid) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -140,235 +167,300 @@ def load_data():
     base = os.path.dirname(os.path.abspath(__file__))
     def p(name): return os.path.join(base, name)
 
-    # Support both underscore and space variants of filenames
     def read_csv(a, b):
         for name in [a, b]:
             fp = p(name)
             if os.path.exists(fp):
                 return pd.read_csv(fp)
-        raise FileNotFoundError(f"Neither {a} nor {b} found in {base}")
+        raise FileNotFoundError(f"Файл не найден: {a} или {b}")
 
     df = read_csv("DataLens_-_formats.csv", "DataLens - formats.csv")
     di = read_csv("DataLens_-_dict_items.csv", "DataLens - dict_items.csv")
-    # format_items: try CSV first, then fall back to xlsx
+
     fi = None
     for name in ["DataLens_-_format_items.csv", "DataLens - format_items.csv"]:
         if os.path.exists(p(name)):
-            fi = pd.read_csv(p(name))
-            break
+            fi = pd.read_csv(p(name)); break
     if fi is None:
-        for name in ["DataLens.xlsx", "DataLens - DataLens.xlsx"]:
+        for name in ["DataLens.xlsx"]:
             if os.path.exists(p(name)):
-                fi = pd.read_excel(p(name), sheet_name="format_items")
-                break
+                fi = pd.read_excel(p(name), sheet_name="format_items"); break
     if fi is None:
-        raise FileNotFoundError("format_items not found. Add DataLens - format_items.csv or DataLens.xlsx to the repo")
+        raise FileNotFoundError("Не найден файл format_items")
 
-    # Join format_items with dict_items to get item names
     merged = fi.merge(di[["dict_id", "item_id", "item_name"]], on=["dict_id", "item_id"], how="left")
     pivot = merged.groupby(["format_id", "dict_id"])["item_name"].apply(list).unstack("dict_id").reset_index()
-
     df = df.merge(pivot, on="format_id", how="left")
     return df, di
 
 df, di = load_data()
 
+# ─── SEASONALITY ──────────────────────────────────────────────────────────────
+BASE_SEASON_MAP = {
+    "Январь":0.80,"Февраль":1.00,"Март":1.20,"Апрель":1.20,"Май":1.00,
+    "Июнь":1.00,"Июль":1.00,"Август":1.00,"Сентябрь":1.25,
+    "Октябрь":1.25,"Ноябрь":1.25,"Декабрь":1.25
+}
+
+def get_season_coeff(platform, month):
+    """Returns coeff for platforms with seasonality data; 1.0 for others."""
+    if str(platform) in {"Buzzoola"}:
+        return BASE_SEASON_MAP.get(month, 1.0)
+    return 1.0
+
+# ─── FORMATTERS ───────────────────────────────────────────────────────────────
 def fmt_pct(v):
     if pd.isna(v): return "—"
-    return f"{v*100:.1f}%"
+    pct = v * 100
+    if pct == round(pct):
+        return f"{int(round(pct))}%"
+    return f"{pct:.1f}%"
 
 def fmt_money(v):
     if pd.isna(v): return "—"
-    return f"{int(v):,} ₽".replace(",", " ")
+    iv = int(round(v))
+    s = f"{iv:,}".replace(",", "\u202f")
+    return f"{s} ₽"
 
 def fmt_reach(v):
     if pd.isna(v): return "—"
     m = v / 1_000_000
-    if m >= 1: return f"{m:.1f}M"
-    return f"{int(v):,}".replace(",", " ")
+    if m >= 1:
+        return f"{int(m)}M" if m == int(m) else f"{m:.1f}M"
+    return f"{int(v):,}".replace(",", "\u202f")
+
+def bool_icon(v):
+    try:
+        if pd.isna(v):
+            return '<span class="bool-no">—</span>'
+    except Exception:
+        pass
+    if str(v).upper() in ("TRUE", "1"):
+        return '<span class="bool-yes">✓</span>'
+    return '<span class="bool-no">—</span>'
+
+def safe_str(v):
+    try:
+        if pd.isna(v): return "—"
+    except Exception:
+        pass
+    return str(v).strip() if v else "—"
 
 # ─── eCPM CALCULATION ─────────────────────────────────────────────────────────
 def calc_ecpm(row):
-    """Convert any buy model to eCPM, then apply discount."""
-    model = row.get("buy_model", "CPM")
+    model = str(row.get("buy_model", "CPM")).strip().upper()
     ctr = row.get("ctr_avg", np.nan)
-    discount = row.get("discount", 0) or 0
+    discount = float(row.get("discount", 0) or 0)
 
     if model == "CPM":
         raw = row.get("cpm_avg", np.nan)
     elif model == "CPC":
         cpc = row.get("cpc_avg", np.nan)
-        if pd.isna(cpc) or pd.isna(ctr) or ctr == 0:
-            raw = np.nan
-        else:
-            raw = cpc * ctr * 1000  # CPC * CTR * 1000 = eCPM
+        raw = cpc * ctr * 1000 if not (pd.isna(cpc) or pd.isna(ctr) or ctr == 0) else np.nan
     elif model == "CPV":
         cpv = row.get("cpv_avg", np.nan)
         vtr = row.get("vtr_avg", np.nan)
-        if pd.isna(cpv) or pd.isna(vtr) or vtr == 0:
-            raw = np.nan
-        else:
-            raw = cpv * vtr * 1000
+        raw = cpv * vtr * 1000 if not (pd.isna(cpv) or pd.isna(vtr) or vtr == 0) else np.nan
     else:
         raw = row.get("cpm_avg", np.nan)
 
-    if pd.isna(raw):
-        return np.nan
+    if pd.isna(raw): return np.nan
     return raw * (1 - discount)
 
 df["ecpm_effective"] = df.apply(calc_ecpm, axis=1)
 
+# ─── DICT OPTIONS ─────────────────────────────────────────────────────────────
+def dict_options(dict_id):
+    return di[di["dict_id"] == dict_id]["item_name"].dropna().tolist()
+
+all_targeting = dict_options("targeting")
+all_dmp = dict_options("dmp")
+
 # ─── SIDEBAR ──────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown('<div class="section-label">Тип формата</div>', unsafe_allow_html=True)
-    format_types = st.multiselect(
-        "format_type", options=["Видео", "Баннер"], default=["Видео", "Баннер"],
-        label_visibility="collapsed"
-    )
+    format_types = st.multiselect("Тип", ["Видео", "Баннер"], default=["Видео", "Баннер"],
+                                   label_visibility="collapsed")
 
     st.markdown('<div class="section-label">Устройство</div>', unsafe_allow_html=True)
-    devices = st.multiselect(
-        "device", options=["Desktop", "Mobile Web", "In-App", "Smart TV"],
-        default=["Desktop", "Mobile Web", "In-App", "Smart TV"],
-        label_visibility="collapsed"
-    )
+    devices = st.multiselect("Устройство", ["Desktop", "Mobile Web", "In-App", "Smart TV"],
+                              default=["Desktop", "Mobile Web", "In-App", "Smart TV"],
+                              label_visibility="collapsed")
 
     st.markdown('<div class="section-label">Модель закупки</div>', unsafe_allow_html=True)
-    buy_models = st.multiselect(
-        "buy_model", options=["CPM", "CPC"], default=["CPM", "CPC"],
-        label_visibility="collapsed"
-    )
+    buy_models = st.multiselect("Модель", ["CPM", "CPC"], default=["CPM", "CPC"],
+                                 label_visibility="collapsed")
+
+    st.markdown('<div class="section-label">Таргетинги</div>', unsafe_allow_html=True)
+    filter_targeting = st.multiselect("Таргетинги", all_targeting, default=[],
+                                       placeholder="Любые таргетинги",
+                                       label_visibility="collapsed")
+
+    st.markdown('<div class="section-label">DMP</div>', unsafe_allow_html=True)
+    filter_dmp = st.multiselect("DMP", all_dmp, default=[],
+                                 placeholder="Любые DMP",
+                                 label_visibility="collapsed")
+
+    st.markdown('<div class="section-label">Дополнительно</div>', unsafe_allow_html=True)
+    req_pixel     = st.checkbox("Верификация пикселем")
+    req_js        = st.checkbox("Верификация JS-тегом")
+    req_brandlift = st.checkbox("Бренд-лифт исследование")
+    req_saleslift = st.checkbox("Sales Lift исследование")
 
     st.markdown('<hr class="light">', unsafe_allow_html=True)
     st.markdown('<div class="section-label">Пороговые значения</div>', unsafe_allow_html=True)
-
-    max_ecpm = st.slider("Макс. eCPM (после скидки), ₽", 0, 1000, 1000, step=10)
-    min_ctr = st.slider("Мин. CTR, %", 0.0, 5.0, 0.0, step=0.1)
+    max_ecpm_thresh = st.slider("Макс. eCPM (после скидки), ₽", 0, 1000, 1000, step=10)
+    min_ctr   = st.slider("Мин. CTR, %", 0.0, 5.0, 0.0, step=0.1)
     min_reach = st.slider("Мин. охват, млн", 0.0, 80.0, 0.0, step=1.0)
-    min_viewability = st.slider("Мин. Viewability, %", 0, 100, 0, step=5)
-    min_vtr = st.slider("Мин. VTR, %", 0.0, 100.0, 0.0, step=5.0)
+    min_view  = st.slider("Мин. Viewability, %", 0, 100, 0, step=5)
+    min_vtr   = st.slider("Мин. VTR, %", 0.0, 100.0, 0.0, step=5.0)
 
     st.markdown('<hr class="light">', unsafe_allow_html=True)
-    st.markdown('<div class="section-label">Скоринг — веса (сумма = 100)</div>', unsafe_allow_html=True)
+    scoring_on = st.toggle("Включить скоринг", value=False)
 
-    w_reach = st.slider("Охват", 0, 100, 20, step=5)
-    w_ecpm  = st.slider("eCPM (чем ниже — тем лучше)", 0, 100, 20, step=5)
-    w_ctr   = st.slider("CTR", 0, 100, 20, step=5)
-    w_vtr   = st.slider("VTR", 0, 100, 15, step=5)
-    w_view  = st.slider("Viewability", 0, 100, 15, step=5)
-    w_comm  = st.slider("Комиссия (чем ниже — тем лучше)", 0, 100, 10, step=5)
-
-    total_w = w_reach + w_ecpm + w_ctr + w_vtr + w_view + w_comm
-    color = "weight-ok" if total_w == 100 else "weight-bad"
-    st.markdown(f'<div class="weight-total {color}">Итого: {total_w} / 100</div>', unsafe_allow_html=True)
-
-    normalize = st.checkbox("Нормализовать веса автоматически", value=True)
+    if scoring_on:
+        st.markdown('<div class="section-label">Веса скоринга (сумма = 100)</div>', unsafe_allow_html=True)
+        w_reach = st.slider("Охват", 0, 100, 20, step=5, key="w_reach")
+        w_ecpm  = st.slider("eCPM (ниже → лучше)", 0, 100, 20, step=5, key="w_ecpm")
+        w_ctr   = st.slider("CTR", 0, 100, 20, step=5, key="w_ctr")
+        w_vtr   = st.slider("VTR", 0, 100, 15, step=5, key="w_vtr")
+        w_view  = st.slider("Viewability", 0, 100, 15, step=5, key="w_view")
+        w_comm  = st.slider("Комиссия (ниже → лучше)", 0, 100, 10, step=5, key="w_comm")
+        total_w = w_reach + w_ecpm + w_ctr + w_vtr + w_view + w_comm
+        cls = "weight-ok" if total_w == 100 else "weight-bad"
+        st.markdown(f'<div class="weight-total-wrap {cls}">Сумма: {total_w} / 100</div>',
+                    unsafe_allow_html=True)
+        normalize = st.checkbox("Нормализовать веса автоматически", value=True)
+    else:
+        w_reach = w_ecpm = w_ctr = w_vtr = w_view = w_comm = 0
+        total_w = 0
+        normalize = False
 
     st.markdown('<hr class="light">', unsafe_allow_html=True)
     st.markdown('<div class="section-label">Сезонность</div>', unsafe_allow_html=True)
     months = ["Январь","Февраль","Март","Апрель","Май","Июнь",
               "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-    coeff_map = {
-        "Январь":0.8,"Февраль":1.0,"Март":1.2,"Апрель":1.2,"Май":1.0,
-        "Июнь":1.0,"Июль":1.0,"Август":1.0,"Сентябрь":1.25,
-        "Октябрь":1.25,"Ноябрь":1.25,"Декабрь":1.25
-    }
-    selected_month = st.selectbox("Месяц размещения", months, index=2, label_visibility="collapsed")
-    season_coeff = coeff_map[selected_month]
-    st.markdown(f'<span style="font-size:0.75rem;color:#888;">Коэффициент сезонности: <b>{season_coeff}x</b></span>', unsafe_allow_html=True)
+    selected_month = st.selectbox("Месяц размещения", months,
+                                   index=months.index("Март"),
+                                   label_visibility="collapsed")
 
 # ─── FILTERING ────────────────────────────────────────────────────────────────
 def has_item(cell, items):
     if not isinstance(cell, list): return False
     return any(i in cell for i in items)
 
-flt = df.copy()
+def has_all_items(cell, items):
+    if not items: return True
+    if not isinstance(cell, list): return False
+    return all(i in cell for i in items)
 
+flt = df.copy()
 if format_types:
     flt = flt[flt["format_type"].apply(lambda x: has_item(x, format_types))]
 if devices:
     flt = flt[flt["device"].apply(lambda x: has_item(x, devices))]
 if buy_models:
     flt = flt[flt["buy_model"].isin(buy_models)]
+if filter_targeting:
+    flt = flt[flt["targeting"].apply(lambda x: has_all_items(x, filter_targeting))]
+if filter_dmp:
+    flt = flt[flt["dmp"].apply(lambda x: has_all_items(x, filter_dmp))]
+if req_pixel:
+    flt = flt[flt["verification_pixel"].apply(lambda v: str(v).upper() in ("TRUE","1"))]
+if req_js:
+    flt = flt[flt["verification_js"].apply(lambda v: str(v).upper() in ("TRUE","1"))]
+if req_brandlift:
+    flt = flt[flt["bls"].apply(lambda v: str(v).upper() in ("TRUE","1"))]
+if req_saleslift:
+    flt = flt[flt["sales_lift"].apply(lambda v: str(v).upper() in ("TRUE","1"))]
 
-# Threshold filters
-flt = flt[flt["ecpm_effective"].fillna(9999) <= max_ecpm]
+flt = flt[flt["ecpm_effective"].fillna(9999) <= max_ecpm_thresh]
 if min_ctr > 0:
     flt = flt[flt["ctr_avg"].fillna(0) >= min_ctr / 100]
 if min_reach > 0:
     flt = flt[flt["max_reach"].fillna(0) >= min_reach * 1_000_000]
-if min_viewability > 0:
-    flt = flt[flt["viewability_avg"].fillna(0) >= min_viewability / 100]
+if min_view > 0:
+    flt = flt[flt["viewability_avg"].fillna(0) >= min_view / 100]
 if min_vtr > 0:
     flt = flt[flt["vtr_avg"].fillna(0) >= min_vtr / 100]
 
+# ─── SEASONAL eCPM ────────────────────────────────────────────────────────────
+flt = flt.copy()
+flt["season_coeff"] = flt["platform"].apply(lambda p: get_season_coeff(p, selected_month))
+flt["ecpm_seasonal"] = flt["ecpm_effective"] * flt["season_coeff"]
+
 # ─── SCORING ──────────────────────────────────────────────────────────────────
-weights = {"reach": w_reach, "ecpm": w_ecpm, "ctr": w_ctr,
-           "vtr": w_vtr, "view": w_view, "comm": w_comm}
-total_w = sum(weights.values())
-
-if normalize and total_w > 0:
-    weights = {k: v / total_w for k, v in weights.items()}
-else:
-    weights = {k: v / 100 for k, v in weights.items()}
-
 def normalize_col(series, invert=False):
     mn, mx = series.min(), series.max()
     if mx == mn: return pd.Series([0.5] * len(series), index=series.index)
     norm = (series - mn) / (mx - mn)
     return 1 - norm if invert else norm
 
-if len(flt) > 0:
-    # eCPM adjusted for seasonality
-    flt = flt.copy()
-    flt["ecpm_seasonal"] = flt["ecpm_effective"] * season_coeff
+if scoring_on and len(flt) > 0:
+    weights = {"reach": w_reach, "ecpm": w_ecpm, "ctr": w_ctr,
+               "vtr": w_vtr, "view": w_view, "comm": w_comm}
+    tw = sum(weights.values())
+    if normalize and tw > 0:
+        weights = {k: v / tw for k, v in weights.items()}
+    else:
+        weights = {k: v / 100 for k, v in weights.items()}
+
+    ecpm_fill_val = flt["ecpm_seasonal"].max() * 2 if flt["ecpm_seasonal"].notna().any() else 9999
+    comm_fill_val = flt["commission"].max() if flt["commission"].notna().any() else 1
 
     s_reach = normalize_col(flt["max_reach"].fillna(0))
-    s_ecpm  = normalize_col(flt["ecpm_seasonal"].fillna(flt["ecpm_seasonal"].max() * 2), invert=True)
+    s_ecpm  = normalize_col(flt["ecpm_seasonal"].fillna(ecpm_fill_val), invert=True)
     s_ctr   = normalize_col(flt["ctr_avg"].fillna(0))
     s_vtr   = normalize_col(flt["vtr_avg"].fillna(0))
     s_view  = normalize_col(flt["viewability_avg"].fillna(0))
-    s_comm  = normalize_col(flt["commission"].fillna(flt["commission"].max()), invert=True)
+    s_comm  = normalize_col(flt["commission"].fillna(comm_fill_val), invert=True)
 
     flt["score"] = (
-        s_reach * weights["reach"] +
-        s_ecpm  * weights["ecpm"] +
-        s_ctr   * weights["ctr"] +
-        s_vtr   * weights["vtr"] +
-        s_view  * weights["view"] +
-        s_comm  * weights["comm"]
+        s_reach * weights["reach"] + s_ecpm * weights["ecpm"] +
+        s_ctr * weights["ctr"] + s_vtr * weights["vtr"] +
+        s_view * weights["view"] + s_comm * weights["comm"]
     ) * 100
-
     flt = flt.sort_values("score", ascending=False).reset_index(drop=True)
+else:
+    flt["score"] = np.nan
+    flt = flt.sort_values("ecpm_seasonal", ascending=True, na_position="last").reset_index(drop=True)
 
-# ─── KPI ROW ──────────────────────────────────────────────────────────────────
-st.markdown('<div class="page-header"><h1>Format Selector</h1><span>Buzzoola · Анализ рекламных форматов</span></div>', unsafe_allow_html=True)
+# ─── HEADER & KPI ─────────────────────────────────────────────────────────────
+st.markdown(
+    '<div class="page-header"><h1>Format Selector</h1>'
+    '<span>Buzzoola · Анализ рекламных форматов</span></div>',
+    unsafe_allow_html=True
+)
 
 top = flt.iloc[0] if len(flt) > 0 else None
 
-col1, col2, col3, col4 = st.columns(4)
-with col1:
+c1, c2, c3, c4 = st.columns(4)
+with c1:
     st.markdown(f"""<div class="kpi-card">
         <div class="kpi-label">Форматов после фильтров</div>
         <div class="kpi-value">{len(flt)}</div>
-        <div class="kpi-sub">из {len(df)} всего</div>
+        <div class="kpi-sub">из {len(df)} доступных</div>
     </div>""", unsafe_allow_html=True)
-with col2:
-    best_name = top["format_name"] if top is not None else "—"
-    best_score = f'{top["score"]:.0f}' if top is not None else "—"
-    st.markdown(f"""<div class="kpi-card">
-        <div class="kpi-label">Лучший формат</div>
-        <div class="kpi-value" style="font-size:1rem;">{best_name}</div>
-        <div class="kpi-sub">Score: {best_score}</div>
-    </div>""", unsafe_allow_html=True)
-with col3:
+with c2:
+    if top is not None:
+        sub = f'Скор: {top["score"]:.0f}' if (scoring_on and not pd.isna(top.get("score", np.nan))) else top["buy_model"]
+        label = "Лучший по скорингу" if scoring_on else "Самый дешёвый eCPM"
+        st.markdown(f"""<div class="kpi-card">
+            <div class="kpi-label">{label}</div>
+            <div class="kpi-value" style="font-size:1rem;">{top['format_name']}</div>
+            <div class="kpi-sub">{sub}</div>
+        </div>""", unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="kpi-card"><div class="kpi-label">Лучший формат</div><div class="kpi-value">—</div></div>', unsafe_allow_html=True)
+with c3:
     avg_ecpm = flt["ecpm_seasonal"].mean() if len(flt) > 0 else np.nan
+    sc_shown = flt["season_coeff"].iloc[0] if len(flt) > 0 else 1.0
     st.markdown(f"""<div class="kpi-card">
         <div class="kpi-label">Средний eCPM (с сезонностью)</div>
         <div class="kpi-value">{fmt_money(avg_ecpm)}</div>
-        <div class="kpi-sub">Месяц: {selected_month} ({season_coeff}x)</div>
+        <div class="kpi-sub">{selected_month} · коэф. {sc_shown}×</div>
     </div>""", unsafe_allow_html=True)
-with col4:
+with c4:
     max_reach_val = flt["max_reach"].max() if len(flt) > 0 else np.nan
     st.markdown(f"""<div class="kpi-card">
         <div class="kpi-label">Макс. охват</div>
@@ -376,28 +468,91 @@ with col4:
         <div class="kpi-sub">среди отфильтрованных</div>
     </div>""", unsafe_allow_html=True)
 
+# ─── CHARTS ───────────────────────────────────────────────────────────────────
+if len(flt) > 0:
+    try:
+        import plotly.graph_objects as go
+
+        ch1, ch2 = st.columns(2)
+
+        with ch1:
+            cdf = flt[flt["ecpm_seasonal"].notna()].sort_values("ecpm_seasonal")
+            if len(cdf) > 0:
+                fig = go.Figure(go.Bar(
+                    x=cdf["ecpm_seasonal"], y=cdf["format_name"],
+                    orientation="h",
+                    marker_color="#A35AFF", marker_line_width=0,
+                    hovertemplate="<b>%{y}</b><br>eCPM: %{x:.0f} ₽<extra></extra>"
+                ))
+                fig.update_layout(
+                    title=dict(text="eCPM по форматам (₽, с учётом сезонности)",
+                               font_size=11, font_color="#8B6FB5"),
+                    height=max(220, len(cdf) * 32),
+                    margin=dict(l=0, r=16, t=36, b=0),
+                    paper_bgcolor="white", plot_bgcolor="white",
+                    xaxis=dict(gridcolor="#F3EBF8", tickfont_size=10, title=None),
+                    yaxis=dict(tickfont_size=10, title=None),
+                    font_family="DM Sans",
+                )
+                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+        with ch2:
+            sdf = flt[flt["ctr_avg"].notna() & flt["viewability_avg"].notna()].copy()
+            if len(sdf) >= 2:
+                med_reach = sdf["max_reach"].median()
+                sdf["bubble"] = sdf["max_reach"].fillna(med_reach).apply(
+                    lambda v: max(10, min(32, v / 3_000_000))
+                )
+                fig2 = go.Figure()
+                for _, r in sdf.iterrows():
+                    fig2.add_trace(go.Scatter(
+                        x=[r["ctr_avg"] * 100], y=[r["viewability_avg"] * 100],
+                        mode="markers+text",
+                        marker=dict(size=r["bubble"], color="#725BFF", opacity=0.72, line_width=0),
+                        text=[r["format_name"]],
+                        textposition="top center",
+                        textfont=dict(size=8, color="#8B6FB5"),
+                        hovertemplate=(f"<b>{r['format_name']}</b><br>"
+                                       f"CTR: {r['ctr_avg']*100:.2f}%<br>"
+                                       f"Viewability: {r['viewability_avg']*100:.0f}%<extra></extra>"),
+                        showlegend=False
+                    ))
+                fig2.update_layout(
+                    title=dict(text="CTR vs Viewability (размер пузыря — охват)",
+                               font_size=11, font_color="#8B6FB5"),
+                    height=300, margin=dict(l=0, r=16, t=36, b=0),
+                    paper_bgcolor="white", plot_bgcolor="white",
+                    xaxis=dict(title="CTR, %", gridcolor="#F3EBF8",
+                               tickfont_size=10, title_font_size=10),
+                    yaxis=dict(title="Viewability, %", gridcolor="#F3EBF8",
+                               tickfont_size=10, title_font_size=10),
+                    font_family="DM Sans",
+                )
+                st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
+    except ImportError:
+        pass  # plotly not installed
+
 # ─── TABLE ────────────────────────────────────────────────────────────────────
-st.markdown('<div class="section-label">Форматы</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-label-main">Форматы</div>', unsafe_allow_html=True)
 
 if len(flt) == 0:
-    st.info("Нет форматов, соответствующих выбранным фильтрам.")
+    st.markdown('<div class="no-results">Нет форматов, соответствующих выбранным фильтрам.</div>',
+                unsafe_allow_html=True)
 else:
-    # Score color
     def score_badge(s):
         if pd.isna(s): return ""
         cls = "score-high" if s >= 65 else ("score-mid" if s >= 40 else "score-low")
-        return f'<span class="score-pill {cls}">▲ {s:.0f}</span>'
+        return f'<span class="score-pill {cls}">{s:.0f}</span>'
 
     def type_tag(cell):
         if not isinstance(cell, list): return ""
-        tags = []
+        out = []
         for t in cell:
-            cls = "tag-video" if t == "Видео" else "tag-banner"
-            tags.append(f'<span class="tag {cls}">{t}</span>')
-        return "".join(tags)
+            out.append(f'<span class="tag {"tag-video" if t == "Видео" else "tag-banner"}">{t}</span>')
+        return "".join(out)
 
     def model_tag(v):
-        cls = "tag-cpm" if v == "CPM" else "tag-cpc"
+        cls = "tag-cpm" if str(v).upper() == "CPM" else "tag-cpc"
         return f'<span class="tag {cls}">{v}</span>'
 
     def device_tags(cell):
@@ -406,194 +561,190 @@ else:
 
     def metric_bar(value, max_val, display):
         if pd.isna(value) or pd.isna(max_val) or max_val == 0:
-            return f'<span style="color:#CCC;font-size:0.75rem;">—</span>'
+            return '<span style="color:#CCC;font-size:0.75rem;">—</span>'
         pct = min(value / max_val * 100, 100)
-        return f'''<div class="metric-bar-wrap">
-            <div class="metric-bar-bg"><div class="metric-bar-fill" style="width:{pct}%"></div></div>
-            <span class="metric-val">{display}</span>
-        </div>'''
+        return (f'<div class="metric-bar-wrap">'
+                f'<div class="metric-bar-bg"><div class="metric-bar-fill" style="width:{pct:.1f}%"></div></div>'
+                f'<span class="metric-val">{display}</span></div>')
 
     max_reach_all = df["max_reach"].max()
-    max_ecpm_all = df["ecpm_effective"].max()
+    last_th = "<th>Скор</th>" if scoring_on else "<th>eCPM (сез.)</th>"
 
     rows_html = ""
     for _, row in flt.iterrows():
         ecpm_s = row.get("ecpm_seasonal", np.nan)
+        if scoring_on:
+            last_td = score_badge(row.get("score", np.nan))
+        else:
+            last_td = f'<span style="font-family:\'DM Mono\',monospace;font-size:0.79rem;">{fmt_money(ecpm_s)}</span>'
         rows_html += f"""<tr>
-            <td>
-                <div class="format-name">{row['format_name']}</div>
-                <div class="format-id">{row['format_id']}</div>
-            </td>
+            <td><div class="format-name">{row['format_name']}</div>
+                <div class="format-id">{row['format_id']}</div></td>
             <td>{type_tag(row.get('format_type', []))}</td>
             <td>{model_tag(row['buy_model'])}</td>
             <td>{device_tags(row.get('device', []))}</td>
             <td>{metric_bar(row.get('max_reach'), max_reach_all, fmt_reach(row.get('max_reach')))}</td>
             <td>{metric_bar(row.get('ctr_avg'), 0.03, fmt_pct(row.get('ctr_avg')))}</td>
             <td>{metric_bar(row.get('viewability_avg'), 1.0, fmt_pct(row.get('viewability_avg')))}</td>
-            <td style="font-family:'DM Mono',monospace;font-size:0.8rem;">{fmt_money(ecpm_s)}</td>
-            <td>{score_badge(row.get('score', np.nan))}</td>
+            <td>{last_td}</td>
         </tr>"""
 
     st.markdown(f"""
     <table class="format-table">
         <thead><tr>
             <th>Формат</th><th>Тип</th><th>Модель</th><th>Устройство</th>
-            <th>Охват</th><th>CTR</th><th>Viewability</th>
-            <th>eCPM (сезон.)</th><th>Score</th>
+            <th>Охват</th><th>CTR</th><th>Viewability</th>{last_th}
         </tr></thead>
         <tbody>{rows_html}</tbody>
-    </table>
-    """, unsafe_allow_html=True)
+    </table>""", unsafe_allow_html=True)
 
     # ─── FORMAT CARD ──────────────────────────────────────────────────────────
     st.markdown('<hr class="light">', unsafe_allow_html=True)
-    st.markdown('<div class="section-label">Карточка формата</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label-main">Карточка формата</div>', unsafe_allow_html=True)
+    st.caption("Выберите формат из списка для просмотра подробной информации")
 
-    format_names = flt["format_name"].tolist()
-    selected_fmt = st.selectbox("Выберите формат для подробной информации",
-                                 format_names, label_visibility="collapsed")
+    fmt_options = ["— не выбрано —"] + flt["format_name"].tolist()
+    selected_fmt = st.selectbox("Формат", fmt_options, label_visibility="collapsed")
 
-    row = flt[flt["format_name"] == selected_fmt].iloc[0]
+    if selected_fmt != "— не выбрано —":
+        row = flt[flt["format_name"] == selected_fmt].iloc[0]
 
-    def tags_html(cell):
-        if not isinstance(cell, list): return '<span style="color:#CCC;font-size:0.75rem;">—</span>'
-        return "".join(f'<span class="tag">{t}</span>' for t in cell)
+        def tags_html(cell):
+            if not isinstance(cell, list):
+                return '<span style="color:#CCC;font-size:0.75rem;">—</span>'
+            return "".join(f'<span class="tag">{t}</span>' for t in cell)
 
-    def bool_icon(v):
-        if v is True or v == "TRUE": return "✓"
-        if v is False or v == "FALSE": return "—"
-        return str(v) if not pd.isna(v) else "—"
+        ecpm_eff = row.get("ecpm_effective", np.nan)
+        ecpm_sea = row.get("ecpm_seasonal", np.nan)
+        sc = row.get("season_coeff", 1.0)
 
-    ecpm_eff = row.get("ecpm_effective", np.nan)
-    ecpm_sea = row.get("ecpm_seasonal", np.nan)
+        links = []
+        for lbl, key in [("Пример", "example_url"),
+                          ("Техтребования", "technical_requirements_url"),
+                          ("Медиакит", "mediakit_url"),
+                          ("Кейсы", "cases_url")]:
+            val = row.get(key)
+            if isinstance(val, str) and val.startswith("http"):
+                links.append(
+                    f'<a href="{val}" target="_blank" '
+                    f'style="font-size:0.78rem;color:#725BFF;text-decoration:none;'
+                    f'margin-right:12px;font-weight:500;">{lbl} ↗</a>'
+                )
 
-    links = []
-    for label, key in [("Пример", "example_url"), ("Техтребования", "technical_requirements_url"),
-                        ("Медиакит", "mediakit_url"), ("Кейсы", "cases_url")]:
-        val = row.get(key)
-        if isinstance(val, str) and val.startswith("http"):
-            links.append(f'<a href="{val}" target="_blank" style="font-size:0.78rem;color:#4F46E5;text-decoration:none;margin-right:12px;">{label} ↗</a>')
+        st.markdown(f"""
+        <div class="card-overlay">
+            <div class="card-title">{row['format_name']}</div>
+            <div class="card-id">{row['format_id']} · {row['buy_model']} · {row.get('platform', '')}</div>
+            <div class="card-desc">{safe_str(row.get('description'))}</div>
 
-    st.markdown(f"""
-    <div class="card-overlay">
-        <div class="card-title">{row['format_name']}</div>
-        <div class="card-id">{row['format_id']} · {row['buy_model']} · {row.get('platform','')}</div>
-        <div class="card-desc">{row.get('description','—')}</div>
+            <div class="card-grid">
+                <div class="card-metric">
+                    <div class="card-metric-label">eCPM (факт)</div>
+                    <div class="card-metric-value">{fmt_money(ecpm_eff)}</div>
+                </div>
+                <div class="card-metric">
+                    <div class="card-metric-label">eCPM (сезон. {sc}×)</div>
+                    <div class="card-metric-value">{fmt_money(ecpm_sea)}</div>
+                </div>
+                <div class="card-metric">
+                    <div class="card-metric-label">Скидка</div>
+                    <div class="card-metric-value">{fmt_pct(row.get('discount'))}</div>
+                </div>
+                <div class="card-metric">
+                    <div class="card-metric-label">Охват (макс.)</div>
+                    <div class="card-metric-value">{fmt_reach(row.get('max_reach'))}</div>
+                </div>
+                <div class="card-metric">
+                    <div class="card-metric-label">CTR (среднее)</div>
+                    <div class="card-metric-value">{fmt_pct(row.get('ctr_avg'))}</div>
+                </div>
+                <div class="card-metric">
+                    <div class="card-metric-label">VTR (среднее)</div>
+                    <div class="card-metric-value">{fmt_pct(row.get('vtr_avg'))}</div>
+                </div>
+                <div class="card-metric">
+                    <div class="card-metric-label">Viewability (среднее)</div>
+                    <div class="card-metric-value">{fmt_pct(row.get('viewability_avg'))}</div>
+                </div>
+                <div class="card-metric">
+                    <div class="card-metric-label">Комиссия</div>
+                    <div class="card-metric-value">{fmt_pct(row.get('commission'))}</div>
+                </div>
+                <div class="card-metric">
+                    <div class="card-metric-label">Мин. бюджет</div>
+                    <div class="card-metric-value">{fmt_money(row.get('min_budget'))}</div>
+                </div>
+            </div>
 
-        <div class="card-grid">
-            <div class="card-metric">
-                <div class="card-metric-label">eCPM (факт)</div>
-                <div class="card-metric-value">{fmt_money(ecpm_eff)}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div>
+                    <div class="card-section">Ценовой диапазон</div>
+                    <div class="info-row">
+                        <span class="info-label">CPM мин / сред / макс</span>
+                        <span class="info-val">{fmt_money(row.get('cpm_min'))} / {fmt_money(row.get('cpm_avg'))} / {fmt_money(row.get('cpm_max'))}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">CPC мин / сред / макс</span>
+                        <span class="info-val">{fmt_money(row.get('cpc_min'))} / {fmt_money(row.get('cpc_avg'))} / {fmt_money(row.get('cpc_max'))}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">CTR мин / макс</span>
+                        <span class="info-val">{fmt_pct(row.get('ctr_min'))} / {fmt_pct(row.get('ctr_max'))}</span>
+                    </div>
+                    <div class="card-section">Верификация</div>
+                    <div class="info-row">
+                        <span class="info-label">Пиксель</span>
+                        <span class="info-val">{bool_icon(row.get('verification_pixel'))}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">JS-тег</span>
+                        <span class="info-val">{bool_icon(row.get('verification_js'))}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Условия верификации</span>
+                        <span class="info-val" style="font-size:0.75rem;color:#8B6FB5;">{safe_str(row.get('verification_terms'))}</span>
+                    </div>
+                    <div class="card-section">Исследования</div>
+                    <div class="info-row">
+                        <span class="info-label">Бренд-лифт</span>
+                        <span class="info-val">{bool_icon(row.get('bls'))}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Sales Lift</span>
+                        <span class="info-val">{bool_icon(row.get('sales_lift'))}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-section">Плейсмент</div>
+                    <div class="tags-row">{tags_html(row.get('placement'))}</div>
+                    <div class="card-section">Устройства</div>
+                    <div class="tags-row">{tags_html(row.get('device'))}</div>
+                    <div class="card-section">Отображение</div>
+                    <div class="tags-row">{tags_html(row.get('display'))}</div>
+                    <div class="card-section">DMP</div>
+                    <div class="tags-row">{tags_html(row.get('dmp'))}</div>
+                    <div class="card-section">Производство</div>
+                    <div class="tags-row">{tags_html(row.get('production'))}</div>
+                </div>
             </div>
-            <div class="card-metric">
-                <div class="card-metric-label">eCPM (сезон. {season_coeff}x)</div>
-                <div class="card-metric-value">{fmt_money(ecpm_sea)}</div>
-            </div>
-            <div class="card-metric">
-                <div class="card-metric-label">Скидка</div>
-                <div class="card-metric-value">{fmt_pct(row.get('discount'))}</div>
-            </div>
-            <div class="card-metric">
-                <div class="card-metric-label">Охват (max)</div>
-                <div class="card-metric-value">{fmt_reach(row.get('max_reach'))}</div>
-            </div>
-            <div class="card-metric">
-                <div class="card-metric-label">CTR (avg)</div>
-                <div class="card-metric-value">{fmt_pct(row.get('ctr_avg'))}</div>
-            </div>
-            <div class="card-metric">
-                <div class="card-metric-label">VTR (avg)</div>
-                <div class="card-metric-value">{fmt_pct(row.get('vtr_avg'))}</div>
-            </div>
-            <div class="card-metric">
-                <div class="card-metric-label">Viewability (avg)</div>
-                <div class="card-metric-value">{fmt_pct(row.get('viewability_avg'))}</div>
-            </div>
-            <div class="card-metric">
-                <div class="card-metric-label">Комиссия</div>
-                <div class="card-metric-value">{fmt_pct(row.get('commission'))}</div>
-            </div>
-            <div class="card-metric">
-                <div class="card-metric-label">Мин. бюджет</div>
-                <div class="card-metric-value">{fmt_money(row.get('min_budget'))}</div>
-            </div>
+
+            <div class="card-section">Таргетинг</div>
+            <div class="tags-row">{tags_html(row.get('targeting'))}</div>
+
+            <div class="card-section">Наценки за таргетинг</div>
+            <div class="tags-row">{tags_html(row.get('targeting_markup'))}</div>
+
+            {'<div class="card-section">Ссылки</div><div style="margin-top:4px;">' + "".join(links) + "</div>" if links else ""}
         </div>
+        """, unsafe_allow_html=True)
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div>
-                <div class="card-section">Ценовой диапазон</div>
-                <div class="info-row">
-                    <span class="info-label">CPM min/avg/max</span>
-                    <span class="info-val">{fmt_money(row.get('cpm_min'))} / {fmt_money(row.get('cpm_avg'))} / {fmt_money(row.get('cpm_max'))}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">CPC min/avg/max</span>
-                    <span class="info-val">{fmt_money(row.get('cpc_min'))} / {fmt_money(row.get('cpc_avg'))} / {fmt_money(row.get('cpc_max'))}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">CTR min/max</span>
-                    <span class="info-val">{fmt_pct(row.get('ctr_min'))} / {fmt_pct(row.get('ctr_max'))}</span>
-                </div>
-
-                <div class="card-section">Верификация</div>
-                <div class="info-row">
-                    <span class="info-label">Pixel</span>
-                    <span class="info-val">{bool_icon(row.get('verification_pixel'))}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">JS-тег</span>
-                    <span class="info-val">{bool_icon(row.get('verification_js'))}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Условия</span>
-                    <span class="info-val" style="font-size:0.75rem;color:#666;">{row.get('verification_terms','—') if not pd.isna(row.get('verification_terms','—')) else '—'}</span>
-                </div>
-
-                <div class="card-section">Дополнительно</div>
-                <div class="info-row">
-                    <span class="info-label">BLS</span>
-                    <span class="info-val">{bool_icon(row.get('bls'))}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Sales Lift</span>
-                    <span class="info-val">{bool_icon(row.get('sales_lift'))}</span>
-                </div>
-            </div>
-            <div>
-                <div class="card-section">Плейсмент</div>
-                <div class="tags-row">{tags_html(row.get('placement'))}</div>
-
-                <div class="card-section">Устройства</div>
-                <div class="tags-row">{tags_html(row.get('device'))}</div>
-
-                <div class="card-section">Отображение</div>
-                <div class="tags-row">{tags_html(row.get('display'))}</div>
-
-                <div class="card-section">DMP</div>
-                <div class="tags-row">{tags_html(row.get('dmp'))}</div>
-
-                <div class="card-section">Производство</div>
-                <div class="tags-row">{tags_html(row.get('production'))}</div>
-            </div>
-        </div>
-
-        <div class="card-section">Таргетинг</div>
-        <div class="tags-row">{tags_html(row.get('targeting'))}</div>
-
-        <div class="card-section">Наценки за таргетинг</div>
-        <div class="tags-row">{tags_html(row.get('targeting_markup'))}</div>
-
-        {'<div class="card-section">Ссылки</div><div>' + "".join(links) + "</div>" if links else ""}
-    </div>
-    """, unsafe_allow_html=True)
-
-    # BLS / Sales Lift terms
-    if isinstance(row.get("bls_terms"), str):
-        with st.expander("📋 Условия BLS"):
-            st.markdown(f'<div style="font-size:0.82rem;color:#444;line-height:1.6;">{row["bls_terms"]}</div>', unsafe_allow_html=True)
-    if isinstance(row.get("sales_lift_terms"), str):
-        with st.expander("📋 Условия Sales Lift"):
-            st.markdown(f'<div style="font-size:0.82rem;color:#444;line-height:1.6;">{row["sales_lift_terms"]}</div>', unsafe_allow_html=True)
-    if isinstance(row.get("seasonality_terms"), str):
-        with st.expander("📋 Условия сезонности"):
-            st.markdown(f'<div style="font-size:0.82rem;color:#444;line-height:1.6;">{row["seasonality_terms"]}</div>', unsafe_allow_html=True)
+        for lbl, key in [("Условия бренд-лифта", "bls_terms"),
+                          ("Условия Sales Lift", "sales_lift_terms"),
+                          ("Условия сезонности", "seasonality_terms")]:
+            val = row.get(key)
+            if isinstance(val, str) and val.strip():
+                with st.expander(f"📋 {lbl}"):
+                    st.markdown(
+                        f'<div style="font-size:0.82rem;color:#4A3080;line-height:1.65;">{val}</div>',
+                        unsafe_allow_html=True
+                    )
