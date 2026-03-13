@@ -309,10 +309,7 @@ def build_dict_aggregates(format_items: pd.DataFrame, dict_items: pd.DataFrame) 
             continue
         if "name" in low or "title" in low:
             continue
-        if any(
-            token in low
-            for token in ["markup", "percent", "coef", "coefficient", "value", "amount", "price", "rate", "surcharge"]
-        ):
+        if any(token in low for token in ["markup", "percent", "coef", "coefficient", "value", "amount", "price", "rate", "surcharge"]):
             value_candidate_cols.append(col)
 
     unit_candidate_cols = []
@@ -511,8 +508,6 @@ def init_weight_state() -> None:
         session_key = f"weight_{key}"
         if session_key not in st.session_state:
             st.session_state[session_key] = value
-    if "top_n_formats" not in st.session_state:
-        st.session_state["top_n_formats"] = 20
     if "selected_format_id" not in st.session_state:
         st.session_state["selected_format_id"] = None
 
@@ -639,23 +634,21 @@ def inject_styles() -> None:
         """
         <style>
         :root {
-            --page-bg: linear-gradient(180deg, rgba(248,242,255,0.42) 0%, rgba(255,255,255,0.78) 100%);
-            --card: #FFFFFF;
+            --bg: #ffffff;
+            --page-wash: rgba(248, 242, 255, 0.42);
+            --card: #ffffff;
             --text: #070037;
             --muted: rgba(7, 0, 55, 0.62);
             --muted-2: rgba(7, 0, 55, 0.48);
+            --line: rgba(7, 0, 55, 0.08);
+            --line-soft: rgba(7, 0, 55, 0.05);
             --accent: #3E20FF;
             --accent-hover: #A35AFF;
             --soft: #D7B8FF;
-            --soft-bg: rgba(248, 242, 255, 0.72);
+            --soft-bg: rgba(248, 242, 255, 0.82);
             --soft-bg-2: rgba(248, 242, 255, 0.48);
-            --line: rgba(215, 184, 255, 0.42);
-            --line-2: rgba(215, 184, 255, 0.26);
-            --line-3: rgba(215, 184, 255, 0.18);
-            --radius-card: 16px;
-            --radius-card-lg: 18px;
-            --radius-input: 10px;
-            --radius-mini: 12px;
+            --radius-card: 18px;
+            --radius-sm: 14px;
             --radius-pill: 999px;
         }
 
@@ -665,70 +658,64 @@ def inject_styles() -> None:
             font-variant-numeric: tabular-nums;
         }
 
-        body {
-            background: #FFFFFF;
-        }
-
         .stApp {
             background:
-                radial-gradient(circle at top left, rgba(215,184,255,0.16), transparent 38%),
-                radial-gradient(circle at top right, rgba(215,184,255,0.10), transparent 32%),
-                linear-gradient(180deg, rgba(248,242,255,0.58) 0%, rgba(255,255,255,0.94) 28%, #FFFFFF 100%);
+                radial-gradient(1200px 400px at 15% 0%, rgba(248, 242, 255, 0.95) 0%, rgba(248, 242, 255, 0.28) 35%, rgba(255,255,255,0) 70%),
+                linear-gradient(180deg, rgba(255,255,255,0.98) 0%, #ffffff 100%);
         }
 
         .block-container {
             max-width: 1320px;
             padding-top: 24px;
-            padding-bottom: 48px;
+            padding-bottom: 44px;
             padding-left: 24px;
             padding-right: 24px;
         }
 
         section[data-testid="stSidebar"] {
-            background: linear-gradient(180deg, rgba(248,242,255,0.72) 0%, rgba(255,255,255,0.96) 100%);
-            border-right: 1px solid rgba(215, 184, 255, 0.34);
+            background: rgba(255,255,255,0.72);
+            border-right: 1px solid rgba(7, 0, 55, 0.06);
+            backdrop-filter: blur(8px);
         }
 
         section[data-testid="stSidebar"] > div {
-            padding-top: 20px;
-            padding-bottom: 22px;
-            padding-left: 16px;
-            padding-right: 16px;
+            padding-top: 18px;
+            padding-bottom: 20px;
+            padding-left: 14px;
+            padding-right: 14px;
         }
 
-        section[data-testid="stSidebar"] .stMarkdown p,
-        section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] .stCheckbox label span {
-            color: var(--text) !important;
+        .sidebar-shell {
+            padding: 4px 2px 0 2px;
         }
 
         .sidebar-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             line-height: 1.2;
             color: var(--text);
-            margin: 0 0 18px 0;
+            margin: 0 0 14px 0;
         }
 
         .sidebar-section-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             line-height: 1.3;
             color: var(--text);
-            margin: 22px 0 10px 0;
-        }
-
-        .sidebar-note {
-            font-size: 12px;
-            line-height: 1.4;
-            color: var(--muted);
-            margin: 8px 0 0 0;
+            margin: 20px 0 10px 0;
         }
 
         .sidebar-divider {
             height: 1px;
-            background: rgba(215, 184, 255, 0.22);
-            margin: 18px 0 18px 0;
+            background: rgba(7, 0, 55, 0.06);
+            margin: 18px 0;
+        }
+
+        .sidebar-note {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.45;
+            margin-top: 8px;
         }
 
         div[data-baseweb="select"] > div,
@@ -737,7 +724,7 @@ def inject_styles() -> None:
         .stTextInput > div > div {
             min-height: 42px !important;
             background: rgba(255,255,255,0.96) !important;
-            border: 1px solid rgba(215, 184, 255, 0.44) !important;
+            border: 1px solid rgba(7, 0, 55, 0.08) !important;
             border-radius: 10px !important;
             box-shadow: none !important;
         }
@@ -746,34 +733,22 @@ def inject_styles() -> None:
         div[data-baseweb="input"] > div:hover,
         .stNumberInput > div > div:hover,
         .stTextInput > div > div:hover {
-            border-color: rgba(163, 90, 255, 0.72) !important;
-        }
-
-        div[data-baseweb="select"] *:focus,
-        div[data-baseweb="input"] *:focus,
-        .stNumberInput *:focus,
-        .stTextInput *:focus {
-            box-shadow: none !important;
-            outline: none !important;
+            border-color: rgba(163, 90, 255, 0.55) !important;
         }
 
         div[data-baseweb="tag"] {
             border-radius: 999px !important;
-            background: rgba(248,242,255,0.72) !important;
-            border: 1px solid rgba(215,184,255,0.44) !important;
-            color: #070037 !important;
+            background: rgba(248,242,255,0.9) !important;
+            border: 1px solid rgba(215,184,255,0.6) !important;
+            color: var(--text) !important;
         }
 
         .stCheckbox label {
             font-size: 14px !important;
         }
 
-        .stCheckbox [data-testid="stWidgetLabel"] {
-            margin-bottom: 4px !important;
-        }
-
         div[data-testid="stSlider"] [data-baseweb="slider"] > div > div:nth-child(1) {
-            background: rgba(215,184,255,0.72) !important;
+            background: rgba(215,184,255,0.75) !important;
             height: 4px !important;
         }
 
@@ -801,8 +776,8 @@ def inject_styles() -> None:
             border: 1px solid #3E20FF;
             background: #3E20FF;
             color: #FFFFFF;
-            font-weight: 600;
             font-size: 14px;
+            font-weight: 600;
             box-shadow: none;
         }
 
@@ -813,179 +788,168 @@ def inject_styles() -> None:
             color: #FFFFFF;
         }
 
-        .stButton > button:focus,
-        .stDownloadButton > button:focus {
-            box-shadow: none !important;
-            outline: none !important;
-        }
-
         .ghost-btn button {
-            background: rgba(255,255,255,0.95) !important;
+            background: #FFFFFF !important;
             color: #3E20FF !important;
-            border: 1px solid rgba(215,184,255,0.46) !important;
+            border: 1px solid rgba(7, 0, 55, 0.08) !important;
         }
 
         .ghost-btn button:hover {
-            border-color: rgba(163,90,255,0.72) !important;
+            border-color: rgba(163, 90, 255, 0.55) !important;
             color: #A35AFF !important;
         }
 
-        .ui-gap {
-            height: 20px;
-        }
+        .ui-gap-16 { height: 16px; }
+        .ui-gap-18 { height: 18px; }
+        .ui-gap-20 { height: 20px; }
 
-        .header-card,
-        .white-card,
-        .format-card,
-        .table-shell {
+        .surface,
+        .table-surface,
+        .detail-surface {
             background: rgba(255,255,255,0.96);
-            border: 1px solid rgba(215, 184, 255, 0.38);
-            border-radius: 16px;
-            backdrop-filter: blur(2px);
+            border: 1px solid rgba(7, 0, 55, 0.06);
+            border-radius: 18px;
         }
 
-        .header-card {
-            padding: 20px 24px;
+        .hero {
+            padding: 18px 22px;
         }
 
-        .header-grid {
+        .hero-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
-            gap: 14px 18px;
+            gap: 16px;
             align-items: center;
         }
 
-        .page-title {
+        .hero-title {
             margin: 0;
             font-size: 29px;
+            line-height: 1.06;
             font-weight: 700;
-            line-height: 1.08;
             letter-spacing: -0.02em;
-            color: #070037;
+            color: var(--text);
         }
 
-        .page-subtitle {
-            margin: 6px 0 0 0;
+        .hero-subtitle {
+            margin: 7px 0 0 0;
+            max-width: 620px;
             font-size: 14px;
-            line-height: 1.5;
-            color: rgba(7, 0, 55, 0.62);
-            max-width: 600px;
+            line-height: 1.48;
+            color: var(--muted);
         }
 
-        .status-pills {
+        .hero-pills {
             display: flex;
-            flex-wrap: wrap;
             gap: 8px;
+            flex-wrap: wrap;
             justify-content: flex-end;
             align-items: center;
         }
 
-        .status-pill {
+        .hero-pill {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            height: 33px;
+            height: 32px;
             padding: 0 11px;
             border-radius: 999px;
-            border: 1px solid rgba(215, 184, 255, 0.42);
-            background: rgba(255,255,255,0.92);
-            color: rgba(7, 0, 55, 0.82);
+            background: #FFFFFF;
+            border: 1px solid rgba(7, 0, 55, 0.08);
             font-size: 12px;
             font-weight: 600;
-            line-height: 1;
+            color: rgba(7, 0, 55, 0.82);
             white-space: nowrap;
         }
 
-        .kpi-grid {
+        .summary-strip {
+            padding: 8px;
+        }
+
+        .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 16px;
+            gap: 8px;
         }
 
-        .kpi-card {
-            background: rgba(255,255,255,0.98);
-            border: 1px solid rgba(215, 184, 255, 0.34);
-            border-radius: 16px;
-            padding: 16px 18px;
-            min-height: 100px;
+        .summary-card {
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #FFFFFF;
+            border: 1px solid rgba(7, 0, 55, 0.05);
+            min-height: 92px;
         }
 
-        .kpi-label {
+        .summary-label {
             font-size: 12px;
-            line-height: 1.35;
             font-weight: 600;
-            color: rgba(7, 0, 55, 0.56);
-            margin-bottom: 16px;
+            line-height: 1.35;
+            color: var(--muted-2);
+            margin-bottom: 14px;
         }
 
-        .kpi-value {
+        .summary-value {
             font-size: 30px;
-            line-height: 1.05;
+            line-height: 1.04;
             font-weight: 700;
-            color: #070037;
             letter-spacing: -0.02em;
+            color: var(--text);
         }
 
-        .section-title-row {
+        .block-head {
             display: flex;
-            align-items: end;
+            align-items: flex-end;
             justify-content: space-between;
             gap: 12px;
             margin-bottom: 10px;
         }
 
-        .section-title {
+        .block-title {
+            margin: 0;
             font-size: 17px;
             line-height: 1.2;
             font-weight: 700;
-            color: #070037;
-            margin: 0;
+            color: var(--text);
         }
 
-        .section-hint {
+        .block-note {
+            margin: 0;
             font-size: 12px;
             line-height: 1.4;
-            color: rgba(7, 0, 55, 0.54);
-            margin: 0;
+            color: var(--muted-2);
         }
 
-        .top-grid {
+        .recommend-grid {
             display: grid;
+            gap: 12px;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
         }
 
-        .top-card {
+        .recommend-card {
             background: rgba(255,255,255,0.98);
-            border: 1px solid rgba(215, 184, 255, 0.36);
+            border: 1px solid rgba(7, 0, 55, 0.06);
             border-radius: 16px;
-            padding: 16px;
-            min-height: 152px;
-            transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+            padding: 15px;
+            min-height: 150px;
         }
 
-        .top-card:hover {
-            border-color: rgba(163, 90, 255, 0.56);
-            transform: translateY(-1px);
-        }
-
-        .top-card-header {
+        .recommend-top {
             display: flex;
-            align-items: start;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 10px;
-            margin-bottom: 7px;
+            margin-bottom: 8px;
         }
 
-        .top-card-title {
-            font-size: 19px;
-            line-height: 1.15;
-            font-weight: 700;
-            color: #070037;
+        .recommend-title {
             margin: 0;
+            font-size: 19px;
+            line-height: 1.14;
+            font-weight: 700;
+            color: var(--text);
         }
 
-        .score-badge {
+        .score-pill {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -993,84 +957,69 @@ def inject_styles() -> None:
             height: 29px;
             padding: 0 10px;
             border-radius: 999px;
-            background: rgba(248,242,255,0.76);
-            border: 1px solid rgba(215,184,255,0.42);
+            background: rgba(62, 32, 255, 0.06);
+            border: 1px solid rgba(62, 32, 255, 0.14);
             color: #3E20FF;
             font-size: 13px;
             font-weight: 700;
-            white-space: nowrap;
             flex: 0 0 auto;
         }
 
-        .top-descriptor {
+        .recommend-meta {
+            margin: 0 0 11px 0;
             font-size: 13px;
-            line-height: 1.4;
-            color: rgba(7, 0, 55, 0.56);
-            margin: 0 0 12px 0;
+            line-height: 1.42;
+            color: var(--muted);
         }
 
-        .mini-stats-grid {
+        .recommend-stats {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px 10px;
+            gap: 8px;
         }
 
-        .mini-stat {
-            background: rgba(248,242,255,0.44);
-            border: 1px solid rgba(215,184,255,0.16);
-            border-radius: 12px;
+        .recommend-stat {
             padding: 10px 11px;
+            border-radius: 12px;
+            background: rgba(248,242,255,0.46);
+            border: 1px solid rgba(7, 0, 55, 0.03);
         }
 
-        .mini-stat-label {
+        .recommend-stat-label {
             font-size: 11px;
             line-height: 1.3;
-            color: rgba(7, 0, 55, 0.50);
+            color: var(--muted-2);
             margin-bottom: 5px;
         }
 
-        .mini-stat-value {
+        .recommend-stat-value {
             font-size: 15px;
             line-height: 1.15;
             font-weight: 700;
-            color: #070037;
+            color: var(--text);
         }
 
-        .table-shell {
+        .table-surface {
             overflow: hidden;
         }
 
-        .table-title-row {
+        .table-head {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(7, 0, 55, 0.05);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            padding: 18px 20px;
-            border-bottom: 1px solid rgba(215, 184, 255, 0.22);
-            background: rgba(255,255,255,0.98);
+            background: rgba(255,255,255,0.96);
         }
 
-        .table-title {
-            margin: 0;
-            font-size: 17px;
-            line-height: 1.2;
-            font-weight: 700;
-            color: #070037;
-        }
-
-        .table-note {
-            margin: 0;
-            font-size: 12px;
-            line-height: 1.4;
-            color: rgba(7, 0, 55, 0.56);
-        }
-
-        .table-inner {
-            padding: 2px 0 0 0;
+        .table-wrap {
+            padding-top: 2px;
         }
 
         div[data-testid="stDataFrame"] {
             border: none !important;
+            background: transparent !important;
         }
 
         div[data-testid="stDataFrame"] [role="table"] {
@@ -1081,112 +1030,94 @@ def inject_styles() -> None:
             border: none !important;
         }
 
-        .format-card-wrap {
-            margin-top: 2px;
-        }
-
-        .format-card-title {
+        .detail-title {
             margin: 0 0 10px 0;
             font-size: 17px;
             line-height: 1.2;
             font-weight: 700;
-            color: #070037;
+            color: var(--text);
         }
 
-        .format-card {
-            border-radius: 18px;
-            padding: 22px 24px 24px 24px;
-            border: 1px solid rgba(215, 184, 255, 0.38);
+        .detail-surface {
+            padding: 22px;
         }
 
         .format-hero {
             padding-bottom: 16px;
-            border-bottom: 1px solid rgba(215, 184, 255, 0.18);
+            border-bottom: 1px solid rgba(7, 0, 55, 0.05);
             margin-bottom: 18px;
         }
 
         .format-name {
             margin: 0 0 8px 0;
             font-size: 29px;
-            line-height: 1.08;
-            letter-spacing: -0.02em;
+            line-height: 1.06;
             font-weight: 700;
-            color: #070037;
+            letter-spacing: -0.02em;
+            color: var(--text);
         }
 
-        .meta-row {
+        .format-meta {
             font-size: 14px;
             line-height: 1.5;
-            color: rgba(7, 0, 55, 0.60);
+            color: var(--muted);
         }
 
-        .card-block {
+        .section-block {
             margin-top: 18px;
         }
 
-        .card-block:first-of-type {
+        .section-block:first-child {
             margin-top: 0;
         }
 
-        .card-block-title {
-            font-size: 14px;
-            line-height: 1.3;
-            font-weight: 700;
-            color: #070037;
+        .section-title {
             margin: 0 0 8px 0;
+            font-size: 14px;
+            line-height: 1.32;
+            font-weight: 700;
+            color: var(--text);
         }
 
-        .metrics-grid {
+        .metric-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px 12px;
+            gap: 10px;
         }
 
-        .metric-box {
-            background: rgba(248,242,255,0.50);
-            border: 1px solid rgba(215,184,255,0.16);
-            border-radius: 12px;
+        .metric-card {
             padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(248,242,255,0.54);
+            border: 1px solid rgba(7, 0, 55, 0.03);
         }
 
-        .metric-box-label {
+        .metric-label {
             font-size: 12px;
             line-height: 1.3;
-            color: rgba(7, 0, 55, 0.52);
+            color: var(--muted-2);
             margin-bottom: 5px;
         }
 
-        .metric-box-value {
+        .metric-value {
             font-size: 17px;
             line-height: 1.15;
             font-weight: 700;
-            color: #070037;
-        }
-
-        .subsection {
-            margin-top: 18px;
-        }
-
-        .subsection-title {
-            font-size: 13px;
-            line-height: 1.3;
-            font-weight: 700;
-            color: #070037;
-            margin: 0 0 7px 0;
+            color: var(--text);
         }
 
         .body-text {
+            margin: 0;
             font-size: 14px;
             line-height: 1.6;
-            color: #070037;
-            margin: 0;
+            color: var(--text);
         }
 
         .muted-empty {
+            margin: 0;
             font-size: 14px;
             line-height: 1.5;
-            color: rgba(7, 0, 55, 0.56);
-            margin: 0;
+            color: var(--muted);
         }
 
         .pill-group {
@@ -1198,21 +1129,21 @@ def inject_styles() -> None:
         .pill {
             display: inline-flex;
             align-items: center;
-            min-height: 25px;
+            min-height: 24px;
             padding: 3px 8px;
             border-radius: 999px;
             background: rgba(248,242,255,0.56);
-            border: 1px solid rgba(215,184,255,0.30);
-            color: rgba(7, 0, 55, 0.88);
+            border: 1px solid rgba(7, 0, 55, 0.05);
             font-size: 11px;
             line-height: 1.2;
             font-weight: 500;
+            color: rgba(7, 0, 55, 0.84);
         }
 
         .link-list {
             display: flex;
             flex-direction: column;
-            gap: 7px;
+            gap: 8px;
         }
 
         .link-list a {
@@ -1229,44 +1160,44 @@ def inject_styles() -> None:
         }
 
         .empty-state {
-            background: rgba(255,255,255,0.96);
-            border: 1px dashed rgba(215,184,255,0.42);
-            border-radius: 16px;
             padding: 18px 20px;
-            color: rgba(7, 0, 55, 0.58);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.96);
+            border: 1px dashed rgba(7, 0, 55, 0.08);
+            color: var(--muted);
             font-size: 14px;
             line-height: 1.5;
         }
 
         @media (max-width: 1180px) {
-            .kpi-grid,
-            .top-grid,
-            .metrics-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .header-grid {
+            .hero-grid {
                 grid-template-columns: 1fr;
             }
 
-            .status-pills {
+            .hero-pills {
                 justify-content: flex-start;
+            }
+
+            .summary-grid,
+            .recommend-grid,
+            .metric-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
 
         @media (max-width: 760px) {
-            .kpi-grid,
-            .top-grid,
-            .metrics-grid {
+            .summary-grid,
+            .recommend-grid,
+            .metric-grid {
                 grid-template-columns: 1fr;
             }
 
-            .page-title,
+            .hero-title,
             .format-name {
                 font-size: 24px;
             }
 
-            .kpi-value {
+            .summary-value {
                 font-size: 26px;
             }
         }
@@ -1277,7 +1208,7 @@ def inject_styles() -> None:
 
 
 def render_sidebar_title() -> None:
-    st.sidebar.markdown('<div class="sidebar-title">Панель управления</div>', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-shell"><div class="sidebar-title">Панель управления</div></div>', unsafe_allow_html=True)
 
 
 def render_sidebar_section_title(title: str) -> None:
@@ -1312,21 +1243,9 @@ def build_sidebar_state(df: pd.DataFrame) -> Tuple[Dict, bool, Dict[str, int]]:
     render_sidebar_title()
 
     render_sidebar_section_title("Фильтры")
-    platforms = st.sidebar.multiselect(
-        "Площадка",
-        options=unique_options(df, "platform"),
-        placeholder="Все площадки",
-    )
-    service_types = st.sidebar.multiselect(
-        "Тип сервиса",
-        options=unique_options(df, "type_service"),
-        placeholder="Все типы",
-    )
-    buy_models = st.sidebar.multiselect(
-        "Модель закупки",
-        options=unique_options(df, "buy_model"),
-        placeholder="Все модели",
-    )
+    platforms = st.sidebar.multiselect("Площадка", options=unique_options(df, "platform"), placeholder="Все площадки")
+    service_types = st.sidebar.multiselect("Тип сервиса", options=unique_options(df, "type_service"), placeholder="Все типы")
+    buy_models = st.sidebar.multiselect("Модель закупки", options=unique_options(df, "buy_model"), placeholder="Все модели")
 
     need_verification_pixel = st.sidebar.checkbox("Нужен пиксель отслеживания", value=False)
     need_verification_js = st.sidebar.checkbox("Нужен JavaScript-трекинг", value=False)
@@ -1336,41 +1255,13 @@ def build_sidebar_state(df: pd.DataFrame) -> Tuple[Dict, bool, Dict[str, int]]:
     render_sidebar_divider()
 
     render_sidebar_section_title("Параметры и таргетинги")
-    filter_format_type = st.sidebar.multiselect(
-        "Тип формата",
-        options=unique_tag_options(df, "format_type"),
-        placeholder="Все значения",
-    )
-    filter_device = st.sidebar.multiselect(
-        "Устройство",
-        options=unique_tag_options(df, "device"),
-        placeholder="Все значения",
-    )
-    filter_placement = st.sidebar.multiselect(
-        "Размещение",
-        options=unique_tag_options(df, "placement"),
-        placeholder="Все значения",
-    )
-    filter_display = st.sidebar.multiselect(
-        "Показ креатива",
-        options=unique_tag_options(df, "display"),
-        placeholder="Все значения",
-    )
-    filter_dmp = st.sidebar.multiselect(
-        "Данные и сегменты",
-        options=unique_tag_options(df, "dmp"),
-        placeholder="Все значения",
-    )
-    filter_targeting = st.sidebar.multiselect(
-        "Таргетинги",
-        options=unique_tag_options(df, "targeting"),
-        placeholder="Все значения",
-    )
-    filter_instream_pos = st.sidebar.multiselect(
-        "Позиция в потоке",
-        options=unique_tag_options(df, "instream_pos"),
-        placeholder="Все значения",
-    )
+    filter_format_type = st.sidebar.multiselect("Тип формата", options=unique_tag_options(df, "format_type"), placeholder="Все значения")
+    filter_device = st.sidebar.multiselect("Устройство", options=unique_tag_options(df, "device"), placeholder="Все значения")
+    filter_placement = st.sidebar.multiselect("Размещение", options=unique_tag_options(df, "placement"), placeholder="Все значения")
+    filter_display = st.sidebar.multiselect("Показ креатива", options=unique_tag_options(df, "display"), placeholder="Все значения")
+    filter_dmp = st.sidebar.multiselect("Данные и сегменты", options=unique_tag_options(df, "dmp"), placeholder="Все значения")
+    filter_targeting = st.sidebar.multiselect("Таргетинги", options=unique_tag_options(df, "targeting"), placeholder="Все значения")
+    filter_instream_pos = st.sidebar.multiselect("Позиция в потоке", options=unique_tag_options(df, "instream_pos"), placeholder="Все значения")
 
     render_sidebar_divider()
 
@@ -1380,16 +1271,9 @@ def build_sidebar_state(df: pd.DataFrame) -> Tuple[Dict, bool, Dict[str, int]]:
     min_vtr = st.sidebar.number_input("Минимальный VTR", min_value=0.0, value=0.0, step=0.01, format="%.4f")
     min_viewability = st.sidebar.number_input("Минимальный Viewability", min_value=0.0, value=0.0, step=0.01, format="%.4f")
 
-    max_ecpm_value = (
-        float(df["ecpm_discounted"].dropna().max())
-        if "ecpm_discounted" in df.columns and not df["ecpm_discounted"].dropna().empty
-        else 1000.0
-    )
-    max_commission_value = (
-        float(df["commission"].dropna().max())
-        if "commission" in df.columns and not df["commission"].dropna().empty
-        else 1.0
-    )
+    max_ecpm_value = float(df["ecpm_discounted"].dropna().max()) if "ecpm_discounted" in df.columns and not df["ecpm_discounted"].dropna().empty else 1000.0
+    max_commission_value = float(df["commission"].dropna().max()) if "commission" in df.columns and not df["commission"].dropna().empty else 1.0
+
     max_ecpm = st.sidebar.number_input("Максимальный eCPM", min_value=0.0, value=max_ecpm_value, step=10.0)
     max_commission = st.sidebar.number_input("Максимальная комиссия", min_value=0.0, value=max_commission_value, step=0.01, format="%.4f")
 
@@ -1459,17 +1343,17 @@ def render_header(found_count: int, scoring_applied: bool) -> None:
     status_text = "Скоринг включен" if scoring_applied else "Скоринг выключен"
     st.markdown(
         f"""
-        <div class="header-card">
-            <div class="header-grid">
+        <div class="surface hero">
+            <div class="hero-grid">
                 <div>
-                    <h1 class="page-title">Подбор рекламных форматов</h1>
-                    <p class="page-subtitle">
-                        Фильтруйте форматы, настраивайте веса и сравнивайте варианты в одном рабочем интерфейсе выбора.
+                    <h1 class="hero-title">Подбор рекламных форматов</h1>
+                    <p class="hero-subtitle">
+                        Рабочий интерфейс выбора: фильтрация, веса скоринга, ранжированный список и детальная карточка формата в одной сцене.
                     </p>
                 </div>
-                <div class="status-pills">
-                    <div class="status-pill">Найдено: {found_count}</div>
-                    <div class="status-pill">{status_text}</div>
+                <div class="hero-pills">
+                    <div class="hero-pill">Найдено: {found_count}</div>
+                    <div class="hero-pill">{status_text}</div>
                 </div>
             </div>
         </div>
@@ -1486,22 +1370,24 @@ def render_kpi_row(df: pd.DataFrame, scoring_applied: bool) -> None:
 
     st.markdown(
         f"""
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-label">Найдено форматов</div>
-                <div class="kpi-value">{found_count}</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Лучший скоринг</div>
-                <div class="kpi-value">{best_score}</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Максимальный охват</div>
-                <div class="kpi-value">{max_reach}</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Минимальный eCPM</div>
-                <div class="kpi-value">{min_ecpm}</div>
+        <div class="surface summary-strip">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">Найдено форматов</div>
+                    <div class="summary-value">{found_count}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Лучший скоринг</div>
+                    <div class="summary-value">{best_score}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Максимальный охват</div>
+                    <div class="summary-value">{max_reach}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Минимальный eCPM</div>
+                    <div class="summary-value">{min_ecpm}</div>
+                </div>
             </div>
         </div>
         """,
@@ -1514,88 +1400,86 @@ def build_top_card_html(row: pd.Series, scoring_applied: bool, mode_label: str) 
     if not title or title.lower() == "nan":
         return ""
 
-    descriptor_parts = [
+    meta_parts = [
         str(row.get("platform", "")).strip(),
         str(row.get("type_service", "")).strip(),
         str(row.get("buy_model", "")).strip(),
     ]
-    descriptor_parts = [x for x in descriptor_parts if x and x.lower() != "nan"]
-    descriptor = " · ".join(descriptor_parts)
-    if not descriptor:
-        descriptor = mode_label
+    meta_parts = [x for x in meta_parts if x and x.lower() != "nan"]
+    meta_text = " · ".join(meta_parts) if meta_parts else mode_label
 
     if scoring_applied and "score" in row.index and pd.notna(row.get("score")):
-        badge_text = format_number(row.get("score"))
+        badge = format_number(row.get("score"))
     else:
-        reach_text = format_number(row.get("max_reach"), 0) if pd.notna(row.get("max_reach")) else ""
-        badge_text = reach_text if reach_text and reach_text != "—" else ""
+        badge = ""
 
-    mini_stats = [
+    stats = [
         ("Охват", format_number(row.get("max_reach"), 0)),
         ("eCPM", format_number(row.get("ecpm_discounted"))),
         ("CTR", format_percent(row.get("ctr_avg"))),
         ("Viewability", format_percent(row.get("viewability_avg"))),
     ]
 
-    stats_html_parts = []
-    for label, value in mini_stats:
-        if value and value != "—":
-            stats_html_parts.append(
-                f"""
-                <div class="mini-stat">
-                    <div class="mini-stat-label">{label}</div>
-                    <div class="mini-stat-value">{value}</div>
-                </div>
-                """
-            )
-
-    if len(stats_html_parts) < 2:
+    valid_stats = [(label, value) for label, value in stats if value and value != "—"]
+    if len(valid_stats) < 2:
         return ""
 
-    badge_html = f'<div class="score-badge">{badge_text}</div>' if badge_text else ""
+    badge_html = f'<div class="score-pill">{badge}</div>' if badge else ""
+
+    stats_html = "".join(
+        [
+            f"""
+            <div class="recommend-stat">
+                <div class="recommend-stat-label">{label}</div>
+                <div class="recommend-stat-value">{value}</div>
+            </div>
+            """
+            for label, value in valid_stats[:4]
+        ]
+    )
 
     return f"""
-    <div class="top-card">
-        <div class="top-card-header">
-            <h3 class="top-card-title">{title}</h3>
+    <div class="recommend-card">
+        <div class="recommend-top">
+            <h3 class="recommend-title">{title}</h3>
             {badge_html}
         </div>
-        <p class="top-descriptor">{descriptor}</p>
-        <div class="mini-stats-grid">
-            {"".join(stats_html_parts[:4])}
+        <p class="recommend-meta">{meta_text}</p>
+        <div class="recommend-stats">
+            {stats_html}
         </div>
     </div>
     """
 
 
 def render_top_formats(top_df: pd.DataFrame, scoring_applied: bool) -> None:
-    block_title = "Топ форматы" if scoring_applied else "Первые форматы в текущей выдаче"
-    block_hint = "Лучшие варианты по скорингу" if scoring_applied else "Первые позиции в текущем порядке сортировки"
-
-    st.markdown(
-        f"""
-        <div class="section-title-row">
-            <h2 class="section-title">{block_title}</h2>
-            <p class="section-hint">{block_hint}</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
     if top_df.empty:
-        st.markdown('<div class="empty-state">Нет данных для отображения этого блока.</div>', unsafe_allow_html=True)
         return
+
+    title = "Топ форматы" if scoring_applied else "Первые форматы в текущей выдаче"
+    note = "Лучшие варианты по скорингу" if scoring_applied else "Первые позиции в текущем порядке сортировки"
 
     cards = []
     for _, row in top_df.iterrows():
-        card_html = build_top_card_html(row, scoring_applied, block_hint)
-        if card_html and "<" in card_html and "top-card" in card_html:
-            cards.append(card_html)
+        html = build_top_card_html(row, scoring_applied, note)
+        if html:
+            cards.append(html)
 
     if not cards:
         return
 
-    st.markdown(f'<div class="top-grid">{"".join(cards)}</div>', unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="block-head">
+            <h2 class="block-title">{title}</h2>
+            <p class="block-note">{note}</p>
+        </div>
+        <div class="recommend-grid">
+            {"".join(cards)}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def prepare_display_table(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFrame:
@@ -1615,7 +1499,7 @@ def prepare_display_table(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFra
         if display_col in table.columns and source_col in df.columns:
             if source_col in {"ctr_avg", "vtr_avg", "viewability_avg", "commission"}:
                 table[display_col] = df[source_col].apply(format_percent)
-            elif source_col in {"max_reach"}:
+            elif source_col == "max_reach":
                 table[display_col] = df[source_col].apply(lambda x: format_number(x, 0))
             else:
                 table[display_col] = df[source_col].apply(format_number)
@@ -1626,18 +1510,17 @@ def prepare_display_table(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFra
 def render_results_table(df: pd.DataFrame, scoring_applied: bool) -> None:
     st.markdown(
         """
-        <div class="table-shell">
-            <div class="table-title-row">
-                <h2 class="table-title">Результаты</h2>
-                <p class="table-note">Выберите один формат для просмотра карточки</p>
+        <div class="table-surface">
+            <div class="table-head">
+                <h2 class="block-title">Результаты</h2>
+                <p class="block-note">Выберите один формат для просмотра карточки</p>
             </div>
-            <div class="table-inner">
+        </div>
         """,
         unsafe_allow_html=True,
     )
 
     if df.empty:
-        st.markdown('</div></div>', unsafe_allow_html=True)
         st.markdown('<div class="empty-state">По текущим фильтрам форматы не найдены.</div>', unsafe_allow_html=True)
         return
 
@@ -1651,8 +1534,6 @@ def render_results_table(df: pd.DataFrame, scoring_applied: bool) -> None:
         selection_mode="single-row",
         height=min(44 * (len(render_df) + 1), 620),
     )
-
-    st.markdown("</div></div>", unsafe_allow_html=True)
 
     selected_rows = []
     if isinstance(selection_event, dict):
@@ -1672,21 +1553,21 @@ def render_results_table(df: pd.DataFrame, scoring_applied: bool) -> None:
 
 
 def render_pill_group(values: List[str]) -> None:
-    clean_values = [str(v).strip() for v in values if pd.notna(v) and str(v).strip()]
-    if not clean_values:
+    clean = [str(v).strip() for v in values if pd.notna(v) and str(v).strip()]
+    if not clean:
         st.markdown('<p class="muted-empty">Нет данных</p>', unsafe_allow_html=True)
         return
-    pills = "".join([f'<span class="pill">{value}</span>' for value in clean_values])
-    st.markdown(f'<div class="pill-group">{pills}</div>', unsafe_allow_html=True)
+    html = "".join([f'<span class="pill">{value}</span>' for value in clean])
+    st.markdown(f'<div class="pill-group">{html}</div>', unsafe_allow_html=True)
 
 
-def render_text_block(title: str, text: Optional[str]) -> None:
+def render_text_section(title: str, text: Optional[str]) -> None:
     if pd.isna(text) or text is None or str(text).strip() == "":
         return
     st.markdown(
         f"""
-        <div class="subsection">
-            <h3 class="subsection-title">{title}</h3>
+        <div class="section-block">
+            <h3 class="section-title">{title}</h3>
             <p class="body-text">{str(text).strip()}</p>
         </div>
         """,
@@ -1695,13 +1576,17 @@ def render_text_block(title: str, text: Optional[str]) -> None:
 
 
 def render_selected_format_card(row: Optional[pd.Series]) -> None:
-    st.markdown('<div class="format-card-wrap"><h2 class="format-card-title">Карточка формата</h2></div>', unsafe_allow_html=True)
+    st.markdown('<h2 class="detail-title">Карточка формата</h2>', unsafe_allow_html=True)
 
     if row is None:
         st.markdown('<div class="empty-state">Выберите формат в таблице, чтобы открыть карточку.</div>', unsafe_allow_html=True)
         return
 
     data = build_format_card_data(row)
+    title = str(data.get("title", "")).strip()
+    if not title:
+        return
+
     meta_text = " · ".join(
         [
             data["meta"].get("platform", "—"),
@@ -1712,38 +1597,38 @@ def render_selected_format_card(row: Optional[pd.Series]) -> None:
 
     st.markdown(
         f"""
-        <div class="format-card">
+        <div class="detail-surface">
             <div class="format-hero">
-                <h2 class="format-name">{data["title"]}</h2>
-                <div class="meta-row">{meta_text}</div>
+                <h3 class="format-name">{title}</h3>
+                <div class="format-meta">{meta_text}</div>
             </div>
 
-            <div class="card-block">
-                <h3 class="card-block-title">Основные показатели</h3>
-                <div class="metrics-grid">
-                    <div class="metric-box">
-                        <div class="metric-box-label">Максимальный охват</div>
-                        <div class="metric-box-value">{data["stats"]["max_reach"]}</div>
+            <div class="section-block">
+                <h4 class="section-title">Основные показатели</h4>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Максимальный охват</div>
+                        <div class="metric-value">{data["stats"]["max_reach"]}</div>
                     </div>
-                    <div class="metric-box">
-                        <div class="metric-box-label">Минимальный бюджет</div>
-                        <div class="metric-box-value">{data["stats"]["min_budget"]}</div>
+                    <div class="metric-card">
+                        <div class="metric-label">Минимальный бюджет</div>
+                        <div class="metric-value">{data["stats"]["min_budget"]}</div>
                     </div>
-                    <div class="metric-box">
-                        <div class="metric-box-label">eCPM с учетом скидки</div>
-                        <div class="metric-box-value">{data["stats"]["ecpm_discounted"]}</div>
+                    <div class="metric-card">
+                        <div class="metric-label">eCPM с учетом скидки</div>
+                        <div class="metric-value">{data["stats"]["ecpm_discounted"]}</div>
                     </div>
-                    <div class="metric-box">
-                        <div class="metric-box-label">Комиссия</div>
-                        <div class="metric-box-value">{data["stats"]["commission"]}</div>
+                    <div class="metric-card">
+                        <div class="metric-label">Комиссия</div>
+                        <div class="metric-value">{data["stats"]["commission"]}</div>
                     </div>
-                    <div class="metric-box">
-                        <div class="metric-box-label">CTR, среднее</div>
-                        <div class="metric-box-value">{data["stats"]["ctr_avg"]}</div>
+                    <div class="metric-card">
+                        <div class="metric-label">CTR, среднее</div>
+                        <div class="metric-value">{data["stats"]["ctr_avg"]}</div>
                     </div>
-                    <div class="metric-box">
-                        <div class="metric-box-label">Viewability, среднее</div>
-                        <div class="metric-box-value">{data["stats"]["viewability_avg"]}</div>
+                    <div class="metric-card">
+                        <div class="metric-label">Viewability, среднее</div>
+                        <div class="metric-value">{data["stats"]["viewability_avg"]}</div>
                     </div>
                 </div>
             </div>
@@ -1759,21 +1644,22 @@ def render_selected_format_card(row: Optional[pd.Series]) -> None:
         f"Brand Lift: {data['stats']['bls']}",
         f"Sales Lift: {data['stats']['sales_lift']}",
     ]
-    st.markdown('<div class="card-block"><h3 class="card-block-title">Дополнительно</h3></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="section-block"><h4 class="section-title">Дополнительно</h4></div>', unsafe_allow_html=True)
     render_pill_group(additional_values)
 
-    render_text_block("Описание", data.get("description"))
-    render_text_block("Условия верификации", data["conditions"].get("verification_terms"))
-    render_text_block("Условия Brand Lift", data["conditions"].get("bls_terms"))
-    render_text_block("Условия Sales Lift", data["conditions"].get("sales_lift_terms"))
-    render_text_block("Условия сезонности", data["conditions"].get("seasonality_terms"))
+    render_text_section("Описание", data.get("description"))
+    render_text_section("Условия верификации", data["conditions"].get("verification_terms"))
+    render_text_section("Условия Brand Lift", data["conditions"].get("bls_terms"))
+    render_text_section("Условия Sales Lift", data["conditions"].get("sales_lift_terms"))
+    render_text_section("Условия сезонности", data["conditions"].get("seasonality_terms"))
 
     if data["dict_groups"]:
         for label, values in data["dict_groups"].items():
             clean_values = [v for v in values if pd.notna(v) and str(v).strip()]
             if not clean_values:
                 continue
-            st.markdown(f'<div class="subsection"><h3 class="subsection-title">{label}</h3></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="section-block"><h4 class="section-title">{label}</h4></div>', unsafe_allow_html=True)
             render_pill_group(clean_values)
 
     links_map = {
@@ -1784,13 +1670,11 @@ def render_selected_format_card(row: Optional[pd.Series]) -> None:
     }
     valid_links = {label: url for label, url in links_map.items() if pd.notna(url) and str(url).strip()}
     if valid_links:
-        links_html = "".join(
-            [f'<a href="{str(url).strip()}" target="_blank">{label}</a>' for label, url in valid_links.items()]
-        )
+        links_html = "".join([f'<a href="{str(url).strip()}" target="_blank">{label}</a>' for label, url in valid_links.items()])
         st.markdown(
             f"""
-            <div class="subsection">
-                <h3 class="subsection-title">Ссылки</h3>
+            <div class="section-block">
+                <h4 class="section-title">Ссылки</h4>
                 <div class="link-list">{links_html}</div>
             </div>
             """,
@@ -1812,29 +1696,39 @@ def main() -> None:
     filtered = apply_filters(df, filter_state)
 
     if scoring_applied:
-        scored = compute_score(filtered, weights)
-        result_df = scored.sort_values(by=["score", "ecpm_discounted"], ascending=[False, True], na_position="last")
+        result_df = compute_score(filtered, weights).sort_values(
+            by=["score", "ecpm_discounted"],
+            ascending=[False, True],
+            na_position="last",
+        )
     else:
         result_df = filtered.copy()
         sort_cols = [col for col in ["max_reach", "ctr_avg"] if col in result_df.columns]
         if sort_cols:
-            result_df = result_df.sort_values(by=sort_cols, ascending=[False] * len(sort_cols), na_position="last")
+            result_df = result_df.sort_values(
+                by=sort_cols,
+                ascending=[False] * len(sort_cols),
+                na_position="last",
+            )
 
-    if not result_df.empty and st.session_state.get("selected_format_id") not in set(result_df["format_id"].tolist()):
-        st.session_state["selected_format_id"] = result_df.iloc[0]["format_id"]
+    if not result_df.empty:
+        valid_ids = set(result_df["format_id"].tolist())
+        if st.session_state.get("selected_format_id") not in valid_ids:
+            st.session_state["selected_format_id"] = result_df.iloc[0]["format_id"]
 
     render_header(len(result_df), scoring_applied)
-    st.markdown('<div class="ui-gap"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="ui-gap-16"></div>', unsafe_allow_html=True)
 
     render_kpi_row(result_df, scoring_applied)
-    st.markdown('<div class="ui-gap"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="ui-gap-18"></div>', unsafe_allow_html=True)
 
     top_df = get_top_formats(result_df, scoring_applied, n=3)
     render_top_formats(top_df, scoring_applied)
-    st.markdown('<div class="ui-gap"></div>', unsafe_allow_html=True)
+    if not top_df.empty:
+        st.markdown('<div class="ui-gap-18"></div>', unsafe_allow_html=True)
 
     render_results_table(result_df, scoring_applied)
-    st.markdown('<div class="ui-gap"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="ui-gap-20"></div>', unsafe_allow_html=True)
 
     selected_row = get_selected_format_by_id(result_df, st.session_state.get("selected_format_id"))
     render_selected_format_card(selected_row)
