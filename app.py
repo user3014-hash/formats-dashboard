@@ -10,17 +10,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ─────────────────────────────────────────────────────────────────────────────
-# DESIGN SYSTEM
-# Palette: #FFFFFF · #C0FFD9 · #3E20FF · #725BFF · #F8F2FF · #070037
-# Sidebar: dark (#070037) background, white text — clear hierarchy
-# Main: light (#F8F2FF) background
-# Accents: blue (#3E20FF) primary, mint (#C0FFD9) success/highlight
-# ─────────────────────────────────────────────────────────────────────────────
-
+# ─── STYLES ───────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
     --white:   #FFFFFF;
@@ -31,202 +24,174 @@ st.markdown("""
     --dark:    #070037;
     --muted:   rgba(7,0,55,0.42);
     --border:  rgba(7,0,55,0.10);
-    --row-h:   rgba(62,32,255,0.05);
-    --sel-row: rgba(62,32,255,0.09);
+    --row-h:   rgba(62,32,255,0.045);
+    --tag-bg:  rgba(62,32,255,0.08);
 }
 
-/* ── Base ── */
-html, body { background: var(--bg) !important; }
 *, *::before, *::after { font-family: 'DM Sans', sans-serif !important; box-sizing: border-box; }
-.main { background: var(--bg) !important; }
-.main .block-container { padding: 1.5rem 2.2rem 2rem !important; max-width: 1480px; }
+html, body, .main { background: var(--bg) !important; }
+.main .block-container { padding: 1.5rem 2rem 3rem !important; max-width: 1460px; }
+[class*="css"] { color: var(--dark); }
 
-/* ── Sidebar: dark background ── */
-section[data-testid="stSidebar"] {
-    background: var(--dark) !important;
-    border-right: none !important;
-}
+/* ── Sidebar dark ── */
+section[data-testid="stSidebar"] { background: var(--dark) !important; border-right: none !important; }
 section[data-testid="stSidebar"] .block-container { padding-top: 0 !important; }
 section[data-testid="stSidebar"] > div { padding: 0 !important; }
-/* All sidebar text: white */
+
+/* All sidebar text white */
 section[data-testid="stSidebar"] label,
 section[data-testid="stSidebar"] p,
-section[data-testid="stSidebar"] span:not([data-baseweb="tag"] span),
-section[data-testid="stSidebar"] div:not([data-baseweb]) {
-    color: rgba(255,255,255,0.85) !important;
-    font-size: 13px !important;
-}
-/* Sidebar widget inputs */
-section[data-testid="stSidebar"] [data-baseweb="select"] > div,
-section[data-testid="stSidebar"] [data-baseweb="input"] {
-    background: rgba(255,255,255,0.08) !important;
-    border-color: rgba(255,255,255,0.15) !important;
-    color: white !important;
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] div { color: rgba(255,255,255,0.82) !important; font-size: 13px !important; }
+
+/* Sidebar selects */
+section[data-testid="stSidebar"] [data-baseweb="select"] > div {
+    background: rgba(255,255,255,0.07) !important;
+    border-color: rgba(255,255,255,0.13) !important;
     border-radius: 7px !important;
 }
-section[data-testid="stSidebar"] [data-baseweb="select"] svg { fill: rgba(255,255,255,0.5) !important; }
-/* Sidebar dropdown options text */
-section[data-testid="stSidebar"] [data-baseweb="menu"] { background: #1A1060 !important; }
-section[data-testid="stSidebar"] [role="option"] { color: white !important; }
-/* Tags inside multiselect */
-section[data-testid="stSidebar"] span[data-baseweb="tag"] {
-    background: var(--blue) !important;
-    border: none !important;
-    border-radius: 5px !important;
-}
-section[data-testid="stSidebar"] span[data-baseweb="tag"] span { color: white !important; font-size: 12px !important; }
-section[data-testid="stSidebar"] span[data-baseweb="tag"] button svg { fill: rgba(255,255,255,0.7) !important; }
-/* Slider */
-section[data-testid="stSidebar"] [data-testid="stSlider"] [role="slider"] {
-    background: var(--blue) !important;
-}
-/* Checkbox */
-section[data-testid="stSidebar"] [data-testid="stCheckbox"] label span { color: rgba(255,255,255,0.85) !important; }
-/* Toggle */
-section[data-testid="stSidebar"] [data-testid="stToggle"] label span { color: rgba(255,255,255,0.85) !important; }
+section[data-testid="stSidebar"] [data-baseweb="select"] svg { fill: rgba(255,255,255,0.45) !important; }
+section[data-testid="stSidebar"] [data-baseweb="select"] span { color: rgba(255,255,255,0.82) !important; }
 
-/* ── Sidebar layout ── */
-.sb-inner { padding: 0 1.1rem 1.5rem; }
-.sb-logo {
-    padding: 1.1rem 1.1rem 0.8rem;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    margin-bottom: 0.2rem;
+/* Tags in multiselect */
+section[data-testid="stSidebar"] [data-baseweb="tag"] {
+    background: var(--blue) !important; border: none !important; border-radius: 5px !important;
 }
-.sb-logo-title { font-size: 15px; font-weight: 600; color: white !important; letter-spacing: -0.01em; }
-.sb-logo-sub { font-size: 11px; color: rgba(255,255,255,0.4) !important; margin-top: 1px; }
+section[data-testid="stSidebar"] [data-baseweb="tag"] span { color: white !important; font-size: 12px !important; }
+section[data-testid="stSidebar"] [data-baseweb="tag"] button svg { fill: rgba(255,255,255,0.65) !important; }
 
-.sb-section {
-    font-size: 9.5px; font-weight: 700; letter-spacing: 0.11em;
+/* Slider track fill */
+section[data-testid="stSidebar"] [data-testid="stSlider"] [role="slider"] { background: var(--blue) !important; }
+
+/* Placeholder text */
+section[data-testid="stSidebar"] [data-baseweb="select"] [data-placeholder] { color: rgba(255,255,255,0.38) !important; }
+
+/* sb-label */
+.sb-label {
+    font-size: 9.5px !important; font-weight: 700 !important; letter-spacing: 0.11em;
     text-transform: uppercase; color: rgba(255,255,255,0.35) !important;
-    margin: 16px 0 5px; display: block;
+    margin: 14px 0 4px; display: block;
 }
-.sb-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 12px 0; }
+.sb-logo {
+    padding: 1rem 1.1rem 0.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    margin-bottom: 4px;
+}
+.sb-logo-t { font-size: 14px !important; font-weight: 600 !important; color: white !important; }
+.sb-logo-s { font-size: 11px !important; color: rgba(255,255,255,0.38) !important; margin-top: 1px; }
+.sb-inner  { padding: 0 1rem 1.5rem; }
+hr.sb-div  { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 10px 0; }
 
-/* ── Header ── */
+/* ── Page header ── */
 .hdr {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1.3rem; padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.25rem; padding-bottom: 0.95rem; border-bottom: 1px solid var(--border);
 }
-.hdr-left { display: flex; align-items: baseline; gap: 10px; }
-.hdr h1 { font-size: 1.15rem; font-weight: 600; color: var(--dark); margin: 0; letter-spacing: -0.02em; }
-.hdr-sub { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace !important; }
+.hdr-l { display: flex; align-items: baseline; gap: 10px; }
+.hdr-t { font-size: 1.12rem; font-weight: 600; color: var(--dark); margin: 0; letter-spacing: -.02em; }
+.hdr-s { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace !important; }
 .hdr-badge {
-    font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
     background: var(--mint); color: var(--dark); padding: 3px 9px; border-radius: 20px;
 }
 
-/* ── KPI cards ── */
+/* ── KPI — EQUAL HEIGHT via inline-flex rows ── */
+.kpi-row { display: flex; gap: 10px; margin-bottom: 1.25rem; align-items: stretch; }
 .kpi-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
+    flex: 1;
+    background: var(--white); border: 1px solid var(--border); border-radius: 11px;
+    padding: 15px 17px; min-height: 92px;
     display: flex; flex-direction: column; justify-content: space-between;
-    min-height: 94px;
-    transition: box-shadow 0.15s ease;
+    border-top: 2px solid var(--blue);
+    animation: fadeUp .28s ease both;
 }
-.kpi-card:hover { box-shadow: 0 2px 12px rgba(62,32,255,0.08); }
-.kpi-lbl { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
-.kpi-val {
-    font-size: 1.5rem; font-weight: 600; color: var(--dark);
-    font-family: 'DM Mono', monospace !important; line-height: 1.05; letter-spacing: -0.02em;
-}
-.kpi-val-sm { font-size: 0.92rem; font-weight: 600; color: var(--dark); line-height: 1.4; }
-.kpi-sub { font-size: 10.5px; color: var(--muted); margin-top: 5px; }
-.kpi-accent { border-top: 2px solid var(--blue); }
-.kpi-accent-mint { border-top: 2px solid var(--mint); }
-
-/* ── Chart containers ── */
-.chart-card {
-    background: var(--white); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px; margin-top: 1.1rem;
-    overflow: hidden;
-}
-.chart-title {
-    font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 10px;
-}
+.kpi-card.mint { border-top-color: var(--mint); }
+.kpi-lbl  { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 5px; }
+.kpi-val  { font-size: 1.42rem; font-weight: 600; color: var(--dark); font-family: 'DM Mono', monospace !important; line-height: 1.05; letter-spacing: -.02em; }
+.kpi-vsm  { font-size: 0.9rem; font-weight: 600; color: var(--dark); line-height: 1.35; }
+.kpi-sub  { font-size: 10.5px; color: var(--muted); margin-top: 4px; }
 
 /* ── Section label ── */
 .slabel {
-    font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--muted); margin: 1.4rem 0 0.5rem; display: block;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--muted); margin: 1.3rem 0 0.55rem; display: block;
 }
 
-/* ── Table ── */
-.tbl-wrap {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
+/* ── Custom HTML table ── */
+.fmt-tbl-wrap {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 11px; overflow: hidden; margin-top: 6px;
 }
-/* Remove inner dataframe border */
-.tbl-wrap iframe { border: none !important; }
-.tbl-wrap [data-testid="stDataFrame"] > div > div { border: none !important; }
+.fmt-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.fmt-tbl th {
+    text-align: left; padding: 9px 14px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--muted); white-space: nowrap;
+}
+.fmt-tbl td { padding: 10px 14px; border-bottom: 1px solid rgba(7,0,55,0.055); vertical-align: middle; }
+.fmt-tbl tr:last-child td { border-bottom: none; }
+.fmt-tbl tbody tr { cursor: pointer; transition: background 0.1s ease; }
+.fmt-tbl tbody tr:hover td { background: var(--row-h); }
+.fmt-tbl tbody tr.sel td   { background: rgba(62,32,255,0.08); }
 
-/* ── Score badge ── */
-.score-badge {
-    display: inline-flex; align-items: center; padding: 2px 8px;
-    border-radius: 20px; font-size: 11px; font-weight: 600;
-    font-family: 'DM Mono', monospace;
-}
-.sc-hi { background: var(--mint); color: #055c32; }
+.f-name { font-weight: 500; color: var(--dark); font-size: 13px; }
+.f-id   { font-family: 'DM Mono', monospace; font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+
+/* Tags */
+.tag     { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; margin: 1px 2px 1px 0; background: var(--tag-bg); color: var(--dark); }
+.tag-v   { background: rgba(192,255,217,0.6); color: #055c30; }
+.tag-b   { background: rgba(114,91,255,0.10); color: #4433bb; }
+.tag-cpm { background: transparent; color: var(--dark); border: 1px solid var(--border); }
+.tag-cpc { background: rgba(62,32,255,0.10); color: var(--blue); }
+
+/* Metric bar */
+.mbar-wrap { display: flex; align-items: center; gap: 6px; }
+.mbar-bg   { height: 4px; background: rgba(7,0,55,0.08); border-radius: 3px; flex: 1; min-width: 48px; }
+.mbar-fill { height: 4px; border-radius: 3px; background: var(--blue); }
+.mbar-val  { font-family: 'DM Mono', monospace; font-size: 11.5px; color: var(--dark); min-width: 42px; text-align: right; white-space: nowrap; }
+
+/* Score badge */
+.sc-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace !important; }
+.sc-hi { background: var(--mint); color: #055c30; }
 .sc-md { background: rgba(62,32,255,0.09); color: var(--blue); }
 .sc-lo { background: var(--bg); color: var(--muted); }
 
 /* ── Card ── */
 .card {
     background: var(--white); border: 1px solid var(--border);
-    border-radius: 14px; padding: 24px; margin-top: 16px;
     border-left: 3px solid var(--blue);
+    border-radius: 12px; padding: 22px; margin-top: 14px;
     animation: fadeSlide .22s ease both;
 }
-@keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
-.card-title { font-size: 1.05rem; font-weight: 600; color: var(--dark); letter-spacing: -0.01em; }
-.card-meta { font-family: 'DM Mono', monospace !important; font-size: 11px; color: var(--muted); margin-bottom: 12px; }
-.card-desc {
-    font-size: 13px; color: var(--dark); line-height: 1.6;
-    padding: 10px 14px; background: var(--bg); border-radius: 8px; margin-bottom: 16px;
-}
-.c-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-.c-m { background: var(--bg); border-radius: 9px; padding: 11px 13px; }
-.c-lbl { font-size: 9.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
-.c-val { font-size: 1.02rem; font-weight: 600; color: var(--dark); font-family: 'DM Mono', monospace !important; }
-.c-sec { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 13px 0 6px; }
-.info-row { display: flex; gap: 8px; margin-bottom: 5px; align-items: baseline; }
-.info-lbl { font-size: 12.5px; color: var(--muted); min-width: 162px; flex-shrink: 0; }
-.info-val { font-size: 12.5px; color: var(--dark); font-weight: 500; }
-.tags-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 2px; }
-.tag { display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 500; background: rgba(62,32,255,0.07); color: var(--dark); }
-.tag-v { background: rgba(192,255,217,0.55); color: #065c30; }
-.tag-b { background: rgba(114,91,255,0.10); color: #4030c0; }
-.tag-cpm { background: transparent; color: var(--dark); border: 1px solid var(--border); }
-.tag-cpc { background: rgba(62,32,255,0.10); color: var(--blue); }
-.bool-y { color: var(--blue); font-weight: 700; font-size: 14px; }
-.bool-n { color: rgba(7,0,55,0.18); }
-.link-a { font-size: 12px; color: var(--blue); text-decoration: none; margin-right: 14px; font-weight: 500; transition: opacity .15s; }
-.link-a:hover { opacity: .7; }
-.card-links { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 0; }
+@keyframes fadeSlide { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+.card-title { font-size: 1.02rem; font-weight: 600; color: var(--dark); letter-spacing: -.01em; }
+.card-meta  { font-family: 'DM Mono', monospace !important; font-size: 11px; color: var(--muted); margin-bottom: 11px; }
+.card-desc  { font-size: 13px; color: var(--dark); line-height: 1.62; padding: 10px 14px; background: var(--bg); border-radius: 8px; margin-bottom: 15px; }
+.c-grid     { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 15px; }
+.c-m        { background: var(--bg); border-radius: 8px; padding: 11px 13px; }
+.c-lbl      { font-size: 9.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+.c-val      { font-size: 1rem; font-weight: 600; color: var(--dark); font-family: 'DM Mono', monospace !important; }
+.c-sec      { font-size: 9.5px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: var(--muted); margin: 13px 0 5px; }
+.info-row   { display: flex; gap: 8px; margin-bottom: 5px; }
+.info-lbl   { font-size: 12.5px; color: var(--muted); min-width: 162px; flex-shrink: 0; }
+.info-val   { font-size: 12.5px; color: var(--dark); font-weight: 500; }
+.tags-row   { display: flex; flex-wrap: wrap; gap: 4px; }
+.bool-y     { color: var(--blue); font-weight: 700; }
+.bool-n     { color: rgba(7,0,55,0.18); }
+.link-a     { font-size: 12px; color: var(--blue); text-decoration: none; margin-right: 14px; font-weight: 500; }
 
-/* ── Scoring weight total ── */
-.w-wrap { display: inline-block; font-size: 12px; font-weight: 600; font-family: 'DM Mono', monospace !important; padding: 4px 12px; border-radius: 7px; margin: 6px 0 2px; }
-.w-ok  { background: var(--mint); color: #055c32; }
-.w-bad { background: rgba(62,32,255,0.1); color: var(--indigo); }
+/* Weight total */
+.w-wrap { display: inline-block; font-size: 12px; font-weight: 600; font-family: 'DM Mono', monospace !important; padding: 4px 11px; border-radius: 7px; margin: 5px 0 2px; }
+.w-ok   { background: var(--mint); color: #055c30; }
+.w-bad  { background: rgba(62,32,255,0.09); color: var(--indigo); }
 
-/* ── No results ── */
-.no-res { text-align: center; padding: 48px 20px; color: var(--muted); background: var(--white); border: 1px solid var(--border); border-radius: 12px; }
-
-/* ── Divider ── */
 hr.light { border: none; border-top: 1px solid var(--border); margin: .9rem 0; }
+.no-res  { text-align: center; padding: 48px 20px; color: var(--muted); background: var(--white); border: 1px solid var(--border); border-radius: 11px; font-size: 13px; }
+.empty-card { margin-top: 14px; padding: 20px; background: var(--white); border: 1px solid var(--border); border-radius: 11px; color: var(--muted); font-size: 13px; }
 
-/* ── Animation on KPI ── */
-@keyframes fadeUp { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
-.kpi-card { animation: fadeUp .28s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
 </style>
 """, unsafe_allow_html=True)
 
@@ -254,36 +219,37 @@ def load_data():
 
 df, di = load_data()
 
-# ─── UTILS ────────────────────────────────────────────────────────────────────
+# ─── HELPERS ──────────────────────────────────────────────────────────────────
 SEASON = {"Январь":0.80,"Февраль":1.00,"Март":1.20,"Апрель":1.20,"Май":1.00,
           "Июнь":1.00,"Июль":1.00,"Август":1.00,"Сентябрь":1.25,
           "Октябрь":1.25,"Ноябрь":1.25,"Декабрь":1.25}
 
-def sk(platform, month):
+def season_k(platform, month):
     return SEASON.get(month, 1.0) if str(platform) == "Buzzoola" else 1.0
 
 def pct(v):
     try:
-        if v is None or (isinstance(v, float) and np.isnan(v)): return "—"
-    except Exception: pass
-    try:
-        x = round(float(v) * 100, 1)
+        f = float(v)
+        if np.isnan(f): return "—"
+        x = round(f * 100, 1)
         return (f"{int(x)}%" if x == int(x) else f"{x:.1f}%").replace(".", ",")
     except Exception: return "—"
 
 def rub(v):
     try:
-        if v is None or (isinstance(v, float) and np.isnan(v)): return "—"
-        return f"{int(round(float(v))):,} ₽".replace(",", "\u202f")
+        f = float(v)
+        if np.isnan(f): return "—"
+        return f"{int(round(f)):,} ₽".replace(",", "\u202f")
     except Exception: return "—"
 
 def reach_s(v):
     try:
-        if v is None or (isinstance(v, float) and np.isnan(v)): return "—"
-        m = float(v) / 1e6
+        f = float(v)
+        if np.isnan(f): return "—"
+        m = f / 1e6
         if m >= 1:
             return (f"{int(m)}M" if m == int(m) else f"{m:.1f}M").replace(".", ",")
-        return f"{int(v):,}".replace(",", "\u202f")
+        return f"{int(f):,}".replace(",", "\u202f")
     except Exception: return "—"
 
 def bv(v):
@@ -293,49 +259,55 @@ def bv(v):
     except Exception: pass
     return '<span class="bool-y">✓</span>' if str(v).upper() in ("TRUE","1") else '<span class="bool-n">—</span>'
 
-def sv(v):
+def sv(v, default="—"):
     try:
-        if v is None or (isinstance(v, float) and np.isnan(v)): return "—"
+        if v is None or (isinstance(v, float) and np.isnan(v)): return default
     except Exception: pass
-    s = str(v).strip()
-    return s if s else "—"
+    s = str(v).strip(); return s if s else default
 
 def thtml(cell):
-    if not isinstance(cell, list) or len(cell) == 0:
-        return '<span style="color:rgba(7,0,55,.18);font-size:11px;">—</span>'
+    if not isinstance(cell, list) or not cell:
+        return '<span style="color:rgba(7,0,55,.16);font-size:11px;">—</span>'
     return "".join(f'<span class="tag">{t}</span>' for t in cell if t)
+
+def mbar(val, max_val, disp):
+    if disp == "—":
+        return '<span style="color:rgba(7,0,55,.18);font-size:11px;">—</span>'
+    try:
+        pct_w = min(float(val) / float(max_val) * 100, 100) if max_val else 0
+    except Exception: pct_w = 0
+    return (f'<div class="mbar-wrap">'
+            f'<div class="mbar-bg"><div class="mbar-fill" style="width:{pct_w:.1f}%"></div></div>'
+            f'<span class="mbar-val">{disp}</span></div>')
 
 def calc_ecpm(row):
     m = str(row.get("buy_model","CPM")).upper()
-    ctr = row.get("ctr_avg", np.nan); d = float(row.get("discount",0) or 0)
+    d = float(row.get("discount", 0) or 0)
     try:
         if m == "CPM": raw = float(row.get("cpm_avg", np.nan))
         elif m == "CPC":
-            cpc, ct = float(row.get("cpc_avg",np.nan)), float(ctr)
+            cpc, ct = float(row.get("cpc_avg",np.nan)), float(row.get("ctr_avg",np.nan))
             raw = cpc*ct*1000 if not (np.isnan(cpc) or np.isnan(ct) or ct==0) else np.nan
         elif m == "CPV":
             cpv, vt = float(row.get("cpv_avg",np.nan)), float(row.get("vtr_avg",np.nan))
             raw = cpv*vt*1000 if not (np.isnan(cpv) or np.isnan(vt) or vt==0) else np.nan
         else: raw = float(row.get("cpm_avg", np.nan))
-    except Exception: raw = np.nan
-    return np.nan if (raw is None or np.isnan(raw)) else raw*(1-d)
+        return np.nan if np.isnan(raw) else raw*(1-d)
+    except Exception: return np.nan
 
 df["ecpm_eff"] = df.apply(calc_ecpm, axis=1)
 
 def opts(did): return di[di["dict_id"]==did]["item_name"].dropna().tolist()
 
 # ─── SIDEBAR ──────────────────────────────────────────────────────────────────
-def ss(t): st.markdown(f'<span class="sb-section">{t}</span>', unsafe_allow_html=True)
-def sdiv(): st.markdown('<hr class="sb-divider">', unsafe_allow_html=True)
+def ss(t): st.markdown(f'<span class="sb-label">{t}</span>', unsafe_allow_html=True)
+def sd():  st.markdown('<hr class="sb-div">', unsafe_allow_html=True)
 
 with st.sidebar:
-    st.markdown("""
-    <div class="sb-logo">
-        <div class="sb-logo-title">Format Selector</div>
-        <div class="sb-logo-sub">Анализ рекламных форматов</div>
-    </div>
-    """, unsafe_allow_html=True)
-    st.markdown('<div class="sb-inner">', unsafe_allow_html=True)
+    st.markdown("""<div class="sb-logo">
+        <div class="sb-logo-t">Format Selector</div>
+        <div class="sb-logo-s">Анализ рекламных форматов</div>
+    </div><div class="sb-inner">""", unsafe_allow_html=True)
 
     ss("Тип формата")
     format_types = st.multiselect("Тип", ["Видео","Баннер"], default=["Видео","Баннер"],
@@ -372,23 +344,20 @@ with st.sidebar:
     ss("DMP")
     f_dmp = st.multiselect("DMP", opts("dmp"), default=[],
                              placeholder="Все DMP", label_visibility="collapsed")
-
-    sdiv()
+    sd()
     ss("Дополнительно")
     req_px = st.checkbox("Верификация пикселем")
     req_js = st.checkbox("Верификация JS-тегом")
     req_bl = st.checkbox("Brand Lift")
     req_sl = st.checkbox("Sales Lift")
-
-    sdiv()
+    sd()
     ss("Пороговые значения")
     max_ecpm_f = st.slider("Макс. eCPM (после скидки), ₽", 0, 1000, 1000, step=10)
     min_ctr  = st.slider("Мин. CTR, %",        0.0,  5.0, 0.0, step=0.1)
     min_rch  = st.slider("Мин. охват, млн",    0.0, 80.0, 0.0, step=1.0)
     min_view = st.slider("Мин. Viewability, %", 0,   100,  0,   step=5)
     min_vtr  = st.slider("Мин. VTR, %",        0.0,100.0, 0.0, step=5.0)
-
-    sdiv()
+    sd()
     scoring = st.toggle("Включить скоринг", value=False)
     if scoring:
         ss("Веса (сумма = 100)")
@@ -404,13 +373,11 @@ with st.sidebar:
         norm = st.checkbox("Нормализовать веса", value=True)
     else:
         wr=we=wc=wv=wi=wm=tw=0; norm=False
-
-    sdiv()
+    sd()
     ss("Сезонность")
     months = ["Январь","Февраль","Март","Апрель","Май","Июнь",
               "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-    sel_m = st.selectbox("Месяц", months, index=months.index("Март"),
-                          label_visibility="collapsed")
+    sel_m = st.selectbox("Месяц", months, index=months.index("Март"), label_visibility="collapsed")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -440,8 +407,8 @@ if min_view > 0: F = F[F["viewability_avg"].fillna(0) >= min_view/100]
 if min_vtr  > 0: F = F[F["vtr_avg"].fillna(0) >= min_vtr/100]
 
 F = F.copy()
-F["sk_coef"] = F["platform"].apply(lambda p: sk(p, sel_m))
-F["ecpm_s"]  = F["ecpm_eff"] * F["sk_coef"]
+F["sk"] = F["platform"].apply(lambda p: season_k(p, sel_m))
+F["ecpm_s"] = F["ecpm_eff"] * F["sk"]
 
 # ─── SCORING ──────────────────────────────────────────────────────────────────
 def ncol(s, inv=False):
@@ -469,63 +436,56 @@ else:
     F = F.sort_values("ecpm_s", ascending=True, na_position="last").reset_index(drop=True)
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
-n_platforms = df["platform"].nunique()
-badge_text = f"{n_platforms} {'площадка' if n_platforms==1 else 'площадки' if n_platforms<5 else 'площадок'}"
-
-st.markdown(f"""
-<div class="hdr">
-    <div class="hdr-left">
-        <h1 class="hdr">Format Selector</h1>
-        <span class="hdr-sub">Анализ рекламных форматов</span>
+n_plat = df["platform"].nunique()
+badge  = f"{n_plat} {'площадка' if n_plat==1 else ('площадки' if n_plat<5 else 'площадок')} · бета"
+st.markdown(f"""<div class="hdr">
+    <div class="hdr-l">
+        <h1 class="hdr-t">Format Selector</h1>
+        <span class="hdr-s">Анализ рекламных форматов</span>
     </div>
-    <span class="hdr-badge">{badge_text} · бета</span>
-</div>
-""", unsafe_allow_html=True)
+    <span class="hdr-badge">{badge}</span>
+</div>""", unsafe_allow_html=True)
 
 # ─── KPI ──────────────────────────────────────────────────────────────────────
 top   = F.iloc[0] if len(F) > 0 else None
 avg_e = F["ecpm_s"].mean() if len(F) > 0 else np.nan
-sk0   = float(F["sk_coef"].iloc[0]) if len(F) > 0 else 1.0
+sk0   = float(F["sk"].iloc[0]) if len(F) > 0 else 1.0
 maxr  = F["max_reach"].max() if len(F) > 0 else np.nan
 
-c1,c2,c3,c4 = st.columns(4)
-with c1:
-    st.markdown(f"""<div class="kpi-card kpi-accent">
+# Use HTML for all 4 cards in one flex row — guarantees equal height
+lbl2 = "Лучший по скорингу" if scoring else "Самый дешевый eCPM"
+if top is not None:
+    sub2 = f'Скор: {top["score"]:.0f}' if (scoring and not pd.isna(top.get("score",np.nan))) else sv(top.get("buy_model","—"))
+    val2_html = f'<div class="kpi-vsm">{sv(top.get("format_name","—"))}</div>'
+else:
+    sub2 = ""; val2_html = '<div class="kpi-val">—</div>'
+
+st.markdown(f"""<div class="kpi-row">
+    <div class="kpi-card">
         <div><div class="kpi-lbl">Форматов после фильтров</div>
         <div class="kpi-val">{len(F)}</div></div>
         <div class="kpi-sub">из {len(df)} доступных</div>
-    </div>""", unsafe_allow_html=True)
-with c2:
-    lbl2 = "Лучший по скорингу" if scoring else "Самый дешевый eCPM"
-    if top is not None:
-        sub2 = f'Скор: {top["score"]:.0f}' if (scoring and not pd.isna(top.get("score",np.nan))) else top.get("buy_model","—")
-        val2 = top.get("format_name","—")
-        st.markdown(f"""<div class="kpi-card kpi-accent">
-            <div><div class="kpi-lbl">{lbl2}</div>
-            <div class="kpi-val-sm">{val2}</div></div>
-            <div class="kpi-sub">{sub2}</div>
-        </div>""", unsafe_allow_html=True)
-    else:
-        st.markdown(f'<div class="kpi-card kpi-accent"><div><div class="kpi-lbl">{lbl2}</div><div class="kpi-val">—</div></div><div class="kpi-sub">&nbsp;</div></div>', unsafe_allow_html=True)
-with c3:
-    st.markdown(f"""<div class="kpi-card kpi-accent">
+    </div>
+    <div class="kpi-card">
+        <div><div class="kpi-lbl">{lbl2}</div>{val2_html}</div>
+        <div class="kpi-sub">{sub2}</div>
+    </div>
+    <div class="kpi-card">
         <div><div class="kpi-lbl">Средний eCPM (с сезонностью)</div>
         <div class="kpi-val">{rub(avg_e)}</div></div>
         <div class="kpi-sub">{sel_m} · коэф. {sk0}×</div>
-    </div>""", unsafe_allow_html=True)
-with c4:
-    st.markdown(f"""<div class="kpi-card kpi-accent-mint">
+    </div>
+    <div class="kpi-card mint">
         <div><div class="kpi-lbl">Макс. охват</div>
         <div class="kpi-val">{reach_s(maxr)}</div></div>
         <div class="kpi-sub">среди отфильтрованных</div>
-    </div>""", unsafe_allow_html=True)
+    </div>
+</div>""", unsafe_allow_html=True)
 
 # ─── CHARTS ───────────────────────────────────────────────────────────────────
 if len(F) > 0:
-    st.markdown('<div style="height:14px;"></div>', unsafe_allow_html=True)
     ch1, ch2 = st.columns(2)
 
-    # ── Chart 1: eCPM bar ──
     with ch1:
         cdf = F[F["ecpm_s"].notna()].sort_values("ecpm_s")
         if len(cdf) > 0:
@@ -534,9 +494,8 @@ if len(F) > 0:
                 cols = [f"rgba(62,32,255,{0.28+0.72*(s-mn_)/max(mx_-mn_,1):.2f})"
                         for s in cdf["score"].fillna(mn_)]
             else:
-                # Gradient from indigo to blue based on position
-                cols = [f"rgba(62,32,255,{0.35+0.65*i/max(len(cdf)-1,1):.2f})"
-                        for i in range(len(cdf))]
+                n = len(cdf)
+                cols = [f"rgba(62,32,255,{0.32+0.68*i/max(n-1,1):.2f})" for i in range(n)]
 
             fig1 = go.Figure(go.Bar(
                 x=cdf["ecpm_s"].round(0), y=cdf["format_name"],
@@ -544,30 +503,26 @@ if len(F) > 0:
                 hovertemplate="<b>%{y}</b><br>eCPM: %{x:.0f} ₽<extra></extra>"
             ))
             fig1.update_layout(
-                title=None,
-                height=max(240, len(cdf)*28+40),
-                margin=dict(l=0, r=14, t=8, b=8),
+                title=dict(text="eCPM по форматам (₽, с сезонностью)",
+                           font_size=11, font_color="rgba(7,0,55,0.42)", font_family="DM Sans"),
+                height=max(260, len(cdf)*29+44),
+                margin=dict(l=0, r=12, t=36, b=4),
                 paper_bgcolor="white", plot_bgcolor="white",
                 xaxis=dict(gridcolor="rgba(7,0,55,0.06)", tickfont_size=10,
-                           title=None, tickfont_color="rgba(7,0,55,0.4)",
-                           zeroline=False),
-                yaxis=dict(tickfont_size=11, title=None, tickfont_color="#070037",
-                           tickmode="linear"),
-                font_family="DM Sans", bargap=0.3,
+                           title=None, tickfont_color="rgba(7,0,55,0.4)", zeroline=False),
+                yaxis=dict(tickfont_size=11, title=None, tickfont_color="#070037", tickmode="linear"),
+                font_family="DM Sans", bargap=0.32,
             )
-            st.markdown('<div class="chart-card"><div class="chart-title">eCPM по форматам (₽, с учетом сезонности)</div>', unsafe_allow_html=True)
             st.plotly_chart(fig1, use_container_width=True, config={"displayModeBar": False})
-            st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Chart 2: CTR vs Viewability scatter ──
     with ch2:
         sdf = F[F["ctr_avg"].notna() & F["viewability_avg"].notna()].copy()
         if len(sdf) >= 2:
-            med = sdf["max_reach"].median()
-            sdf["bsz"] = sdf["max_reach"].fillna(med).apply(lambda v: max(9,min(34,float(v)/2.2e6)))
+            med = float(sdf["max_reach"].median()) if sdf["max_reach"].notna().any() else 1e6
+            sdf["bsz"] = sdf["max_reach"].fillna(med).apply(lambda v: max(9, min(34, float(v)/2.2e6)))
             if scoring and sdf["score"].notna().any():
                 mn2, mx2 = sdf["score"].min(), sdf["score"].max()
-                scols = [f"rgba(62,32,255,{0.3+0.7*(s-mn2)/max(mx2-mn2,1):.2f})"
+                scols = [f"rgba(62,32,255,{0.28+0.72*(s-mn2)/max(mx2-mn2,1):.2f})"
                          for s in sdf["score"].fillna(mn2)]
             else:
                 scols = ["#725BFF"] * len(sdf)
@@ -577,8 +532,7 @@ if len(F) > 0:
                 fig2.add_trace(go.Scatter(
                     x=[float(r["ctr_avg"])*100], y=[float(r["viewability_avg"])*100],
                     mode="markers+text",
-                    marker=dict(size=r["bsz"], color=scols[i],
-                                line=dict(color="white", width=1.5)),
+                    marker=dict(size=r["bsz"], color=scols[i], line=dict(color="white", width=1.5)),
                     text=[r["format_name"]], textposition="top center",
                     textfont=dict(size=8, color="#070037"),
                     hovertemplate=(f"<b>{r['format_name']}</b><br>"
@@ -587,23 +541,20 @@ if len(F) > 0:
                     showlegend=False
                 ))
             fig2.update_layout(
-                title=None,
-                height=max(240, len(sdf)*28+40),
-                margin=dict(l=0,r=14,t=8,b=8),
+                title=dict(text="CTR vs Viewability (размер — охват)",
+                           font_size=11, font_color="rgba(7,0,55,0.42)", font_family="DM Sans"),
+                height=max(260, len(sdf)*29+44),
+                margin=dict(l=0, r=12, t=36, b=4),
                 paper_bgcolor="white", plot_bgcolor="white",
-                xaxis=dict(title="CTR, %", gridcolor="rgba(7,0,55,0.06)",
-                           tickfont_size=10, title_font_size=10,
-                           tickfont_color="rgba(7,0,55,0.4)",
+                xaxis=dict(title="CTR, %", gridcolor="rgba(7,0,55,0.06)", tickfont_size=10,
+                           title_font_size=10, tickfont_color="rgba(7,0,55,0.4)",
                            title_font_color="rgba(7,0,55,0.4)", zeroline=False),
-                yaxis=dict(title="Viewability, %", gridcolor="rgba(7,0,55,0.06)",
-                           tickfont_size=10, title_font_size=10,
-                           tickfont_color="rgba(7,0,55,0.4)",
+                yaxis=dict(title="Viewability, %", gridcolor="rgba(7,0,55,0.06)", tickfont_size=10,
+                           title_font_size=10, tickfont_color="rgba(7,0,55,0.4)",
                            title_font_color="rgba(7,0,55,0.4)", zeroline=False),
                 font_family="DM Sans",
             )
-            st.markdown('<div class="chart-card"><div class="chart-title">CTR vs Viewability (размер — охват)</div>', unsafe_allow_html=True)
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
-            st.markdown('</div>', unsafe_allow_html=True)
 
 # ─── TABLE ────────────────────────────────────────────────────────────────────
 st.markdown('<span class="slabel">Форматы</span>', unsafe_allow_html=True)
@@ -612,54 +563,98 @@ if len(F) == 0:
     st.markdown('<div class="no-res">Нет форматов, соответствующих выбранным фильтрам.</div>',
                 unsafe_allow_html=True)
 else:
-    def _list(c): return ", ".join(c) if isinstance(c, list) else ""
-    def _score(s):
+    # Max values for progress bars
+    max_reach_all = df["max_reach"].max()
+    max_ctr_all   = min(df["ctr_avg"].max(), 0.05) if df["ctr_avg"].notna().any() else 0.05
+    max_vw_all    = 1.0
+
+    sel_id = st.session_state.get("sel_fmt_id", None)
+
+    # Build HTML table rows
+    def type_tags(cell):
+        if not isinstance(cell, list): return ""
+        return "".join(f'<span class="tag {"tag-v" if t=="Видео" else "tag-b"}">{t}</span>' for t in cell)
+
+    def model_tag(v):
+        return f'<span class="tag {"tag-cpm" if str(v).upper()=="CPM" else "tag-cpc"}">{v}</span>'
+
+    def dev_tags(cell):
+        if not isinstance(cell, list): return ""
+        return "".join(f'<span class="tag">{d}</span>' for d in cell)
+
+    def score_html(s):
         try:
-            return "" if pd.isna(s) else f"{s:.0f}"
+            if pd.isna(s): return ""
+            v = float(s)
+            cls = "sc-hi" if v>=65 else ("sc-md" if v>=40 else "sc-lo")
+            return f'<span class="sc-pill {cls}">{v:.0f}</span>'
         except Exception: return ""
 
-    disp = pd.DataFrame({
-        "Формат":     F["format_name"],
-        "ID":         F["format_id"],
-        "Тип":        F["format_type"].apply(_list),
-        "Модель":     F["buy_model"],
-        "Устройства": F["device"].apply(_list),
-        "Охват":      F["max_reach"].apply(reach_s),
-        "CTR":        F["ctr_avg"].apply(pct),
-        "Viewability":F["viewability_avg"].apply(pct),
-        "eCPM (сез.)":F["ecpm_s"].apply(rub),
-    })
-    if scoring: disp["Скор"] = F["score"].apply(_score)
+    last_th = "<th>Скор</th>" if scoring else "<th>eCPM (сез.)</th>"
 
-    event = st.dataframe(
-        disp,
-        use_container_width=True,
+    rows_html = ""
+    for _, row in F.iterrows():
+        fid = row["format_id"]
+        sel_cls = "sel" if fid == sel_id else ""
+
+        es = row.get("ecpm_s", np.nan)
+        last_td = score_html(row.get("score", np.nan)) if scoring else \
+                  f'<span style="font-family:\'DM Mono\',monospace;font-size:12px;">{rub(es)}</span>'
+
+        rows_html += f"""
+        <tr class="{sel_cls}" data-fid="{fid}">
+            <td><div class="f-name">{row['format_name']}</div>
+                <div class="f-id">{fid}</div></td>
+            <td>{type_tags(row.get('format_type',[]))}</td>
+            <td>{model_tag(row['buy_model'])}</td>
+            <td>{dev_tags(row.get('device',[]))}</td>
+            <td>{mbar(row.get('max_reach'), max_reach_all, reach_s(row.get('max_reach')))}</td>
+            <td>{mbar(row.get('ctr_avg'), max_ctr_all, pct(row.get('ctr_avg')))}</td>
+            <td>{mbar(row.get('viewability_avg'), max_vw_all, pct(row.get('viewability_avg')))}</td>
+            <td>{last_td}</td>
+        </tr>"""
+
+    # Hidden input to receive selected format id from JS
+    clicked_id = st.query_params.get("fmt", None)
+    if clicked_id and clicked_id in F["format_id"].values:
+        st.session_state["sel_fmt_id"] = clicked_id
+        sel_id = clicked_id
+
+    st.markdown(f"""
+    <div class="fmt-tbl-wrap">
+    <table class="fmt-tbl">
+        <thead><tr>
+            <th>Формат</th><th>Тип</th><th>Модель</th><th>Устройства</th>
+            <th>Охват</th><th>CTR</th><th>Viewability</th>{last_th}
+        </tr></thead>
+        <tbody>{rows_html}</tbody>
+    </table>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ─── ROW CLICK: use st.dataframe on top (invisible), capture selection ───
+    # Build minimal df just for selection
+    sel_df = F[["format_name","format_id"]].copy().reset_index(drop=True)
+    ev = st.dataframe(
+        sel_df,
         hide_index=True,
+        use_container_width=True,
         on_select="rerun",
         selection_mode="single-row",
         column_config={
-            "Формат":      st.column_config.TextColumn(width="large"),
-            "ID":          st.column_config.TextColumn(width="small"),
-            "Тип":         st.column_config.TextColumn(width="small"),
-            "Модель":      st.column_config.TextColumn(width="small"),
-            "Устройства":  st.column_config.TextColumn(width="medium"),
-            "Охват":       st.column_config.TextColumn(width="small"),
-            "CTR":         st.column_config.TextColumn(width="small"),
-            "Viewability": st.column_config.TextColumn(width="small"),
-            "eCPM (сез.)": st.column_config.TextColumn(width="small"),
-            **({"Скор": st.column_config.TextColumn(width="small")} if scoring else {}),
+            "format_name": st.column_config.TextColumn("Выберите формат из таблицы выше"),
+            "format_id":   st.column_config.TextColumn("ID", width="small"),
         },
-        height=min(600, (len(F)+1)*38+2),
+        height=min(500, (len(F)+1)*38+2),
+        key="sel_df",
     )
+    sel_rows = ev.selection.rows if hasattr(ev, "selection") else []
 
-    # ─── FORMAT CARD ──────────────────────────────────────────────────────────
-    sel = (event.selection.rows if hasattr(event, "selection") else []) or []
-
-    if sel:
-        idx = sel[0]
+    # ─── CARD ─────────────────────────────────────────────────────────────────
+    if sel_rows:
+        idx = sel_rows[0]
         r   = F.iloc[idx]
 
-        # Safe field access — always use .get() with default
         def gf(field, default=np.nan):
             val = r.get(field, default)
             if val is None: return default
@@ -670,15 +665,18 @@ else:
 
         ee  = gf("ecpm_eff")
         es2 = gf("ecpm_s")
-        sc  = gf("sk_coef", 1.0)
+        sc  = gf("sk", 1.0)
+        sc_disp = f"{float(sc):.1f}".replace(".", ",") if sc != int(sc) else str(int(sc))
 
-        # Score display
-        score_val = gf("score", np.nan)
-        score_html = ""
-        if scoring and not (isinstance(score_val, float) and np.isnan(score_val)):
-            s = float(score_val)
-            cls = "sc-hi" if s>=65 else ("sc-md" if s>=40 else "sc-lo")
-            score_html = f'<span class="score-badge {cls}" style="margin-left:8px;">{s:.0f}</span>'
+        sc_score = gf("score", np.nan)
+        score_badge_html = ""
+        if scoring:
+            try:
+                if not np.isnan(float(sc_score)):
+                    sv2 = float(sc_score)
+                    cls2 = "sc-hi" if sv2>=65 else ("sc-md" if sv2>=40 else "sc-lo")
+                    score_badge_html = f'<span class="sc-pill {cls2}" style="margin-left:8px;">{sv2:.0f}</span>'
+            except Exception: pass
 
         links = []
         for lbl_, key in [("Пример","example_url"),("Техтребования","technical_requirements_url"),
@@ -689,18 +687,18 @@ else:
 
         st.markdown(f"""
         <div class="card">
-            <div class="card-header">
+            <div class="card-top">
                 <div>
-                    <div class="card-title">{sv(gf('format_name','—'))}{score_html}</div>
-                    <div class="card-meta">{sv(gf('format_id','—'))} · {sv(gf('buy_model','—'))} · {sv(gf('platform','—'))}</div>
+                    <div class="card-title">{sv(gf('format_name'))}{score_badge_html}</div>
+                    <div class="card-meta">{sv(gf('format_id'))} · {sv(gf('buy_model'))} · {sv(gf('platform'))}</div>
                 </div>
-                {'<div class="card-links">'+("".join(links))+"</div>" if links else ""}
+                <div>{"".join(links)}</div>
             </div>
-            <div class="card-desc">{sv(gf('description','Описание не указано'))}</div>
+            <div class="card-desc">{sv(gf('description'), 'Описание не указано')}</div>
 
             <div class="c-grid">
                 <div class="c-m"><div class="c-lbl">eCPM (факт)</div><div class="c-val">{rub(ee)}</div></div>
-                <div class="c-m"><div class="c-lbl">eCPM (сезон. {sc}×)</div><div class="c-val">{rub(es2)}</div></div>
+                <div class="c-m"><div class="c-lbl">eCPM (сезон. {sc_disp}×)</div><div class="c-val">{rub(es2)}</div></div>
                 <div class="c-m"><div class="c-lbl">Скидка</div><div class="c-val">{pct(gf('discount'))}</div></div>
                 <div class="c-m"><div class="c-lbl">Охват (макс.)</div><div class="c-val">{reach_s(gf('max_reach'))}</div></div>
                 <div class="c-m"><div class="c-lbl">CTR (среднее)</div><div class="c-val">{pct(gf('ctr_avg'))}</div></div>
@@ -723,39 +721,32 @@ else:
                 <div class="info-row"><span class="info-lbl">Пиксель</span><span class="info-val">{bv(gf('verification_pixel'))}</span></div>
                 <div class="info-row"><span class="info-lbl">JS-тег</span><span class="info-val">{bv(gf('verification_js'))}</span></div>
                 <div class="info-row"><span class="info-lbl">Условия</span>
-                    <span class="info-val" style="font-size:12px;color:var(--muted);">{sv(gf('verification_terms','—'))}</span></div>
+                    <span class="info-val" style="font-size:12px;color:var(--muted);">{sv(gf('verification_terms'))}</span></div>
                 <div class="c-sec">Исследования</div>
                 <div class="info-row"><span class="info-lbl">Brand Lift</span><span class="info-val">{bv(gf('bls'))}</span></div>
                 <div class="info-row"><span class="info-lbl">Sales Lift</span><span class="info-val">{bv(gf('sales_lift'))}</span></div>
             </div>
             <div>
-                <div class="c-sec">Плейсмент</div>
-                <div class="tags-row">{thtml(gf('placement', []))}</div>
-                <div class="c-sec">Устройства</div>
-                <div class="tags-row">{thtml(gf('device', []))}</div>
-                <div class="c-sec">Отображение</div>
-                <div class="tags-row">{thtml(gf('display', []))}</div>
-                <div class="c-sec">DMP</div>
-                <div class="tags-row">{thtml(gf('dmp', []))}</div>
-                <div class="c-sec">Производство</div>
-                <div class="tags-row">{thtml(gf('production', []))}</div>
+                <div class="c-sec">Плейсмент</div><div class="tags-row">{thtml(gf('placement',[]))}</div>
+                <div class="c-sec">Устройства</div><div class="tags-row">{thtml(gf('device',[]))}</div>
+                <div class="c-sec">Отображение</div><div class="tags-row">{thtml(gf('display',[]))}</div>
+                <div class="c-sec">DMP</div><div class="tags-row">{thtml(gf('dmp',[]))}</div>
+                <div class="c-sec">Производство</div><div class="tags-row">{thtml(gf('production',[]))}</div>
             </div>
             </div>
 
             <div class="c-sec">Таргетинг</div>
-            <div class="tags-row">{thtml(gf('targeting', []))}</div>
-
+            <div class="tags-row">{thtml(gf('targeting',[]))}</div>
             <div class="c-sec">Наценки за таргетинг</div>
-            <div class="tags-row">{thtml(gf('targeting_markup', []))}</div>
+            <div class="tags-row">{thtml(gf('targeting_markup',[]))}</div>
         </div>
         """, unsafe_allow_html=True)
 
-        # Expandable terms — only if text present
         for lbl_, key in [("Условия Brand Lift","bls_terms"),
                            ("Условия Sales Lift","sales_lift_terms"),
                            ("Условия сезонности","seasonality_terms")]:
             v = gf(key, "")
             if isinstance(v, str) and v.strip():
                 with st.expander(f"📋 {lbl_}"):
-                    st.markdown(f'<p style="font-size:13px;line-height:1.65;color:var(--dark);">{v}</p>',
+                    st.markdown(f'<p style="font-size:13px;line-height:1.65;">{v}</p>',
                                 unsafe_allow_html=True)
