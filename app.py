@@ -6,6 +6,35 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Format Selector", page_icon="📊",
                    layout="wide", initial_sidebar_state="expanded")
 
+# ── JS: force sidebar width (CSS alone can't override Streamlit's inline style) ──
+st.markdown("""
+<script>
+(function fixSidebar() {
+    const SIDEBAR_W = "285px";
+    function apply() {
+        const sb = document.querySelector('[data-testid="stSidebar"]');
+        if (!sb) return;
+        sb.style.setProperty("width",    SIDEBAR_W, "important");
+        sb.style.setProperty("min-width",SIDEBAR_W, "important");
+        sb.style.setProperty("max-width",SIDEBAR_W, "important");
+        const inner = sb.querySelector(":scope > div");
+        if (inner) {
+            inner.style.setProperty("width",    SIDEBAR_W, "important");
+            inner.style.setProperty("min-width",SIDEBAR_W, "important");
+            inner.style.setProperty("max-width",SIDEBAR_W, "important");
+            inner.style.setProperty("overflow-x","hidden","important");
+        }
+        const handle = document.querySelector('[data-testid="stSidebarResizeHandle"]');
+        if (handle) handle.style.setProperty("display","none","important");
+    }
+    apply();
+    const obs = new MutationObserver(apply);
+    obs.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["style"]});
+})();
+</script>
+""", unsafe_allow_html=True)
+
+
 # ─── CSS ──────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -28,22 +57,17 @@ html, body { background: var(--bg) !important; }
 .main      { background: var(--bg) !important; }
 .main .block-container { padding: 1.5rem 2rem 3rem !important; max-width: 1440px; }
 
-/* ── sidebar shell – fixed width, white, right border ── */
-section[data-testid="stSidebar"] {
-    background: var(--white) !important;
-    border-right: 1px solid var(--border) !important;
-    box-shadow: none !important;
-    min-width: 260px !important;
-    max-width: 260px !important;
-    width: 260px !important;
-}
-section[data-testid="stSidebar"] [data-testid="stSidebarResizeHandle"] { display: none !important; }
-/* inner Streamlit padding override */
-section[data-testid="stSidebar"] > div:first-child { padding: 0 !important; }
-section[data-testid="stSidebar"] .block-container  { padding: 0 !important; max-width: none !important; }
-
-/* all text inside sidebar — same size as main panel */
-section[data-testid="stSidebar"] * {
+/* ── sidebar – white, right border ── */
+[data-testid="stSidebar"] { background: var(--white) !important; border-right: 1px solid var(--border) !important; box-shadow: none !important; }
+[data-testid="stSidebar"] > div { background: var(--white) !important; }
+[data-testid="stSidebarResizeHandle"] { display: none !important; }
+[data-testid="stSidebar"] > div:first-child { padding: 0 !important; overflow-x: hidden !important; }
+[data-testid="stSidebar"] .block-container  { padding: 0 !important; max-width: none !important; }
+/* sidebar text — normal readable size */
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span:not([data-baseweb="tag"] span),
+[data-testid="stSidebar"] div:not([data-baseweb]) {
     color: var(--dark) !important;
     font-family: 'DM Sans', sans-serif !important;
     font-size: 14px !important;
@@ -167,6 +191,9 @@ section[data-testid="stSidebar"] [role="slider"] { background: var(--blue) !impo
           border-radius: 7px; margin: 5px 0 2px; }
 .w-ok  { background: var(--mint); color: #055c30; }
 .w-bad { background: rgba(62,32,255,.09); color: var(--indigo); }
+
+.fmt-tbl tbody tr.tbl-sel td { background: rgba(62,32,255,.06) !important; }
+.fmt-tbl tbody tr.tbl-sel .f-name { color: var(--blue); }
 
 .no-res { text-align: center; padding: 48px 20px; color: var(--muted);
           background: var(--white); border: 1px solid var(--border);
@@ -569,66 +596,112 @@ if len(F) == 0:
     st.markdown('<div class="no-res">Нет форматов, соответствующих выбранным фильтрам.</div>',
                 unsafe_allow_html=True)
 else:
-    # ── ProgressColumn table: visual bars + checkbox row selection ──
     def _list(c): return ", ".join(c) if isinstance(c, list) else ""
 
-    max_reach_v = float(df["max_reach"].max()) if df["max_reach"].notna().any() else 1.0
-    max_ecpm_v  = float(F["ecpm_s"].max())     if F["ecpm_s"].notna().any()     else 1.0
-    max_ctr_v   = 5.0   # cap at 5% for bar scale
+    # ── Max values for bar scaling ──
+    max_reach_all = max(float(df["max_reach"].max()), 1.0)  if df["max_reach"].notna().any() else 1.0
+    max_ctr_all   = max(float(df["ctr_avg"].max()),  0.001) if df["ctr_avg"].notna().any()   else 0.05
+    max_ecpm_all  = max(float(F["ecpm_s"].max()),    1.0)   if F["ecpm_s"].notna().any()      else 1.0
 
-    disp = pd.DataFrame({
-        "Формат":      F["format_name"].values,
-        "ID":          F["format_id"].values,
-        "Тип":         F["format_type"].apply(_list).values,
-        "Модель":      F["buy_model"].values,
-        "Устройства":  F["device"].apply(_list).values,
-        "Охват":       (F["max_reach"] / max_reach_v * 100).fillna(0).values,
-        "CTR":         (F["ctr_avg"]   * 100).fillna(0).values,
-        "Viewability": (F["viewability_avg"] * 100).fillna(0).values,
-        "eCPM":        F["ecpm_s"].fillna(0).values,
-    })
-    if scoring:
-        disp["Скор"] = F["score"].fillna(0).values
+    # ── Helper renderers ──
+    def type_tags(cell):
+        if not isinstance(cell, list): return ""
+        out = ""
+        for t in cell:
+            cls = "tag-v" if t == "Видео" else "tag-b"
+            out += f'<span class="tag {cls}">{t}</span>'
+        return out
 
-    col_cfg = {
-        "Формат":      st.column_config.TextColumn(width="large"),
-        "ID":          st.column_config.TextColumn(width="small"),
-        "Тип":         st.column_config.TextColumn(width="small"),
-        "Модель":      st.column_config.TextColumn(width="small"),
-        "Устройства":  st.column_config.TextColumn(width="medium"),
-        "Охват":       st.column_config.ProgressColumn(
-                           "Охват", min_value=0, max_value=100,
-                           format="%.1f%%", width="medium"),
-        "CTR":         st.column_config.ProgressColumn(
-                           "CTR", min_value=0, max_value=max_ctr_v,
-                           format="%.2f%%", width="small"),
-        "Viewability": st.column_config.ProgressColumn(
-                           "Viewability", min_value=0, max_value=100,
-                           format="%.0f%%", width="small"),
-        "eCPM":        st.column_config.ProgressColumn(
-                           "eCPM (сез.)", min_value=0, max_value=max_ecpm_v,
-                           format="%.0f ₽", width="small"),
-    }
-    if scoring:
-        col_cfg["Скор"] = st.column_config.ProgressColumn(
-            "Скор", min_value=0, max_value=100, format="%.0f", width="small")
+    def model_tag(v):
+        cls = "tag-cpc" if str(v).upper() == "CPC" else "tag-cpm"
+        return f'<span class="tag {cls}">{v}</span>'
 
+    def dev_tags(cell):
+        if not isinstance(cell, list): return ""
+        return " ".join(f'<span class="tag">{d}</span>' for d in cell)
+
+    def mbar(val, max_val, label):
+        if label == "—":
+            return '<span style="color:rgba(7,0,55,.18);font-size:11px">—</span>'
+        try: pw = min(float(val) / float(max_val) * 100, 100) if max_val else 0
+        except: pw = 0
+        return ('<div class="mbar-wrap">'
+                + '<div class="mbar-bg"><div class="mbar-fill" style="width:' + f'{pw:.1f}' + '%"></div></div>'
+                + '<span class="mbar-val">' + label + '</span></div>')
+
+    def score_pill(s):
+        try:
+            v = float(s)
+            if np.isnan(v): return "—"
+            cls = "sc-hi" if v>=65 else ("sc-md" if v>=40 else "sc-lo")
+            return f'<span class="sc-pill {cls}">{v:.0f}</span>'
+        except: return "—"
+
+    # ── Build HTML table rows ──
+    sel_idx = st.session_state.get("_sel_row", None)
+    rows_html = ""
+    for i, (_, row) in enumerate(F.iterrows()):
+        hi = ' class="tbl-sel"' if sel_idx == i else ""
+        if scoring:
+            last_cell = score_pill(row.get("score", np.nan))
+            last_hdr  = "Скор"
+        else:
+            v = row.get("ecpm_s", np.nan)
+            last_cell = ('<span style="font-family:var(--mono,monospace);font-size:12px">' + rub(v) + '</span>')
+            last_hdr  = "eCPM (сез.)"
+
+        rows_html += (
+            f'<tr{hi}>' +
+            f'<td><div class="f-name">{row["format_name"]}</div>' +
+            f'<div class="f-id">{row["format_id"]}</div></td>' +
+            f'<td>{type_tags(row.get("format_type",[]))}</td>' +
+            f'<td>{model_tag(row["buy_model"])}</td>' +
+            f'<td>{dev_tags(row.get("device",[]))}</td>' +
+            f'<td>{mbar(row.get("max_reach"), max_reach_all, reach_s(row.get("max_reach")))}</td>' +
+            f'<td>{mbar(row.get("ctr_avg"),   max_ctr_all,   pct(row.get("ctr_avg")))}</td>' +
+            f'<td>{mbar(row.get("viewability_avg"), 1.0,     pct(row.get("viewability_avg")))}</td>' +
+            f'<td>{last_cell}</td></tr>'
+        )
+
+    st.markdown(
+        '<div class="fmt-tbl-wrap"><table class="fmt-tbl"><thead><tr>' +
+        '<th>Формат</th><th>Тип</th><th>Модель</th><th>Устройства</th>' +
+        '<th>Охват</th><th>CTR</th><th>Viewability</th>' +
+        f'<th>{last_hdr}</th></tr></thead><tbody>' +
+        rows_html + '</tbody></table></div>',
+        unsafe_allow_html=True
+    )
+
+    # ── Compact selector dataframe — only for row selection ──
+    st.markdown(
+        '<div style="margin-top:6px;">' +
+        '<p style="font-size:11px;color:rgba(7,0,55,.4);margin:0 0 3px;">' +
+        '↑ Кликните строку выше, или выберите здесь для открытия карточки:</p></div>',
+        unsafe_allow_html=True
+    )
+    sel_df = F[["format_name", "format_id"]].copy().reset_index(drop=True)
     ev = st.dataframe(
-        disp,
-        use_container_width=True,
+        sel_df,
         hide_index=True,
+        use_container_width=True,
         on_select="rerun",
         selection_mode="single-row",
-        column_config=col_cfg,
-        height=min(560, (len(F)+1)*44+2),
-        key="main_tbl",
+        column_config={
+            "format_name": st.column_config.TextColumn("Формат"),
+            "format_id":   st.column_config.TextColumn("ID", width="small"),
+        },
+        height=min(300, (len(F)+1)*35+4),
+        key="sel_df",
     )
 
     sel = ev.selection.rows if hasattr(ev, "selection") else []
-
-    # ─── CARD ─────────────────────────────────────────────────────────────────
     if sel:
-        r = F.iloc[sel[0]]
+        st.session_state["_sel_row"] = sel[0]
+
+    # ─── CARD — shown when a row is selected ─────────────────────────────── ─────────────────────────────────────────────────────────────────
+    card_row_idx = st.session_state.get("_sel_row", None)
+    if card_row_idx is not None and card_row_idx < len(F):
+        r = F.iloc[card_row_idx]
 
         def gf(field, default=np.nan):
             val = r.get(field, default)
