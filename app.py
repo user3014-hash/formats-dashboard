@@ -33,54 +33,61 @@ html, body, .main { background: var(--bg) !important; }
 .main .block-container { padding: 1.5rem 2rem 3rem !important; max-width: 1460px; }
 [class*="css"] { color: var(--dark); }
 
-/* ── Sidebar dark ── */
-section[data-testid="stSidebar"] { background: var(--dark) !important; border-right: none !important; }
+/* ── Sidebar light ── */
+section[data-testid="stSidebar"] {
+    background: var(--white) !important;
+    border-right: 1px solid var(--border) !important;
+}
 section[data-testid="stSidebar"] .block-container { padding-top: 0 !important; }
 section[data-testid="stSidebar"] > div { padding: 0 !important; }
 
-/* All sidebar text white */
+/* All sidebar text dark */
 section[data-testid="stSidebar"] label,
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
-section[data-testid="stSidebar"] div { color: rgba(255,255,255,0.82) !important; font-size: 13px !important; }
+section[data-testid="stSidebar"] div { color: var(--dark) !important; font-size: 13px !important; }
 
 /* Sidebar selects */
 section[data-testid="stSidebar"] [data-baseweb="select"] > div {
-    background: rgba(255,255,255,0.07) !important;
-    border-color: rgba(255,255,255,0.13) !important;
+    background: var(--white) !important;
+    border-color: var(--border) !important;
     border-radius: 7px !important;
 }
-section[data-testid="stSidebar"] [data-baseweb="select"] svg { fill: rgba(255,255,255,0.45) !important; }
-section[data-testid="stSidebar"] [data-baseweb="select"] span { color: rgba(255,255,255,0.82) !important; }
+section[data-testid="stSidebar"] [data-baseweb="select"] svg { fill: var(--muted) !important; }
+section[data-testid="stSidebar"] [data-baseweb="select"] span { color: var(--dark) !important; }
 
 /* Tags in multiselect */
 section[data-testid="stSidebar"] [data-baseweb="tag"] {
     background: var(--blue) !important; border: none !important; border-radius: 5px !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="tag"] span { color: white !important; font-size: 12px !important; }
-section[data-testid="stSidebar"] [data-baseweb="tag"] button svg { fill: rgba(255,255,255,0.65) !important; }
+section[data-testid="stSidebar"] [data-baseweb="tag"] button svg { fill: rgba(255,255,255,0.7) !important; }
 
-/* Slider track fill */
+/* Slider */
 section[data-testid="stSidebar"] [data-testid="stSlider"] [role="slider"] { background: var(--blue) !important; }
 
-/* Placeholder text */
-section[data-testid="stSidebar"] [data-baseweb="select"] [data-placeholder] { color: rgba(255,255,255,0.38) !important; }
+/* Placeholder */
+section[data-testid="stSidebar"] [data-baseweb="select"] [data-placeholder] { color: var(--muted) !important; }
+
+/* Checkbox / toggle label */
+section[data-testid="stSidebar"] [data-testid="stCheckbox"] label span,
+section[data-testid="stSidebar"] [data-testid="stToggle"] label span { color: var(--dark) !important; }
 
 /* sb-label */
 .sb-label {
     font-size: 9.5px !important; font-weight: 700 !important; letter-spacing: 0.11em;
-    text-transform: uppercase; color: rgba(255,255,255,0.35) !important;
+    text-transform: uppercase; color: var(--muted) !important;
     margin: 14px 0 4px; display: block;
 }
 .sb-logo {
-    padding: 1rem 1.1rem 0.75rem;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 1rem 1.2rem 0.85rem;
+    border-bottom: 1px solid var(--border);
     margin-bottom: 4px;
 }
-.sb-logo-t { font-size: 14px !important; font-weight: 600 !important; color: white !important; }
-.sb-logo-s { font-size: 11px !important; color: rgba(255,255,255,0.38) !important; margin-top: 1px; }
-.sb-inner  { padding: 0 1rem 1.5rem; }
-hr.sb-div  { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 10px 0; }
+.sb-logo-t { font-size: 14px !important; font-weight: 600 !important; color: var(--dark) !important; }
+.sb-logo-s { font-size: 11px !important; color: var(--muted) !important; margin-top: 1px; }
+.sb-inner  { padding: 0 1.1rem 1.5rem; }
+hr.sb-div  { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
 
 /* ── Page header ── */
 .hdr {
@@ -190,6 +197,15 @@ hr.sb-div  { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin:
 hr.light { border: none; border-top: 1px solid var(--border); margin: .9rem 0; }
 .no-res  { text-align: center; padding: 48px 20px; color: var(--muted); background: var(--white); border: 1px solid var(--border); border-radius: 11px; font-size: 13px; }
 .empty-card { margin-top: 14px; padding: 20px; background: var(--white); border: 1px solid var(--border); border-radius: 11px; color: var(--muted); font-size: 13px; }
+
+/* Format selector below table */
+.fmt-selector-wrap [data-baseweb="select"] > div {
+    background: var(--white) !important;
+    border: 1px solid var(--border) !important;
+    border-top: none !important;
+    border-radius: 0 0 11px 11px !important;
+    font-size: 13px !important;
+}
 
 @keyframes fadeUp { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
 </style>
@@ -568,7 +584,7 @@ else:
     max_ctr_all   = min(df["ctr_avg"].max(), 0.05) if df["ctr_avg"].notna().any() else 0.05
     max_vw_all    = 1.0
 
-    sel_id = st.session_state.get("sel_fmt_id", None)
+    sel_id = None  # no row highlight needed — selectbox handles selection
 
     # Build HTML table rows
     def type_tags(cell):
@@ -614,139 +630,158 @@ else:
             <td>{last_td}</td>
         </tr>"""
 
-    # Hidden input to receive selected format id from JS
-    clicked_id = st.query_params.get("fmt", None)
-    if clicked_id and clicked_id in F["format_id"].values:
-        st.session_state["sel_fmt_id"] = clicked_id
-        sel_id = clicked_id
+    # ─── FORMAT SELECTION via selectbox (no duplicate table) ──────────────────
+    fmt_names = F["format_name"].tolist()
+    fmt_ids   = F["format_id"].tolist()
 
-    st.markdown(f"""
-    <div class="fmt-tbl-wrap">
-    <table class="fmt-tbl">
-        <thead><tr>
-            <th>Формат</th><th>Тип</th><th>Модель</th><th>Устройства</th>
-            <th>Охват</th><th>CTR</th><th>Viewability</th>{last_th}
-        </tr></thead>
-        <tbody>{rows_html}</tbody>
-    </table>
-    </div>
-    """, unsafe_allow_html=True)
+    # Keep selection in session state; reset if format list changed
+    ss_key = "sel_fmt_idx"
+    prev_ids_key = "prev_fmt_ids"
+    if st.session_state.get(prev_ids_key) != fmt_ids:
+        st.session_state[ss_key] = 0
+        st.session_state[prev_ids_key] = fmt_ids
 
-    # ─── ROW CLICK: use st.dataframe on top (invisible), capture selection ───
-    # Build minimal df just for selection
-    sel_df = F[["format_name","format_id"]].copy().reset_index(drop=True)
-    ev = st.dataframe(
-        sel_df,
-        hide_index=True,
-        use_container_width=True,
-        on_select="rerun",
-        selection_mode="single-row",
-        column_config={
-            "format_name": st.column_config.TextColumn("Выберите формат из таблицы выше"),
-            "format_id":   st.column_config.TextColumn("ID", width="small"),
-        },
-        height=min(500, (len(F)+1)*38+2),
-        key="sel_df",
+    sel_idx = st.session_state.get(ss_key, 0)
+    # Clamp in case list shrank
+    sel_idx = min(sel_idx, len(fmt_names) - 1)
+
+    # Render HTML table (visual only, no interaction needed)
+    tbl_html = (
+        '<div class="fmt-tbl-wrap">'
+        '<table class="fmt-tbl">'
+        '<thead><tr>'
+        '<th>Формат</th><th>Тип</th><th>Модель</th><th>Устройства</th>'
+        '<th>Охват</th><th>CTR</th><th>Viewability</th>'
+        + ('<th>Скор</th>' if scoring else '<th>eCPM (сез.)</th>') +
+        '</tr></thead><tbody>'
+        + rows_html +
+        '</tbody></table></div>'
     )
-    sel_rows = ev.selection.rows if hasattr(ev, "selection") else []
+    st.markdown(tbl_html, unsafe_allow_html=True)
+
+    # Selectbox for picking a format → opens card below
+    st.markdown('<div class="fmt-selector-wrap">', unsafe_allow_html=True)
+    chosen_name = st.selectbox(
+        "Выберите формат для карточки",
+        options=fmt_names,
+        index=sel_idx,
+        key="fmt_selectbox",
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+    chosen_pos = fmt_names.index(chosen_name)
+    st.session_state[ss_key] = chosen_pos
 
     # ─── CARD ─────────────────────────────────────────────────────────────────
-    if sel_rows:
-        idx = sel_rows[0]
-        r   = F.iloc[idx]
+    r = F.iloc[chosen_pos]
 
-        def gf(field, default=np.nan):
-            val = r.get(field, default)
-            if val is None: return default
-            try:
-                if isinstance(val, float) and np.isnan(val): return default
-            except Exception: pass
-            return val
+    def gf(field, default=np.nan):
+        val = r.get(field, default)
+        if val is None: return default
+        try:
+            if isinstance(val, float) and np.isnan(val): return default
+        except Exception: pass
+        return val
 
-        ee  = gf("ecpm_eff")
-        es2 = gf("ecpm_s")
-        sc  = gf("sk", 1.0)
-        sc_disp = f"{float(sc):.1f}".replace(".", ",") if sc != int(sc) else str(int(sc))
+    ee  = gf("ecpm_eff")
+    es2 = gf("ecpm_s")
+    sc  = gf("sk", 1.0)
+    try:
+        sc_f = float(sc)
+        sc_disp = str(int(sc_f)) if sc_f == int(sc_f) else f"{sc_f:.1f}".replace(".", ",")
+    except Exception:
+        sc_disp = "1"
 
-        sc_score = gf("score", np.nan)
-        score_badge_html = ""
-        if scoring:
-            try:
-                if not np.isnan(float(sc_score)):
-                    sv2 = float(sc_score)
-                    cls2 = "sc-hi" if sv2>=65 else ("sc-md" if sv2>=40 else "sc-lo")
-                    score_badge_html = f'<span class="sc-pill {cls2}" style="margin-left:8px;">{sv2:.0f}</span>'
-            except Exception: pass
+    # Score badge — build separately, no nested f-string
+    score_badge = ""
+    if scoring:
+        try:
+            sv_score = float(gf("score", np.nan))
+            if not np.isnan(sv_score):
+                sc_cls = "sc-hi" if sv_score >= 65 else ("sc-md" if sv_score >= 40 else "sc-lo")
+                score_badge = '<span class="sc-pill ' + sc_cls + '" style="margin-left:8px;">' + str(int(sv_score)) + '</span>'
+        except Exception:
+            pass
 
-        links = []
-        for lbl_, key in [("Пример","example_url"),("Техтребования","technical_requirements_url"),
-                           ("Медиакит","mediakit_url"),("Кейсы","cases_url")]:
-            v = gf(key, "")
-            if isinstance(v, str) and v.startswith("http"):
-                links.append(f'<a class="link-a" href="{v}" target="_blank">{lbl_} ↗</a>')
+    # Links — build separately
+    links_html = ""
+    for lbl_, url_key in [("Пример", "example_url"),
+                           ("Техтребования", "technical_requirements_url"),
+                           ("Медиакит", "mediakit_url"),
+                           ("Кейсы", "cases_url")]:
+        v = gf(url_key, "")
+        if isinstance(v, str) and v.startswith("http"):
+            links_html += '<a class="link-a" href="' + v + '" target="_blank">' + lbl_ + ' ↗</a>'
 
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-top">
-                <div>
-                    <div class="card-title">{sv(gf('format_name'))}{score_badge_html}</div>
-                    <div class="card-meta">{sv(gf('format_id'))} · {sv(gf('buy_model'))} · {sv(gf('platform'))}</div>
-                </div>
-                <div>{"".join(links)}</div>
-            </div>
-            <div class="card-desc">{sv(gf('description'), 'Описание не указано')}</div>
+    # Metric grid — build separately
+    ecpm_lbl = "eCPM (сезон. " + sc_disp + "×)"
+    grid_html = (
+        '<div class="c-m"><div class="c-lbl">eCPM (факт)</div><div class="c-val">' + rub(ee) + '</div></div>'
+        + '<div class="c-m"><div class="c-lbl">' + ecpm_lbl + '</div><div class="c-val">' + rub(es2) + '</div></div>'
+        + '<div class="c-m"><div class="c-lbl">Скидка</div><div class="c-val">' + pct(gf("discount")) + '</div></div>'
+        + '<div class="c-m"><div class="c-lbl">Охват (макс.)</div><div class="c-val">' + reach_s(gf("max_reach")) + '</div></div>'
+        + '<div class="c-m"><div class="c-lbl">CTR (среднее)</div><div class="c-val">' + pct(gf("ctr_avg")) + '</div></div>'
+        + '<div class="c-m"><div class="c-lbl">VTR (среднее)</div><div class="c-val">' + pct(gf("vtr_avg")) + '</div></div>'
+        + '<div class="c-m"><div class="c-lbl">Viewability (среднее)</div><div class="c-val">' + pct(gf("viewability_avg")) + '</div></div>'
+        + '<div class="c-m"><div class="c-lbl">Комиссия</div><div class="c-val">' + pct(gf("commission")) + '</div></div>'
+        + '<div class="c-m"><div class="c-lbl">Мин. бюджет</div><div class="c-val">' + rub(gf("min_budget")) + '</div></div>'
+    )
 
-            <div class="c-grid">
-                <div class="c-m"><div class="c-lbl">eCPM (факт)</div><div class="c-val">{rub(ee)}</div></div>
-                <div class="c-m"><div class="c-lbl">eCPM (сезон. {sc_disp}×)</div><div class="c-val">{rub(es2)}</div></div>
-                <div class="c-m"><div class="c-lbl">Скидка</div><div class="c-val">{pct(gf('discount'))}</div></div>
-                <div class="c-m"><div class="c-lbl">Охват (макс.)</div><div class="c-val">{reach_s(gf('max_reach'))}</div></div>
-                <div class="c-m"><div class="c-lbl">CTR (среднее)</div><div class="c-val">{pct(gf('ctr_avg'))}</div></div>
-                <div class="c-m"><div class="c-lbl">VTR (среднее)</div><div class="c-val">{pct(gf('vtr_avg'))}</div></div>
-                <div class="c-m"><div class="c-lbl">Viewability (среднее)</div><div class="c-val">{pct(gf('viewability_avg'))}</div></div>
-                <div class="c-m"><div class="c-lbl">Комиссия</div><div class="c-val">{pct(gf('commission'))}</div></div>
-                <div class="c-m"><div class="c-lbl">Мин. бюджет</div><div class="c-val">{rub(gf('min_budget'))}</div></div>
-            </div>
+    # Left info column
+    info_left = (
+        '<div class="c-sec">Ценовой диапазон</div>'
+        + '<div class="info-row"><span class="info-lbl">CPM мин / сред / макс</span>'
+        + '<span class="info-val">' + rub(gf("cpm_min")) + " / " + rub(gf("cpm_avg")) + " / " + rub(gf("cpm_max")) + '</span></div>'
+        + '<div class="info-row"><span class="info-lbl">CPC мин / сред / макс</span>'
+        + '<span class="info-val">' + rub(gf("cpc_min")) + " / " + rub(gf("cpc_avg")) + " / " + rub(gf("cpc_max")) + '</span></div>'
+        + '<div class="info-row"><span class="info-lbl">CTR мин / макс</span>'
+        + '<span class="info-val">' + pct(gf("ctr_min")) + " / " + pct(gf("ctr_max")) + '</span></div>'
+        + '<div class="c-sec">Верификация</div>'
+        + '<div class="info-row"><span class="info-lbl">Пиксель</span><span class="info-val">' + bv(gf("verification_pixel")) + '</span></div>'
+        + '<div class="info-row"><span class="info-lbl">JS-тег</span><span class="info-val">' + bv(gf("verification_js")) + '</span></div>'
+        + '<div class="info-row"><span class="info-lbl">Условия</span>'
+        + '<span class="info-val" style="font-size:12px;color:var(--muted);">' + sv(gf("verification_terms")) + '</span></div>'
+        + '<div class="c-sec">Исследования</div>'
+        + '<div class="info-row"><span class="info-lbl">Brand Lift</span><span class="info-val">' + bv(gf("bls")) + '</span></div>'
+        + '<div class="info-row"><span class="info-lbl">Sales Lift</span><span class="info-val">' + bv(gf("sales_lift")) + '</span></div>'
+    )
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            <div>
-                <div class="c-sec">Ценовой диапазон</div>
-                <div class="info-row"><span class="info-lbl">CPM мин / сред / макс</span>
-                    <span class="info-val">{rub(gf('cpm_min'))} / {rub(gf('cpm_avg'))} / {rub(gf('cpm_max'))}</span></div>
-                <div class="info-row"><span class="info-lbl">CPC мин / сред / макс</span>
-                    <span class="info-val">{rub(gf('cpc_min'))} / {rub(gf('cpc_avg'))} / {rub(gf('cpc_max'))}</span></div>
-                <div class="info-row"><span class="info-lbl">CTR мин / макс</span>
-                    <span class="info-val">{pct(gf('ctr_min'))} / {pct(gf('ctr_max'))}</span></div>
-                <div class="c-sec">Верификация</div>
-                <div class="info-row"><span class="info-lbl">Пиксель</span><span class="info-val">{bv(gf('verification_pixel'))}</span></div>
-                <div class="info-row"><span class="info-lbl">JS-тег</span><span class="info-val">{bv(gf('verification_js'))}</span></div>
-                <div class="info-row"><span class="info-lbl">Условия</span>
-                    <span class="info-val" style="font-size:12px;color:var(--muted);">{sv(gf('verification_terms'))}</span></div>
-                <div class="c-sec">Исследования</div>
-                <div class="info-row"><span class="info-lbl">Brand Lift</span><span class="info-val">{bv(gf('bls'))}</span></div>
-                <div class="info-row"><span class="info-lbl">Sales Lift</span><span class="info-val">{bv(gf('sales_lift'))}</span></div>
-            </div>
-            <div>
-                <div class="c-sec">Плейсмент</div><div class="tags-row">{thtml(gf('placement',[]))}</div>
-                <div class="c-sec">Устройства</div><div class="tags-row">{thtml(gf('device',[]))}</div>
-                <div class="c-sec">Отображение</div><div class="tags-row">{thtml(gf('display',[]))}</div>
-                <div class="c-sec">DMP</div><div class="tags-row">{thtml(gf('dmp',[]))}</div>
-                <div class="c-sec">Производство</div><div class="tags-row">{thtml(gf('production',[]))}</div>
-            </div>
-            </div>
+    # Right tags column
+    info_right = (
+        '<div class="c-sec">Плейсмент</div><div class="tags-row">' + thtml(gf("placement", [])) + '</div>'
+        + '<div class="c-sec">Устройства</div><div class="tags-row">' + thtml(gf("device", [])) + '</div>'
+        + '<div class="c-sec">Отображение</div><div class="tags-row">' + thtml(gf("display", [])) + '</div>'
+        + '<div class="c-sec">DMP</div><div class="tags-row">' + thtml(gf("dmp", [])) + '</div>'
+        + '<div class="c-sec">Производство</div><div class="tags-row">' + thtml(gf("production", [])) + '</div>'
+    )
 
-            <div class="c-sec">Таргетинг</div>
-            <div class="tags-row">{thtml(gf('targeting',[]))}</div>
-            <div class="c-sec">Наценки за таргетинг</div>
-            <div class="tags-row">{thtml(gf('targeting_markup',[]))}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    # Assemble full card HTML — no nested f-strings
+    card_html = (
+        '<div class="card">'
+        + '<div class="card-top">'
+        + '<div><div class="card-title">' + sv(gf("format_name")) + score_badge + '</div>'
+        + '<div class="card-meta">' + sv(gf("format_id")) + ' · ' + sv(gf("buy_model")) + ' · ' + sv(gf("platform")) + '</div></div>'
+        + ('<div>' + links_html + '</div>' if links_html else '')
+        + '</div>'
+        + '<div class="card-desc">' + sv(gf("description"), "Описание не указано") + '</div>'
+        + '<div class="c-grid">' + grid_html + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">'
+        + '<div>' + info_left + '</div>'
+        + '<div>' + info_right + '</div>'
+        + '</div>'
+        + '<div class="c-sec">Таргетинг</div>'
+        + '<div class="tags-row">' + thtml(gf("targeting", [])) + '</div>'
+        + '<div class="c-sec">Наценки за таргетинг</div>'
+        + '<div class="tags-row">' + thtml(gf("targeting_markup", [])) + '</div>'
+        + '</div>'
+    )
 
-        for lbl_, key in [("Условия Brand Lift","bls_terms"),
-                           ("Условия Sales Lift","sales_lift_terms"),
-                           ("Условия сезонности","seasonality_terms")]:
-            v = gf(key, "")
-            if isinstance(v, str) and v.strip():
-                with st.expander(f"📋 {lbl_}"):
-                    st.markdown(f'<p style="font-size:13px;line-height:1.65;">{v}</p>',
-                                unsafe_allow_html=True)
+    st.markdown(card_html, unsafe_allow_html=True)
+
+    for lbl_, key in [("Условия Brand Lift", "bls_terms"),
+                       ("Условия Sales Lift", "sales_lift_terms"),
+                       ("Условия сезонности", "seasonality_terms")]:
+        v = gf(key, "")
+        if isinstance(v, str) and v.strip():
+            with st.expander("📋 " + lbl_):
+                st.markdown('<p style="font-size:13px;line-height:1.65;">' + v + '</p>',
+                            unsafe_allow_html=True)
