@@ -136,9 +136,33 @@ div[data-testid="stSelectbox"] label { font-size: 0.78rem !important; color: #55
 # ─── DATA LOADING ─────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
-    df = pd.read_csv("DataLens_-_formats.csv")
-    di = pd.read_csv("DataLens_-_dict_items.csv")
-    fi = pd.read_excel("DataLens.xlsx", sheet_name="format_items")
+    import os
+    base = os.path.dirname(os.path.abspath(__file__))
+    def p(name): return os.path.join(base, name)
+
+    # Support both underscore and space variants of filenames
+    def read_csv(a, b):
+        for name in [a, b]:
+            fp = p(name)
+            if os.path.exists(fp):
+                return pd.read_csv(fp)
+        raise FileNotFoundError(f"Neither {a} nor {b} found in {base}")
+
+    df = read_csv("DataLens_-_formats.csv", "DataLens - formats.csv")
+    di = read_csv("DataLens_-_dict_items.csv", "DataLens - dict_items.csv")
+    # format_items: try CSV first, then fall back to xlsx
+    fi = None
+    for name in ["DataLens_-_format_items.csv", "DataLens - format_items.csv"]:
+        if os.path.exists(p(name)):
+            fi = pd.read_csv(p(name))
+            break
+    if fi is None:
+        for name in ["DataLens.xlsx", "DataLens - DataLens.xlsx"]:
+            if os.path.exists(p(name)):
+                fi = pd.read_excel(p(name), sheet_name="format_items")
+                break
+    if fi is None:
+        raise FileNotFoundError("format_items not found. Add DataLens - format_items.csv or DataLens.xlsx to the repo")
 
     # Join format_items with dict_items to get item names
     merged = fi.merge(di[["dict_id", "item_id", "item_name"]], on=["dict_id", "item_id"], how="left")
