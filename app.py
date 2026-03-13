@@ -7,233 +7,226 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Format Selector", page_icon="📊",
                    layout="wide", initial_sidebar_state="expanded")
 
-# ─── DESIGN SYSTEM ────────────────────────────────────────────────────────────
-# Typography: 3 levels only
-#   Display  — 22px / 600  → titles, KPI numbers
-#   Body     — 13px / 400  → text, table, card content
-#   Label    — 10px / 700  → uppercase section headers, meta
-# Colors: --white --mint --blue --indigo --bg --dark --muted --border
-# Numbers always in DM Mono
+# ─── DESIGN SYSTEM (per audit) ────────────────────────────────────────────────
+# Primary accent:  #3E20FF  — CTAs, active states, key highlights only
+# Background:      #FFFFFF / page #F8F2FF
+# Dark surfaces:   #070037
+# Secondary:       #725BFF  — progress bars, secondary badges
+# Soft purple bg:  #F8F2FF  — hover rows, selected panel bg
+# Status teal:     #77F5DF / #C0FFD9 / #EEFFF5 — Видео tags, positive metrics
+# Neutral muted:   #B1B4B8
+# Typography: Inter, 400 body / 500 labels+values, sentence case, max 18px
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  --white:#FFFFFF;
-  --mint:#C0FFD9;
-  --blue:#3E20FF;
-  --indigo:#725BFF;
-  --bg:#F8F2FF;
-  --dark:#070037;
-  --muted:rgba(7,0,55,.42);
-  --border:rgba(7,0,55,.09);
-  --shadow:0 1px 3px rgba(7,0,55,.06);
+  --accent:   #3E20FF;
+  --bg-page:  #F8F2FF;
+  --bg-white: #FFFFFF;
+  --bg-soft:  #F8F2FF;
+  --dark:     #070037;
+  --muted:    #B1B4B8;
+  --border:   rgba(7,0,55,.08);
+  --border2:  #E8E8F0;
+  --secondary:#725BFF;
+  --teal:     #77F5DF;
+  --teal-bg:  #EEFFF5;
+  --teal-text:#0F6E56;
+  --purple-bg:#F0EEFF;
+  --purple-text:#3E20FF;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --radius:   8px;
+  --mono:     'DM Mono', monospace;
 }
 
-/* ── reset ── */
-*,*::before,*::after { box-sizing:border-box; font-family:'DM Sans',sans-serif !important; }
-html,body,.main,.stApp { background:var(--bg) !important; }
-.main .block-container { padding:2rem 2.5rem 4rem !important; max-width:1480px; }
+/* reset */
+*, *::before, *::after { box-sizing:border-box; font-family:'Inter',sans-serif !important; }
+html, body, .main, .stApp { background:var(--bg-page) !important; }
+.main .block-container { padding:1.75rem 2rem 4rem !important; max-width:1480px; }
+p, span, div, label { color:var(--dark); }
 
-/* ── SIDEBAR ── */
+/* ── SIDEBAR ─────────────────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {
-  background:var(--white) !important;
-  border-right:1px solid var(--border) !important;
+  background:var(--bg-white) !important;
+  border-right:1px solid var(--border2) !important;
   box-shadow:none !important;
 }
-[data-testid="stSidebar"] > div:first-child {
-  padding:0 !important;
-  overflow-x:hidden !important;
-}
-[data-testid="stSidebar"] .block-container {
-  padding:0 !important; max-width:100% !important;
-}
+[data-testid="stSidebar"] > div:first-child { padding:0 !important; overflow-x:hidden !important; }
+[data-testid="stSidebar"] .block-container   { padding:0 !important; max-width:100% !important; }
 [data-testid="stSidebarResizeHandle"] { display:none !important; }
 
-/* sidebar controls */
-[data-testid="stSidebar"] label {
-  color:var(--dark) !important; font-size:13px !important;
-  font-weight:400 !important; line-height:1.45 !important;
-}
-[data-testid="stSidebar"] p {
-  color:var(--dark) !important; font-size:13px !important; margin:0 !important;
-}
-[data-testid="stSidebar"] [data-testid="stSlider"] p {
-  font-size:10px !important; color:var(--muted) !important;
-}
-[data-testid="stSidebar"] [data-baseweb="select"] > div {
-  background:var(--bg) !important;
-  border:1px solid var(--border) !important;
-  border-radius:8px !important;
-}
-[data-testid="stSidebar"] [data-baseweb="select"] span {
-  color:var(--dark) !important; font-size:13px !important;
-}
-[data-testid="stSidebar"] [data-baseweb="select"] svg { fill:var(--muted) !important; }
-[data-testid="stSidebar"] [data-baseweb="tag"] {
-  background:var(--blue) !important; border:none !important; border-radius:5px !important;
-}
-[data-testid="stSidebar"] [data-baseweb="tag"] span { color:#fff !important; font-size:11px !important; }
-[data-testid="stSidebar"] [data-baseweb="tag"] [role="presentation"] svg { fill:rgba(255,255,255,.7) !important; }
-[data-testid="stSidebar"] [role="slider"] { background:var(--blue) !important; }
-[data-testid="stSidebar"] .stCheckbox label { font-size:13px !important; color:var(--dark) !important; }
-[data-testid="stSidebar"] .stToggle label  { font-size:13px !important; color:var(--dark) !important; }
-
-/* Sidebar layout — padding via CSS on Streamlit's own inner elements */
-/* stSidebarContent is the scrollable wrapper Streamlit generates */
+/* padding on Streamlit's generated inner containers */
 [data-testid="stSidebarContent"],
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"],
-[data-testid="stSidebar"] .stMainBlockContainer {
-  padding-left: 1.25rem !important;
-  padding-right: 1.25rem !important;
-  padding-bottom: 2rem !important;
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+  padding-left:1.1rem !important;
+  padding-right:1.1rem !important;
+  padding-bottom:2rem !important;
 }
-/* Also target the stSidebar inner div that Streamlit uses as scroll container */
 [data-testid="stSidebar"] > div > div > div {
-  padding-left: 1.25rem !important;
-  padding-right: 1.25rem !important;
-}
-.sb-rule  { border:none; border-top:1px solid var(--border); margin:14px 0; }
-.sb-sec   {
-  display:block; font-size:10px !important; font-weight:700; letter-spacing:.11em;
-  text-transform:uppercase; color:var(--muted) !important; margin:16px 0 5px;
+  padding-left:1.1rem !important;
+  padding-right:1.1rem !important;
 }
 
-/* ── HEADER ── */
+/* sidebar text */
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p { color:var(--dark) !important; font-size:13px !important; font-weight:400 !important; margin:0 !important; }
+[data-testid="stSidebar"] [data-testid="stSlider"] p { font-size:11px !important; color:var(--muted) !important; }
+
+/* sidebar selects — neutral bg, no heavy fill */
+[data-testid="stSidebar"] [data-baseweb="select"] > div {
+  background:var(--bg-white) !important; border:1px solid var(--border2) !important; border-radius:var(--radius) !important;
+}
+[data-testid="stSidebar"] [data-baseweb="select"] span { color:var(--dark) !important; font-size:13px !important; }
+[data-testid="stSidebar"] [data-baseweb="select"] svg  { fill:var(--muted) !important; }
+
+/* active filter tags — soft bg #F8F2FF, accent text, small × — no heavy fill */
+[data-testid="stSidebar"] [data-baseweb="tag"] {
+  background:var(--bg-soft) !important; border:0.5px solid var(--secondary) !important; border-radius:5px !important;
+}
+[data-testid="stSidebar"] [data-baseweb="tag"] span { color:var(--accent) !important; font-size:11px !important; font-weight:500 !important; }
+[data-testid="stSidebar"] [data-baseweb="tag"] [role="presentation"] svg { fill:var(--secondary) !important; }
+[data-testid="stSidebar"] [role="slider"]     { background:var(--accent) !important; }
+[data-testid="stSidebar"] .stCheckbox label   { font-size:13px !important; color:var(--dark) !important; }
+[data-testid="stSidebar"] .stToggle   label   { font-size:13px !important; color:var(--dark) !important; }
+
+/* sidebar section headers — 11px uppercase #B1B4B8, no borders */
+.sb-group-label {
+  display:block; font-size:11px; font-weight:500; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--muted); margin:20px 0 6px; padding:0;
+}
+.sb-rule { border:none; border-top:1px solid var(--border2); margin:12px 0; }
+.sb-subgroup { margin-left:0; }
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
 .hdr { display:flex; align-items:center; justify-content:space-between;
-       padding-bottom:1rem; margin-bottom:1.4rem; border-bottom:1px solid var(--border); }
-.hdr-title { font-size:18px; font-weight:600; color:var(--dark); letter-spacing:-.03em; }
-.hdr-sub   { font-size:10px; color:var(--muted); font-family:'DM Mono',monospace !important;
-             letter-spacing:.04em; margin-left:10px; }
+       padding-bottom:.85rem; margin-bottom:1.25rem; border-bottom:1px solid var(--border2); }
+.hdr-title { font-size:18px; font-weight:600; color:var(--dark); letter-spacing:-.02em; }
+.hdr-sub   { font-size:12px; color:var(--muted); margin-left:10px; }
 
-/* ── KPI cards ── */
-.kpi-row  { display:flex; gap:12px; margin-bottom:1.5rem; }
-.kpi-card { flex:1; background:var(--white); border:1px solid var(--border);
-            border-radius:12px; padding:16px 18px;
-            display:flex; flex-direction:column; gap:4px;
-            box-shadow:var(--shadow); }
-.kpi-label { font-size:10px; font-weight:700; letter-spacing:.08em;
-             text-transform:uppercase; color:var(--muted); }
-.kpi-value { font-size:22px; font-weight:600; color:var(--dark); line-height:1.1;
-             font-family:'DM Mono',monospace !important; letter-spacing:-.03em; }
-.kpi-value.text { font-family:'DM Sans',sans-serif !important; font-size:15px; line-height:1.3; }
-.kpi-sub   { font-size:10px; color:var(--muted); margin-top:1px; }
+/* ── KPI CARDS ───────────────────────────────────────────────────────────── */
+.kpi-row  { display:flex; gap:10px; margin-bottom:1.5rem; }
+.kpi-card { flex:1; background:var(--bg-white); border:1px solid var(--border2);
+            border-radius:12px; padding:16px 18px; box-shadow:var(--shadow-sm);
+            display:flex; flex-direction:column; gap:3px; }
+/* muted 12px label */
+.kpi-label { font-size:12px; font-weight:500; color:var(--muted); text-transform:none; letter-spacing:0; }
+/* 28px number — only place we go big */
+.kpi-value { font-size:28px; font-weight:500; color:var(--dark); line-height:1.1;
+             font-family:var(--mono) !important; letter-spacing:-.02em; }
+/* 500 value — text KPI same size as others but non-mono */
+.kpi-value.text { font-family:'Inter',sans-serif !important; font-size:15px; font-weight:500; line-height:1.3; }
+/* small context string */
+.kpi-sub  { font-size:11px; color:var(--muted); margin-top:2px; }
+/* colored dot */
+.kpi-dot  { display:inline-block; width:6px; height:6px; border-radius:50%;
+            background:var(--accent); margin-right:5px; vertical-align:middle; }
 
-/* ── Section label ── */
-.sec-label { font-size:10px; font-weight:700; letter-spacing:.10em;
-             text-transform:uppercase; color:var(--muted);
-             margin:1.8rem 0 .7rem; display:block; }
+/* ── SECTION LABEL ───────────────────────────────────────────────────────── */
+.sec-label { font-size:12px; font-weight:500; color:var(--muted);
+             margin:1.5rem 0 .6rem; display:block; }
 
-/* ── Table (no outer border, clean rows) ── */
-.fmt-tbl-outer { background:var(--white); border-radius:12px;
-                 overflow:hidden; box-shadow:var(--shadow); }
+/* ── TABLE ───────────────────────────────────────────────────────────────── */
+.fmt-tbl-outer { background:var(--bg-white); border-radius:12px;
+                 overflow:hidden; box-shadow:var(--shadow-sm); }
 .fmt-tbl { width:100%; border-collapse:collapse; font-size:13px; }
-.fmt-tbl thead tr { background:var(--bg); }
+/* sentence case, 12px, #B1B4B8, NO ALL CAPS */
 .fmt-tbl th {
-  padding:9px 14px;
-  font-size:10px; font-weight:700; letter-spacing:.09em;
-  text-transform:uppercase; color:var(--muted);
+  padding:9px 14px; background:#FAFAFA;
+  font-size:12px; font-weight:500; color:var(--muted);
   text-align:left; white-space:nowrap;
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid var(--border2);
+  letter-spacing:0; text-transform:none;
 }
-.fmt-tbl td {
-  padding:10px 14px;
-  border-bottom:1px solid rgba(7,0,55,.045);
-  vertical-align:middle;
-}
+.fmt-tbl td { padding:9px 14px; border-bottom:1px solid #F2F2F8; vertical-align:middle; }
 .fmt-tbl tbody tr:last-child td { border-bottom:none; }
 .fmt-tbl tbody tr { cursor:pointer; transition:background .1s; }
-.fmt-tbl tbody tr:hover td { background:rgba(62,32,255,.035); }
-.fmt-tbl tbody tr.sel td   { background:rgba(62,32,255,.065) !important; }
-.fmt-tbl tbody tr.sel .fn  { color:var(--blue); }
+/* alternating rows: white / #FAFAFA */
+.fmt-tbl tbody tr:nth-child(even) td { background:#FAFAFA; }
+/* hover: #F8F2FF, no border flash */
+.fmt-tbl tbody tr:hover td { background:var(--bg-soft) !important; }
+/* selected row */
+.fmt-tbl tbody tr.sel td   { background:var(--bg-soft) !important; }
+.fmt-tbl tbody tr.sel .fn  { color:var(--accent); font-weight:500; }
 
-.fn  { font-size:13px; font-weight:500; color:var(--dark); line-height:1.2; }
-.fid { font-size:10px; font-family:'DM Mono',monospace; color:var(--muted); margin-top:2px; }
+.fn  { font-size:13px; font-weight:400; color:var(--dark); line-height:1.2; }
+.fid { font-size:11px; font-family:var(--mono); color:var(--muted); margin-top:1px; }
 
-/* tags */
-.tag { display:inline-block; padding:2px 7px; border-radius:5px; font-size:11px;
-       font-weight:500; margin:1px 2px 1px 0;
-       background:rgba(62,32,255,.08); color:var(--dark); }
-.tag-v   { background:rgba(192,255,217,.7); color:#055c30; }
-.tag-b   { background:rgba(114,91,255,.11); color:#3d2faa; }
-.tag-cpm { border:1px solid var(--border); background:transparent; color:var(--muted); }
-.tag-cpc { background:rgba(62,32,255,.09); color:var(--blue); }
+/* type tags: Видео = teal, Баннер = soft purple */
+.tag     { display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px;
+           font-weight:500; margin:1px 2px 1px 0; background:#F2F2F8; color:var(--dark); }
+.tag-v   { background:var(--teal-bg); color:var(--teal-text); }
+.tag-b   { background:var(--purple-bg); color:var(--purple-text); }
+/* CPM/CPC: small pill, #070037 10% opacity bg, text #070037 */
+.tag-cpm { background:rgba(7,0,55,.07); color:var(--dark); border:none; font-size:11px; }
+.tag-cpc { background:rgba(62,32,255,.08); color:var(--accent); font-size:11px; }
 
-/* bar */
+/* progress bars: filled #725BFF on track #F8F2FF, fixed 80px, numeric inline */
 .bw { display:flex; align-items:center; gap:6px; }
-.bb { flex:1; min-width:32px; height:4px; background:rgba(7,0,55,.08); border-radius:2px; }
-.bf { height:4px; border-radius:2px; background:var(--blue); }
-.bv { font-family:'DM Mono',monospace; font-size:10px; color:var(--dark);
-      min-width:32px; text-align:right; white-space:nowrap; }
+.bb { width:80px; flex-shrink:0; height:4px; background:#EDEDF8; border-radius:2px; }
+.bf { height:4px; border-radius:2px; background:var(--secondary); }
+.bv { font-family:var(--mono); font-size:11px; color:var(--dark); white-space:nowrap; }
 
-/* score pill */
+/* score */
 .sc-pill { display:inline-flex; align-items:center; padding:2px 8px; border-radius:20px;
-           font-size:11px; font-weight:600; font-family:'DM Mono',monospace !important; }
-.sc-hi { background:var(--mint); color:#055c30; }
-.sc-md { background:rgba(62,32,255,.09); color:var(--blue); }
-.sc-lo { background:rgba(7,0,55,.06); color:var(--muted); }
+           font-size:11px; font-weight:500; font-family:var(--mono) !important; }
+.sc-hi { background:var(--teal-bg); color:var(--teal-text); }
+.sc-md { background:var(--purple-bg); color:var(--accent); }
+.sc-lo { background:#F2F2F8; color:var(--muted); }
 
-/* ── CARD ── */
+/* ── DETAIL PANEL (card) ─────────────────────────────────────────────────── */
 .card {
-  background:var(--white); border:1px solid var(--border);
-  border-left:3px solid var(--blue); border-radius:12px;
-  padding:24px; margin-top:16px; box-shadow:var(--shadow);
-  animation:slideUp .18s ease both;
+  background:var(--bg-soft); border:1px solid var(--border2);
+  border-left:3px solid var(--accent); border-radius:12px;
+  padding:24px; margin-top:12px;
+  box-shadow:var(--shadow-sm);
+  animation:slideUp .16s ease both;
 }
-@keyframes slideUp {
-  from { opacity:0; transform:translateY(6px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-.card-header { display:flex; align-items:flex-start;
-               justify-content:space-between; margin-bottom:5px; }
-.card-title  { font-size:16px; font-weight:600; color:var(--dark); letter-spacing:-.02em; }
-.card-meta   { font-size:10px; color:var(--muted);
-               font-family:'DM Mono',monospace !important;
-               letter-spacing:.04em; margin-bottom:14px; }
+@keyframes slideUp { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+.card-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:4px; }
+/* card title 16px */
+.card-title  { font-size:16px; font-weight:600; color:var(--dark); letter-spacing:-.01em; }
+.card-meta   { font-size:11px; color:var(--muted); font-family:var(--mono) !important; margin-bottom:14px; }
 .card-desc   { font-size:13px; color:var(--dark); line-height:1.65;
-               background:var(--bg); padding:12px 14px; border-radius:8px;
-               margin-bottom:18px; }
-.card-links  { display:flex; gap:2px; flex-wrap:wrap; }
-.card-link   { font-size:12px; color:var(--blue); font-weight:500;
-               text-decoration:none; padding:3px 8px; border-radius:5px;
-               border:1px solid rgba(62,32,255,.15);
-               transition:background .1s; }
-.card-link:hover { background:rgba(62,32,255,.07); }
+               background:var(--bg-white); padding:12px 14px; border-radius:var(--radius); margin-bottom:18px; }
 
+/* CTA buttons — ghost style */
+.card-links { display:flex; gap:6px; flex-wrap:wrap; }
+.card-link  { font-size:12px; color:var(--accent); font-weight:500; text-decoration:none;
+              padding:4px 10px; border-radius:6px; border:1px solid var(--accent);
+              transition:all .12s; background:transparent; }
+.card-link:hover { background:var(--accent); color:#fff; }
+
+/* 3-col stat grid, white bg, radius 8 */
 .metrics-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
-.metric-box  { background:var(--bg); border-radius:9px; padding:11px 13px; }
-.metric-lbl  { font-size:10px; font-weight:700; text-transform:uppercase;
-               letter-spacing:.08em; color:var(--muted); margin-bottom:5px; }
-.metric-val  { font-size:15px; font-weight:600; color:var(--dark);
-               font-family:'DM Mono',monospace !important; line-height:1.1; }
+.metric-box  { background:var(--bg-white); border-radius:var(--radius); padding:11px 13px; }
+.metric-lbl  { font-size:11px; font-weight:500; color:var(--muted); margin-bottom:5px; text-transform:none; }
+.metric-val  { font-size:15px; font-weight:500; color:var(--dark); font-family:var(--mono) !important; line-height:1.1; }
 
 .info-grid   { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:12px; }
-.c-sec   { font-size:10px; font-weight:700; letter-spacing:.10em; text-transform:uppercase;
+/* section labels 11px uppercase */
+.c-sec   { font-size:11px; font-weight:500; letter-spacing:.08em; text-transform:uppercase;
            color:var(--muted); margin:14px 0 6px; }
 .info-row { display:flex; gap:8px; margin-bottom:5px; align-items:baseline; }
 .info-lbl { font-size:13px; color:var(--muted); min-width:148px; flex-shrink:0; }
 .info-val { font-size:13px; color:var(--dark); font-weight:500; }
 .tags-row { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:2px; }
-.bool-y   { color:var(--blue); font-weight:600; font-size:13px; }
-.bool-n   { color:rgba(7,0,55,.16); font-size:13px; }
+.bool-y   { color:var(--accent); font-weight:500; font-size:13px; }
+.bool-n   { color:#D0D0DC; font-size:13px; }
 
 .terms-box { font-size:13px; color:var(--dark); line-height:1.65;
-             background:var(--bg); padding:11px 14px; border-radius:8px;
-             margin-top:4px; }
+             background:var(--bg-white); padding:11px 14px; border-radius:var(--radius); margin-top:4px; }
 
-/* scoring weight indicator */
-.w-pill { display:inline-block; font-size:12px; font-weight:600;
-          font-family:'DM Mono',monospace !important; padding:4px 12px;
-          border-radius:7px; margin-top:6px; }
-.w-ok  { background:var(--mint); color:#055c30; }
-.w-bad { background:rgba(62,32,255,.09); color:var(--indigo); }
+.w-pill { display:inline-block; font-size:12px; font-weight:500;
+          font-family:var(--mono) !important; padding:4px 12px; border-radius:6px; margin-top:6px; }
+.w-ok  { background:var(--teal-bg); color:var(--teal-text); }
+.w-bad { background:var(--purple-bg); color:var(--accent); }
 
-.no-res { text-align:center; padding:56px 20px; color:var(--muted);
-          font-size:13px; background:var(--white); border-radius:12px;
-          box-shadow:var(--shadow); }
+.no-res { text-align:center; padding:56px 20px; color:var(--muted); font-size:13px;
+          background:var(--bg-white); border-radius:12px; box-shadow:var(--shadow-sm); }
 
-/* hide Streamlit chrome we don't need */
 #MainMenu, footer, [data-testid="stToolbar"] { display:none !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -256,7 +249,7 @@ def load_data():
     if fi is None and os.path.exists(p("DataLens.xlsx")):
         fi = pd.read_excel(p("DataLens.xlsx"), sheet_name="format_items")
     if fi is None: raise FileNotFoundError("format_items")
-    m = fi.merge(di[["dict_id","item_id","item_name"]], on=["dict_id","item_id"], how="left")
+    m  = fi.merge(di[["dict_id","item_id","item_name"]], on=["dict_id","item_id"], how="left")
     pv = m.groupby(["format_id","dict_id"])["item_name"].apply(list).unstack("dict_id").reset_index()
     return df.merge(pv, on="format_id", how="left"), di
 
@@ -305,7 +298,7 @@ def sv(v, d="—"):
 
 def th(cell):
     if not isinstance(cell,list) or not cell:
-        return '<span style="color:rgba(7,0,55,.14);font-size:10px">—</span>'
+        return '<span style="color:#D0D0DC;font-size:11px">—</span>'
     return "".join(f'<span class="tag">{t}</span>' for t in cell if t)
 
 def calc_ecpm(row):
@@ -322,84 +315,82 @@ def calc_ecpm(row):
         return np.nan if np.isnan(raw) else raw*(1-d)
     except: return np.nan
 
-df["ecpm_eff"]=df.apply(calc_ecpm,axis=1)
+df["ecpm_eff"] = df.apply(calc_ecpm, axis=1)
 def opts(did): return di[di["dict_id"]==did]["item_name"].dropna().tolist()
 
-# ─── SIDEBAR ──────────────────────────────────────────────────────────────────
+# ─── SIDEBAR — 3 groups: Основные / Аудитория / Качество ─────────────────────
 with st.sidebar:
-    # Padding injected here via HTML — Streamlit can't be blocked from
-    # resetting its own .block-container padding, so we wrap in a div
-    def sec(t): st.markdown(f'<span class="sb-sec">{t}</span>', unsafe_allow_html=True)
+    def grp(t): st.markdown(f'<span class="sb-group-label">{t}</span>', unsafe_allow_html=True)
     def rule():  st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
 
-    sec("Тип формата")
-    format_types=st.multiselect("_ft",["Видео","Баннер"],default=["Видео","Баннер"],
-                                placeholder="Все типы",label_visibility="collapsed")
-    sec("Устройство")
-    devices=st.multiselect("_dv",["Desktop","Mobile Web","In-App","Smart TV"],
-                           default=["Desktop","Mobile Web","In-App","Smart TV"],
-                           placeholder="Все устройства",label_visibility="collapsed")
-    sec("Модель закупки")
-    buy_models=st.multiselect("_bm",["CPM","CPC"],default=["CPM","CPC"],
-                              placeholder="Все модели",label_visibility="collapsed")
+    # ── GROUP 1: Основные ──
+    grp("Основные")
+    format_types = st.multiselect("_ft", ["Видео","Баннер"], default=["Видео","Баннер"],
+                                  placeholder="Тип формата", label_visibility="collapsed")
+    devices      = st.multiselect("_dv", ["Desktop","Mobile Web","In-App","Smart TV"],
+                                  default=["Desktop","Mobile Web","In-App","Smart TV"],
+                                  placeholder="Устройство", label_visibility="collapsed")
+    buy_models   = st.multiselect("_bm", ["CPM","CPC"], default=["CPM","CPC"],
+                                  placeholder="Модель закупки", label_visibility="collapsed")
 
-    show_b=not format_types or "Баннер" in format_types
-    show_v=not format_types or "Видео"  in format_types
+    show_b = not format_types or "Баннер" in format_types
+    show_v = not format_types or "Видео"  in format_types
     if show_b:
-        sec("Отображение")
-        f_disp=st.multiselect("_db",opts("display"),default=[],
-                              placeholder="Все варианты",label_visibility="collapsed")
+        f_disp = st.multiselect("_db", opts("display"), default=[],
+                                placeholder="Отображение", label_visibility="collapsed")
     else: f_disp=[]
     if show_v:
-        sec("Плейсмент")
-        f_plac=st.multiselect("_pl",opts("placement"),default=[],
-                              placeholder="Все плейсменты",label_visibility="collapsed")
-        sec("Позиция")
-        f_inst=st.multiselect("_in",opts("instream_pos"),default=[],
-                              placeholder="Все позиции",label_visibility="collapsed")
+        f_plac = st.multiselect("_pl", opts("placement"), default=[],
+                                placeholder="Плейсмент", label_visibility="collapsed")
+        f_inst = st.multiselect("_in", opts("instream_pos"), default=[],
+                                placeholder="Позиция", label_visibility="collapsed")
     else: f_plac=[]; f_inst=[]
-    sec("Таргетинги")
-    f_targ=st.multiselect("_tr",opts("targeting"),default=[],
-                          placeholder="Все таргетинги",label_visibility="collapsed")
-    sec("DMP")
-    f_dmp=st.multiselect("_dp",opts("dmp"),default=[],
-                         placeholder="Все DMP",label_visibility="collapsed")
+
     rule()
-    sec("Дополнительно")
-    req_px=st.checkbox("Верификация пикселем")
-    req_js=st.checkbox("Верификация JS-тегом")
-    req_bl=st.checkbox("Brand Lift")
-    req_sl=st.checkbox("Sales Lift")
+    # ── GROUP 2: Аудитория ──
+    grp("Аудитория")
+    f_targ = st.multiselect("_tr", opts("targeting"), default=[],
+                             placeholder="Таргетинги", label_visibility="collapsed")
+    f_dmp  = st.multiselect("_dp", opts("dmp"), default=[],
+                             placeholder="DMP", label_visibility="collapsed")
+
     rule()
-    sec("Пороговые значения")
-    max_ecpm_f=st.slider("Макс. eCPM (после скидки), ₽",0,1000,1000,step=10)
-    min_ctr   =st.slider("Мин. CTR, %",0.0,5.0,0.0,step=0.1)
-    min_rch   =st.slider("Мин. охват, млн",0.0,80.0,0.0,step=1.0)
-    min_view  =st.slider("Мин. Viewability, %",0,100,0,step=5)
-    min_vtr   =st.slider("Мин. VTR, %",0.0,100.,0.0,step=5.0)
+    # ── GROUP 3: Качество ──
+    grp("Качество")
+    req_px = st.checkbox("Верификация пикселем")
+    req_js = st.checkbox("Верификация JS-тегом")
+    req_bl = st.checkbox("Brand Lift")
+    req_sl = st.checkbox("Sales Lift")
+
+    # Secondary filters collapsed under "Пороговые значения"
+    with st.expander("Пороговые значения"):
+        max_ecpm_f = st.slider("Макс. eCPM (после скидки), ₽", 0, 1000, 1000, step=10)
+        min_ctr    = st.slider("Мин. CTR, %",        0.0, 5.0, 0.0, step=0.1)
+        min_rch    = st.slider("Мин. охват, млн",    0.0,80.0, 0.0, step=1.0)
+        min_view   = st.slider("Мин. Viewability, %",  0, 100,   0, step=5)
+        min_vtr    = st.slider("Мин. VTR, %",        0.0,100., 0.0, step=5.0)
+
     rule()
-    scoring=st.toggle("Включить скоринг",value=False)
+    scoring = st.toggle("Скоринг", value=False)
     if scoring:
-        sec("Веса (сумма = 100)")
+        grp("Веса (сумма = 100)")
         wr=st.slider("Охват",0,100,20,step=5)
-        we=st.slider("eCPM (ниже — лучше)",0,100,20,step=5)
+        we=st.slider("eCPM",0,100,20,step=5)
         wc=st.slider("CTR",0,100,20,step=5)
         wv=st.slider("VTR",0,100,15,step=5)
         wi=st.slider("Viewability",0,100,15,step=5)
-        wm=st.slider("Комиссия (ниже — лучше)",0,100,10,step=5)
+        wm=st.slider("Комиссия",0,100,10,step=5)
         tw=wr+we+wc+wv+wi+wm
         st.markdown(f'<div class="w-pill {"w-ok" if tw==100 else "w-bad"}">Сумма: {tw}/100</div>',
                     unsafe_allow_html=True)
-        norm=st.checkbox("Нормализовать веса",value=True)
+        norm=st.checkbox("Нормализовать", value=True)
     else: wr=we=wc=wv=wi=wm=tw=0; norm=False
+
     rule()
-    sec("Сезонность")
+    grp("Сезонность")
     months=["Январь","Февраль","Март","Апрель","Май","Июнь",
             "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-    sel_m=st.selectbox("_mo",months,index=months.index("Март"),label_visibility="collapsed")
-
-
-
+    sel_m=st.selectbox("_mo", months, index=months.index("Март"), label_visibility="collapsed")
 
 # ─── FILTER ───────────────────────────────────────────────────────────────────
 def has(c,i): return isinstance(c,list) and any(x in c for x in i)
@@ -426,8 +417,8 @@ if min_rch >0: F=F[F["max_reach"].fillna(0)       >=min_rch*1e6]
 if min_view>0: F=F[F["viewability_avg"].fillna(0) >=min_view/100]
 if min_vtr >0: F=F[F["vtr_avg"].fillna(0)         >=min_vtr/100]
 F=F.copy()
-F["_sk"]=F["platform"].apply(lambda p:sk(p,sel_m))
-F["ecpm_s"]=F["ecpm_eff"]*F["_sk"]
+F["_sk"]   = F["platform"].apply(lambda p:sk(p,sel_m))
+F["ecpm_s"]= F["ecpm_eff"]*F["_sk"]
 
 # ─── SCORING ──────────────────────────────────────────────────────────────────
 def ncol(s,inv=False):
@@ -456,25 +447,26 @@ else:
 # ─── HEADER ───────────────────────────────────────────────────────────────────
 st.markdown(
     '<div class="hdr">'
-    '<div style="display:flex;align-items:baseline;gap:10px">'
+    '<div style="display:flex;align-items:baseline;gap:8px">'
     '<span class="hdr-title">Format Selector</span>'
     '<span class="hdr-sub">Анализ рекламных форматов</span>'
     '</div></div>',
     unsafe_allow_html=True)
 
-# ─── KPI ──────────────────────────────────────────────────────────────────────
-top=F.iloc[0] if len(F)>0 else None
-avg_e=F["ecpm_s"].mean() if len(F)>0 else np.nan
-sk0=float(F["_sk"].iloc[0]) if len(F)>0 else 1.
-maxr=F["max_reach"].max() if len(F)>0 else np.nan
-lbl2="Лучший по скорингу" if scoring else "Самый дешевый eCPM"
-top_name=sv(top.get("format_name","—")) if top is not None else "—"
-top_sub=(f'Скор: {top["score"]:.0f}' if scoring and top is not None and not pd.isna(top.get("score",np.nan))
-         else sv(top.get("buy_model","—")) if top is not None else "")
-sk0_d=str(int(sk0)) if sk0==int(sk0) else f"{sk0:.1f}".replace(".",",")
+# ─── KPI — 4 cards, colored dot as directional signal ─────────────────────────
+top    = F.iloc[0] if len(F)>0 else None
+avg_e  = F["ecpm_s"].mean() if len(F)>0 else np.nan
+sk0    = float(F["_sk"].iloc[0]) if len(F)>0 else 1.
+maxr   = F["max_reach"].max() if len(F)>0 else np.nan
+lbl2   = "Лучший по скорингу" if scoring else "Самый дешевый eCPM"
+top_nm = sv(top.get("format_name","—")) if top is not None else "—"
+top_sb = (f'Скор: {top["score"]:.0f}' if scoring and top is not None and not pd.isna(top.get("score",np.nan))
+          else sv(top.get("buy_model","—")) if top is not None else "")
+sk0_d  = str(int(sk0)) if sk0==int(sk0) else f"{sk0:.1f}".replace(".",",")
 
 st.markdown(
     f'<div class="kpi-row">'
+
     f'<div class="kpi-card">'
     f'<div class="kpi-label">Форматов после фильтров</div>'
     f'<div class="kpi-value">{len(F)}</div>'
@@ -482,8 +474,8 @@ st.markdown(
 
     f'<div class="kpi-card">'
     f'<div class="kpi-label">{lbl2}</div>'
-    f'<div class="kpi-value text">{top_name}</div>'
-    f'<div class="kpi-sub">{top_sub}</div></div>'
+    f'<div class="kpi-value text">{top_nm}</div>'
+    f'<div class="kpi-sub">{top_sb}</div></div>'
 
     f'<div class="kpi-card">'
     f'<div class="kpi-label">Средний eCPM</div>'
@@ -494,19 +486,20 @@ st.markdown(
     f'<div class="kpi-label">Макс. охват</div>'
     f'<div class="kpi-value">{reach_s(maxr)}</div>'
     f'<div class="kpi-sub">среди отфильтрованных</div></div>'
+
     f'</div>',
     unsafe_allow_html=True)
 
 # ─── TABLE ────────────────────────────────────────────────────────────────────
 st.markdown('<span class="sec-label">Форматы</span>', unsafe_allow_html=True)
 
-# Handle row selection via query params (set by JS click handler)
-qp=st.query_params
+# Row selection via query params
+qp = st.query_params
 if "_row" in qp:
     try:
-        ni=int(str(qp["_row"]))
-        if st.session_state.get("_sel")!=ni:
-            st.session_state["_sel"]=ni
+        ni = int(str(qp["_row"]))
+        if st.session_state.get("_sel") != ni:
+            st.session_state["_sel"] = ni
             st.rerun()
     except: pass
 
@@ -521,17 +514,22 @@ else:
     def type_tags(c):
         if not isinstance(c,list): return ""
         return "".join(f'<span class="tag {"tag-v" if t=="Видео" else "tag-b"}">{t}</span>' for t in c)
+
     def mtag(v):
         return f'<span class="tag {"tag-cpc" if str(v).upper()=="CPC" else "tag-cpm"}">{v}</span>'
+
     def dtags(c):
-        if not isinstance(c,list): return '<span style="color:rgba(7,0,55,.14)">—</span>'
+        if not isinstance(c,list): return '<span style="color:#D0D0DC">—</span>'
         return " ".join(f'<span class="tag">{d}</span>' for d in c)
-    def bar(val,mx,label):
-        if label=="—": return '<span style="color:rgba(7,0,55,.18);font-size:10px">—</span>'
+
+    def bar(val, mx, label):
+        if label=="—": return '<span style="color:#D0D0DC;font-size:11px">—</span>'
         try: pw=min(float(val)/float(mx)*100,100)
         except: pw=0
-        return (f'<div class="bw"><div class="bb"><div class="bf" style="width:{pw:.1f}%"></div></div>'
+        return (f'<div class="bw"><div class="bb">'
+                f'<div class="bf" style="width:{pw:.1f}%"></div></div>'
                 f'<span class="bv">{label}</span></div>')
+
     def spill(s):
         try:
             v=float(s); assert not np.isnan(v)
@@ -539,13 +537,13 @@ else:
             return f'<span class="sc-pill {cls}">{v:.0f}</span>'
         except: return ""
 
-    sel_idx=st.session_state.get("_sel")
-    last_hdr="<th>Скор</th>" if scoring else "<th>eCPM (сез.)</th>"
+    sel_idx = st.session_state.get("_sel")
+    last_hdr = "<th>Скор</th>" if scoring else "<th>eCPM (сез.)</th>"
     rows=""
     for i,(_,row) in enumerate(F.iterrows()):
         sc=" sel" if sel_idx==i else ""
-        ltd=(spill(row.get("score",np.nan)) if scoring else
-             f'<span style="font-family:DM Mono,monospace;font-size:12px">{rub(row.get("ecpm_s",np.nan))}</span>')
+        ltd = (spill(row.get("score",np.nan)) if scoring else
+               f'<span style="font-family:var(--mono);font-size:12px">{rub(row.get("ecpm_s",np.nan))}</span>')
         rows+=(
             f'<tr class="{sc}" data-i="{i}">'
             f'<td><div class="fn">{row["format_name"]}</div><div class="fid">{row["format_id"]}</div></td>'
@@ -565,9 +563,8 @@ else:
         f'</tr></thead><tbody>{rows}</tbody></table></div>',
         unsafe_allow_html=True)
 
-    # JS click → query param → rerun (no extra UI)
-    components.html("""
-<script>
+    # JS click → query_params → rerun
+    components.html("""<script>
 (function() {
   function attach() {
     var rows = window.parent.document.querySelectorAll('.fmt-tbl tbody tr[data-i]');
@@ -575,27 +572,23 @@ else:
       if (tr._ok) return;
       tr._ok = true;
       tr.addEventListener('click', function() {
-        var idx = tr.getAttribute('data-i');
         var url = new URL(window.parent.location.href);
-        url.searchParams.set('_row', idx);
+        url.searchParams.set('_row', tr.getAttribute('data-i'));
         window.parent.history.pushState({}, '', url.toString());
         window.parent.dispatchEvent(new PopStateEvent('popstate', {state:{}}));
       });
     });
   }
   attach();
-  new MutationObserver(attach).observe(
-    window.parent.document.body, {childList:true, subtree:true}
-  );
+  new MutationObserver(attach).observe(window.parent.document.body, {childList:true, subtree:true});
 })();
-</script>
-""", height=0, scrolling=False)
+</script>""", height=0, scrolling=False)
 
-    # ─── CARD ─────────────────────────────────────────────────────────────────
-    ci=st.session_state.get("_sel")
+    # ─── DETAIL PANEL ─────────────────────────────────────────────────────────
+    ci = st.session_state.get("_sel")
     if ci is not None and 0<=ci<len(F):
-        r=F.iloc[ci]
-        def gf(field,default=np.nan):
+        r = F.iloc[ci]
+        def gf(field, default=np.nan):
             val=r.get(field,default)
             if val is None: return default
             try:
@@ -626,17 +619,16 @@ else:
                 links+=f'<a class="card-link" href="{v}" target="_blank">{lbl_} ↗</a>'
 
         grid=(
-            f'<div class="metric-box"><div class="metric-lbl">eCPM (факт)</div><div class="metric-val">{rub(ee)}</div></div>'
-            f'<div class="metric-box"><div class="metric-lbl">eCPM (сезон. {scd}×)</div><div class="metric-val">{rub(es2)}</div></div>'
+            f'<div class="metric-box"><div class="metric-lbl">eCPM факт</div><div class="metric-val">{rub(ee)}</div></div>'
+            f'<div class="metric-box"><div class="metric-lbl">eCPM сезон. {scd}×</div><div class="metric-val">{rub(es2)}</div></div>'
             f'<div class="metric-box"><div class="metric-lbl">Скидка</div><div class="metric-val">{pct(gf("discount"))}</div></div>'
-            f'<div class="metric-box"><div class="metric-lbl">Охват (макс.)</div><div class="metric-val">{reach_s(gf("max_reach"))}</div></div>'
-            f'<div class="metric-box"><div class="metric-lbl">CTR (среднее)</div><div class="metric-val">{pct(gf("ctr_avg"))}</div></div>'
-            f'<div class="metric-box"><div class="metric-lbl">VTR (среднее)</div><div class="metric-val">{pct(gf("vtr_avg"))}</div></div>'
+            f'<div class="metric-box"><div class="metric-lbl">Охват макс.</div><div class="metric-val">{reach_s(gf("max_reach"))}</div></div>'
+            f'<div class="metric-box"><div class="metric-lbl">CTR среднее</div><div class="metric-val">{pct(gf("ctr_avg"))}</div></div>'
+            f'<div class="metric-box"><div class="metric-lbl">VTR среднее</div><div class="metric-val">{pct(gf("vtr_avg"))}</div></div>'
             f'<div class="metric-box"><div class="metric-lbl">Viewability</div><div class="metric-val">{pct(gf("viewability_avg"))}</div></div>'
             f'<div class="metric-box"><div class="metric-lbl">Комиссия</div><div class="metric-val">{pct(gf("commission"))}</div></div>'
             f'<div class="metric-box"><div class="metric-lbl">Мин. бюджет</div><div class="metric-val">{rub(gf("min_budget"))}</div></div>'
         )
-
         il=(
             '<div class="c-sec">Ценовой диапазон</div>'
             f'<div class="info-row"><span class="info-lbl">CPM мин / сред / макс</span>'
@@ -660,10 +652,8 @@ else:
             '<div class="c-sec">Производство</div><div class="tags-row">'+th(gf("production",[]))+'</div>'
         )
 
-        # Terms inline
         terms=""
-        for tlbl,tkey in [("Условия Brand Lift","bls_terms"),
-                           ("Условия Sales Lift","sales_lift_terms"),
+        for tlbl,tkey in [("Условия Brand Lift","bls_terms"),("Условия Sales Lift","sales_lift_terms"),
                            ("Условия сезонности","seasonality_terms")]:
             v=gf(tkey,"")
             if isinstance(v,str) and v.strip():
@@ -693,22 +683,21 @@ if len(F)>0:
         cdf=F[F["ecpm_s"].notna()].sort_values("ecpm_s",ascending=False).head(12)
         if len(cdf)>0:
             cp=cdf.sort_values("ecpm_s"); n=len(cp)
-            clrs=[f"rgba(62,32,255,{.28+.72*i/max(n-1,1):.2f})" for i in range(n)]
+            clrs=[f"rgba(114,91,255,{.3+.7*i/max(n-1,1):.2f})" for i in range(n)]
             fig1=go.Figure(go.Bar(
                 x=cp["ecpm_s"].round(0), y=cp["format_name"], orientation="h",
                 marker_color=clrs, marker_line_width=0,
                 text=cp["ecpm_s"].round(0).astype(int).astype(str)+" ₽",
-                textposition="outside", textfont=dict(size=9,color="rgba(7,0,55,.38)"),
+                textposition="outside", textfont=dict(size=9,color="#B1B4B8"),
                 hovertemplate="<b>%{y}</b><br>eCPM: <b>%{x:.0f} ₽</b><extra></extra>"))
             fig1.update_layout(
-                title=dict(text="eCPM по форматам, ₽ (с сезонностью)",
-                           font=dict(size=10,color="rgba(7,0,55,.4)")),
+                title=dict(text="eCPM по форматам, ₽",font=dict(size=11,color="#B1B4B8",family="Inter")),
                 height=max(260,n*30+60), margin=dict(l=0,r=65,t=36,b=4),
-                paper_bgcolor="white", plot_bgcolor="white",
-                xaxis=dict(gridcolor="rgba(7,0,55,.055)",tickfont_size=9,
-                           tickfont_color="rgba(7,0,55,.3)",zeroline=False,title=None),
-                yaxis=dict(tickfont_size=10,tickfont_color="#070037",title=None,tickmode="linear"),
-                font_family="DM Sans", bargap=0.3)
+                paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+                xaxis=dict(gridcolor="#F2F2F8",tickfont_size=10,
+                           tickfont_color="#B1B4B8",zeroline=False,title=None),
+                yaxis=dict(tickfont_size=11,tickfont_color="#070037",title=None,tickmode="linear"),
+                font_family="Inter", bargap=0.3)
             st.plotly_chart(fig1,use_container_width=True,config={"displayModeBar":False})
     with c2:
         sdf=F[F["ecpm_s"].notna()&F["ctr_avg"].notna()].copy()
@@ -720,10 +709,10 @@ if len(F)>0:
                 fig2.add_trace(go.Scatter(
                     x=[float(row["ctr_avg"])*100], y=[float(row["ecpm_s"])],
                     mode="markers+text",
-                    marker=dict(size=row["bsz"],color="#725BFF",opacity=.72,
+                    marker=dict(size=row["bsz"],color="#725BFF",opacity=.7,
                                 line=dict(color="white",width=1.5)),
                     text=[row["format_name"]], textposition="top center",
-                    textfont=dict(size=8,color="rgba(7,0,55,.5)"),
+                    textfont=dict(size=9,color="#B1B4B8"),
                     hovertemplate=(
                         f"<b>{row['format_name']}</b><br>"
                         f"CTR: <b>{float(row['ctr_avg'])*100:.2f}%</b><br>"
@@ -731,15 +720,12 @@ if len(F)>0:
                         f"Охват: {reach_s(row.get('max_reach'))}<extra></extra>"),
                     showlegend=False))
             fig2.update_layout(
-                title=dict(text="CTR vs eCPM (размер пузыря — охват)",
-                           font=dict(size=10,color="rgba(7,0,55,.4)")),
+                title=dict(text="CTR vs eCPM",font=dict(size=11,color="#B1B4B8",family="Inter")),
                 height=max(260,len(sdf)*30+60), margin=dict(l=0,r=10,t=36,b=4),
-                paper_bgcolor="white", plot_bgcolor="white",
-                xaxis=dict(title="CTR, %",gridcolor="rgba(7,0,55,.055)",tickfont_size=9,
-                           title_font_size=9,tickfont_color="rgba(7,0,55,.3)",
-                           title_font_color="rgba(7,0,55,.3)",zeroline=False),
-                yaxis=dict(title="eCPM, ₽",gridcolor="rgba(7,0,55,.055)",tickfont_size=9,
-                           title_font_size=9,tickfont_color="rgba(7,0,55,.3)",
-                           title_font_color="rgba(7,0,55,.3)",zeroline=False),
-                font_family="DM Sans")
+                paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+                xaxis=dict(title="CTR, %",gridcolor="#F2F2F8",tickfont_size=10,title_font_size=10,
+                           tickfont_color="#B1B4B8",title_font_color="#B1B4B8",zeroline=False),
+                yaxis=dict(title="eCPM, ₽",gridcolor="#F2F2F8",tickfont_size=10,title_font_size=10,
+                           tickfont_color="#B1B4B8",title_font_color="#B1B4B8",zeroline=False),
+                font_family="Inter")
             st.plotly_chart(fig2,use_container_width=True,config={"displayModeBar":False})
