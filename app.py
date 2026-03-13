@@ -80,8 +80,20 @@ html,body,.main,.stApp { background:var(--bg) !important; }
 [data-testid="stSidebar"] .stCheckbox label { font-size:13px !important; color:var(--dark) !important; }
 [data-testid="stSidebar"] .stToggle label  { font-size:13px !important; color:var(--dark) !important; }
 
-/* Sidebar layout */
-.sb-body  { padding:0 1.25rem 2.5rem; }
+/* Sidebar layout — padding via CSS on Streamlit's own inner elements */
+/* stSidebarContent is the scrollable wrapper Streamlit generates */
+[data-testid="stSidebarContent"],
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"],
+[data-testid="stSidebar"] .stMainBlockContainer {
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
+  padding-bottom: 2rem !important;
+}
+/* Also target the stSidebar inner div that Streamlit uses as scroll container */
+[data-testid="stSidebar"] > div > div > div {
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
+}
 .sb-rule  { border:none; border-top:1px solid var(--border); margin:14px 0; }
 .sb-sec   {
   display:block; font-size:10px !important; font-weight:700; letter-spacing:.11em;
@@ -317,8 +329,6 @@ def opts(did): return di[di["dict_id"]==did]["item_name"].dropna().tolist()
 with st.sidebar:
     # Padding injected here via HTML — Streamlit can't be blocked from
     # resetting its own .block-container padding, so we wrap in a div
-    st.markdown('<div class="sb-body">', unsafe_allow_html=True)
-
     def sec(t): st.markdown(f'<span class="sb-sec">{t}</span>', unsafe_allow_html=True)
     def rule():  st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
 
@@ -388,20 +398,8 @@ with st.sidebar:
             "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
     sel_m=st.selectbox("_mo",months,index=months.index("Март"),label_visibility="collapsed")
 
-    st.markdown('</div>', unsafe_allow_html=True)
 
-# Inject sidebar padding fix via components — runs in parent frame context
-components.html("""
-<script>
-(function patchSidebar() {
-  var sb = window.parent.document.querySelector('[data-testid="stSidebar"] .block-container');
-  if (!sb) { setTimeout(patchSidebar, 100); return; }
-  sb.style.setProperty('padding', '0', 'important');
-  var wrap = window.parent.document.querySelector('.sb-body');
-  if (wrap) wrap.style.setProperty('padding', '0 1.25rem 2.5rem', 'important');
-})();
-</script>
-""", height=0, scrolling=False)
+
 
 # ─── FILTER ───────────────────────────────────────────────────────────────────
 def has(c,i): return isinstance(c,list) and any(x in c for x in i)
