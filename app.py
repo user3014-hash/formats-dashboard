@@ -28,20 +28,25 @@ html, body { background: var(--bg) !important; }
 .main      { background: var(--bg) !important; }
 .main .block-container { padding: 1.5rem 2rem 3rem !important; max-width: 1440px; }
 
-/* ── sidebar shell – white with right border ── */
+/* ── sidebar shell – fixed width, white, right border ── */
 section[data-testid="stSidebar"] {
     background: var(--white) !important;
     border-right: 1px solid var(--border) !important;
     box-shadow: none !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+    width: 260px !important;
 }
+section[data-testid="stSidebar"] [data-testid="stSidebarResizeHandle"] { display: none !important; }
 /* inner Streamlit padding override */
 section[data-testid="stSidebar"] > div:first-child { padding: 0 !important; }
 section[data-testid="stSidebar"] .block-container  { padding: 0 !important; max-width: none !important; }
 
-/* all text inside sidebar */
+/* all text inside sidebar — same size as main panel */
 section[data-testid="stSidebar"] * {
     color: var(--dark) !important;
     font-family: 'DM Sans', sans-serif !important;
+    font-size: 14px !important;
 }
 
 /* select boxes inside sidebar */
@@ -490,13 +495,16 @@ if len(F) > 0:
                 y=cdf_plot["format_name"],
                 orientation="h",
                 marker_color=cols, marker_line_width=0,
-                hovertemplate="<b>%{y}</b><br>eCPM: %{x:.0f} ₽<extra></extra>"
+                hovertemplate="<b>%{y}</b><br>eCPM: <b>%{x:.0f} ₽</b><extra></extra>",
+                text=cdf_plot["ecpm_s"].round(0).astype(int).astype(str) + " ₽",
+                textposition="outside",
+                textfont=dict(size=9, color="rgba(7,0,55,0.55)")
             ))
             fig1.update_layout(
                 title=dict(text="eCPM по форматам (₽, с сезонностью)",
                            font=dict(size=10, color="rgba(7,0,55,.42)", family="DM Sans")),
                 height=max(220, n*26+50),
-                margin=dict(l=0,r=10,t=34,b=4),
+                margin=dict(l=0,r=55,t=34,b=4),
                 paper_bgcolor="white", plot_bgcolor="white",
                 xaxis=dict(gridcolor="rgba(7,0,55,.06)", tickfont_size=9,
                            tickfont_color="rgba(7,0,55,.4)", zeroline=False, title=None),
@@ -528,11 +536,12 @@ if len(F) > 0:
                                 line=dict(color="white", width=1.5)),
                     text=[row["format_name"]],
                     textposition="top center",
-                    textfont=dict(size=8, color="#070037"),
+                    textfont=dict(size=8, color="rgba(7,0,55,0.65)"),
                     hovertemplate=(
                         f"<b>{row['format_name']}</b><br>"
-                        f"CTR: {float(row['ctr_avg'])*100:.2f}%<br>"
-                        f"eCPM: {float(row['ecpm_s']):.0f} ₽<extra></extra>"),
+                        f"CTR: <b>{float(row['ctr_avg'])*100:.2f}%</b><br>"
+                        f"eCPM: <b>{float(row['ecpm_s']):.0f} ₽</b><br>"
+                        f"Охват: {reach_s(row.get('max_reach'))}<extra></extra>"),
                     showlegend=False
                 ))
             fig2.update_layout(
@@ -560,24 +569,49 @@ if len(F) == 0:
     st.markdown('<div class="no-res">Нет форматов, соответствующих выбранным фильтрам.</div>',
                 unsafe_allow_html=True)
 else:
-    # Build display dataframe – text columns so we can format nicely
+    # ── ProgressColumn table: visual bars + checkbox row selection ──
     def _list(c): return ", ".join(c) if isinstance(c, list) else ""
-    def _sc(s):
-        try: return "" if pd.isna(s) else f"{s:.0f}"
-        except: return ""
+
+    max_reach_v = float(df["max_reach"].max()) if df["max_reach"].notna().any() else 1.0
+    max_ecpm_v  = float(F["ecpm_s"].max())     if F["ecpm_s"].notna().any()     else 1.0
+    max_ctr_v   = 5.0   # cap at 5% for bar scale
 
     disp = pd.DataFrame({
-        "Формат":     F["format_name"],
-        "ID":         F["format_id"],
-        "Тип":        F["format_type"].apply(_list),
-        "Модель":     F["buy_model"],
-        "Устройства": F["device"].apply(_list),
-        "Охват":      F["max_reach"].apply(reach_s),
-        "CTR":        F["ctr_avg"].apply(pct),
-        "Viewability":F["viewability_avg"].apply(pct),
-        "eCPM (сез.)":F["ecpm_s"].apply(rub),
+        "Формат":      F["format_name"].values,
+        "ID":          F["format_id"].values,
+        "Тип":         F["format_type"].apply(_list).values,
+        "Модель":      F["buy_model"].values,
+        "Устройства":  F["device"].apply(_list).values,
+        "Охват":       (F["max_reach"] / max_reach_v * 100).fillna(0).values,
+        "CTR":         (F["ctr_avg"]   * 100).fillna(0).values,
+        "Viewability": (F["viewability_avg"] * 100).fillna(0).values,
+        "eCPM":        F["ecpm_s"].fillna(0).values,
     })
-    if scoring: disp["Скор"] = F["score"].apply(_sc)
+    if scoring:
+        disp["Скор"] = F["score"].fillna(0).values
+
+    col_cfg = {
+        "Формат":      st.column_config.TextColumn(width="large"),
+        "ID":          st.column_config.TextColumn(width="small"),
+        "Тип":         st.column_config.TextColumn(width="small"),
+        "Модель":      st.column_config.TextColumn(width="small"),
+        "Устройства":  st.column_config.TextColumn(width="medium"),
+        "Охват":       st.column_config.ProgressColumn(
+                           "Охват", min_value=0, max_value=100,
+                           format="%.1f%%", width="medium"),
+        "CTR":         st.column_config.ProgressColumn(
+                           "CTR", min_value=0, max_value=max_ctr_v,
+                           format="%.2f%%", width="small"),
+        "Viewability": st.column_config.ProgressColumn(
+                           "Viewability", min_value=0, max_value=100,
+                           format="%.0f%%", width="small"),
+        "eCPM":        st.column_config.ProgressColumn(
+                           "eCPM (сез.)", min_value=0, max_value=max_ecpm_v,
+                           format="%.0f ₽", width="small"),
+    }
+    if scoring:
+        col_cfg["Скор"] = st.column_config.ProgressColumn(
+            "Скор", min_value=0, max_value=100, format="%.0f", width="small")
 
     ev = st.dataframe(
         disp,
@@ -585,19 +619,8 @@ else:
         hide_index=True,
         on_select="rerun",
         selection_mode="single-row",
-        column_config={
-            "Формат":      st.column_config.TextColumn(width="large"),
-            "ID":          st.column_config.TextColumn(width="small"),
-            "Тип":         st.column_config.TextColumn(width="small"),
-            "Модель":      st.column_config.TextColumn(width="small"),
-            "Устройства":  st.column_config.TextColumn(width="medium"),
-            "Охват":       st.column_config.TextColumn(width="small"),
-            "CTR":         st.column_config.TextColumn(width="small"),
-            "Viewability": st.column_config.TextColumn(width="small"),
-            "eCPM (сез.)": st.column_config.TextColumn(width="small"),
-            **({"Скор": st.column_config.TextColumn(width="small")} if scoring else {}),
-        },
-        height=min(560, (len(F)+1)*38+2),
+        column_config=col_cfg,
+        height=min(560, (len(F)+1)*44+2),
         key="main_tbl",
     )
 
