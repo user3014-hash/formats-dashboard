@@ -309,7 +309,10 @@ def build_dict_aggregates(format_items: pd.DataFrame, dict_items: pd.DataFrame) 
             continue
         if "name" in low or "title" in low:
             continue
-        if any(token in low for token in ["markup", "percent", "coef", "coefficient", "value", "amount", "price", "rate", "surcharge"]):
+        if any(
+            token in low
+            for token in ["markup", "percent", "coef", "coefficient", "value", "amount", "price", "rate", "surcharge"]
+        ):
             value_candidate_cols.append(col)
 
     unit_candidate_cols = []
@@ -636,16 +639,19 @@ def inject_styles() -> None:
         """
         <style>
         :root {
-            --bg: #F8F2FF;
+            --page-bg: linear-gradient(180deg, rgba(248,242,255,0.42) 0%, rgba(255,255,255,0.78) 100%);
             --card: #FFFFFF;
             --text: #070037;
             --muted: rgba(7, 0, 55, 0.62);
+            --muted-2: rgba(7, 0, 55, 0.48);
             --accent: #3E20FF;
             --accent-hover: #A35AFF;
             --soft: #D7B8FF;
-            --soft-bg: #F8F2FF;
-            --line: rgba(215, 184, 255, 0.8);
-            --line-soft: rgba(215, 184, 255, 0.55);
+            --soft-bg: rgba(248, 242, 255, 0.72);
+            --soft-bg-2: rgba(248, 242, 255, 0.48);
+            --line: rgba(215, 184, 255, 0.42);
+            --line-2: rgba(215, 184, 255, 0.26);
+            --line-3: rgba(215, 184, 255, 0.18);
             --radius-card: 16px;
             --radius-card-lg: 18px;
             --radius-input: 10px;
@@ -659,8 +665,15 @@ def inject_styles() -> None:
             font-variant-numeric: tabular-nums;
         }
 
+        body {
+            background: #FFFFFF;
+        }
+
         .stApp {
-            background: var(--bg);
+            background:
+                radial-gradient(circle at top left, rgba(215,184,255,0.16), transparent 38%),
+                radial-gradient(circle at top right, rgba(215,184,255,0.10), transparent 32%),
+                linear-gradient(180deg, rgba(248,242,255,0.58) 0%, rgba(255,255,255,0.94) 28%, #FFFFFF 100%);
         }
 
         .block-container {
@@ -672,13 +685,13 @@ def inject_styles() -> None:
         }
 
         section[data-testid="stSidebar"] {
-            background: var(--bg);
-            border-right: 1px solid #D7B8FF;
+            background: linear-gradient(180deg, rgba(248,242,255,0.72) 0%, rgba(255,255,255,0.96) 100%);
+            border-right: 1px solid rgba(215, 184, 255, 0.34);
         }
 
         section[data-testid="stSidebar"] > div {
             padding-top: 20px;
-            padding-bottom: 20px;
+            padding-bottom: 22px;
             padding-left: 16px;
             padding-right: 16px;
         }
@@ -694,28 +707,28 @@ def inject_styles() -> None:
             font-weight: 700;
             line-height: 1.2;
             color: var(--text);
-            margin: 0 0 16px 0;
+            margin: 0 0 18px 0;
         }
 
         .sidebar-section-title {
             font-size: 14px;
             font-weight: 700;
-            line-height: 1.35;
+            line-height: 1.3;
             color: var(--text);
-            margin: 16px 0 10px 0;
+            margin: 22px 0 10px 0;
         }
 
         .sidebar-note {
             font-size: 12px;
-            line-height: 1.45;
+            line-height: 1.4;
             color: var(--muted);
             margin: 8px 0 0 0;
         }
 
         .sidebar-divider {
             height: 1px;
-            background: rgba(215, 184, 255, 0.7);
-            margin: 14px 0 14px 0;
+            background: rgba(215, 184, 255, 0.22);
+            margin: 18px 0 18px 0;
         }
 
         div[data-baseweb="select"] > div,
@@ -723,8 +736,8 @@ def inject_styles() -> None:
         .stNumberInput > div > div,
         .stTextInput > div > div {
             min-height: 42px !important;
-            background: #FFFFFF !important;
-            border: 1px solid #D7B8FF !important;
+            background: rgba(255,255,255,0.96) !important;
+            border: 1px solid rgba(215, 184, 255, 0.44) !important;
             border-radius: 10px !important;
             box-shadow: none !important;
         }
@@ -733,7 +746,7 @@ def inject_styles() -> None:
         div[data-baseweb="input"] > div:hover,
         .stNumberInput > div > div:hover,
         .stTextInput > div > div:hover {
-            border-color: #A35AFF !important;
+            border-color: rgba(163, 90, 255, 0.72) !important;
         }
 
         div[data-baseweb="select"] *:focus,
@@ -746,8 +759,8 @@ def inject_styles() -> None:
 
         div[data-baseweb="tag"] {
             border-radius: 999px !important;
-            background: #F8F2FF !important;
-            border: 1px solid #D7B8FF !important;
+            background: rgba(248,242,255,0.72) !important;
+            border: 1px solid rgba(215,184,255,0.44) !important;
             color: #070037 !important;
         }
 
@@ -755,8 +768,12 @@ def inject_styles() -> None:
             font-size: 14px !important;
         }
 
+        .stCheckbox [data-testid="stWidgetLabel"] {
+            margin-bottom: 4px !important;
+        }
+
         div[data-testid="stSlider"] [data-baseweb="slider"] > div > div:nth-child(1) {
-            background: #D7B8FF !important;
+            background: rgba(215,184,255,0.72) !important;
             height: 4px !important;
         }
 
@@ -785,6 +802,7 @@ def inject_styles() -> None:
             background: #3E20FF;
             color: #FFFFFF;
             font-weight: 600;
+            font-size: 14px;
             box-shadow: none;
         }
 
@@ -802,13 +820,13 @@ def inject_styles() -> None:
         }
 
         .ghost-btn button {
-            background: #FFFFFF !important;
+            background: rgba(255,255,255,0.95) !important;
             color: #3E20FF !important;
-            border: 1px solid #D7B8FF !important;
+            border: 1px solid rgba(215,184,255,0.46) !important;
         }
 
         .ghost-btn button:hover {
-            border-color: #A35AFF !important;
+            border-color: rgba(163,90,255,0.72) !important;
             color: #A35AFF !important;
         }
 
@@ -818,26 +836,28 @@ def inject_styles() -> None:
 
         .header-card,
         .white-card,
-        .format-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(215, 184, 255, 0.8);
+        .format-card,
+        .table-shell {
+            background: rgba(255,255,255,0.96);
+            border: 1px solid rgba(215, 184, 255, 0.38);
             border-radius: 16px;
+            backdrop-filter: blur(2px);
         }
 
         .header-card {
-            padding: 24px;
+            padding: 20px 24px;
         }
 
         .header-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
-            gap: 20px;
-            align-items: start;
+            gap: 14px 18px;
+            align-items: center;
         }
 
         .page-title {
             margin: 0;
-            font-size: 30px;
+            font-size: 29px;
             font-weight: 700;
             line-height: 1.08;
             letter-spacing: -0.02em;
@@ -845,32 +865,34 @@ def inject_styles() -> None:
         }
 
         .page-subtitle {
-            margin: 8px 0 0 0;
+            margin: 6px 0 0 0;
             font-size: 14px;
             line-height: 1.5;
             color: rgba(7, 0, 55, 0.62);
-            max-width: 760px;
+            max-width: 600px;
         }
 
         .status-pills {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             justify-content: flex-end;
+            align-items: center;
         }
 
         .status-pill {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            height: 36px;
-            padding: 0 12px;
+            height: 33px;
+            padding: 0 11px;
             border-radius: 999px;
-            border: 1px solid #D7B8FF;
-            background: #FFFFFF;
-            color: #070037;
-            font-size: 13px;
+            border: 1px solid rgba(215, 184, 255, 0.42);
+            background: rgba(255,255,255,0.92);
+            color: rgba(7, 0, 55, 0.82);
+            font-size: 12px;
             font-weight: 600;
+            line-height: 1;
             white-space: nowrap;
         }
 
@@ -881,24 +903,24 @@ def inject_styles() -> None:
         }
 
         .kpi-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(215, 184, 255, 0.8);
+            background: rgba(255,255,255,0.98);
+            border: 1px solid rgba(215, 184, 255, 0.34);
             border-radius: 16px;
-            padding: 20px;
-            min-height: 116px;
+            padding: 16px 18px;
+            min-height: 100px;
         }
 
         .kpi-label {
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.35;
             font-weight: 600;
-            color: rgba(7, 0, 55, 0.62);
-            margin-bottom: 14px;
+            color: rgba(7, 0, 55, 0.56);
+            margin-bottom: 16px;
         }
 
         .kpi-value {
-            font-size: 32px;
-            line-height: 1.08;
+            font-size: 30px;
+            line-height: 1.05;
             font-weight: 700;
             color: #070037;
             letter-spacing: -0.02em;
@@ -909,11 +931,11 @@ def inject_styles() -> None:
             align-items: end;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 17px;
             line-height: 1.2;
             font-weight: 700;
             color: #070037;
@@ -921,9 +943,9 @@ def inject_styles() -> None:
         }
 
         .section-hint {
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.4;
-            color: rgba(7, 0, 55, 0.62);
+            color: rgba(7, 0, 55, 0.54);
             margin: 0;
         }
 
@@ -934,29 +956,29 @@ def inject_styles() -> None:
         }
 
         .top-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(215, 184, 255, 0.9);
+            background: rgba(255,255,255,0.98);
+            border: 1px solid rgba(215, 184, 255, 0.36);
             border-radius: 16px;
-            padding: 18px;
-            min-height: 168px;
-            transition: border-color 0.15s ease, background 0.15s ease;
+            padding: 16px;
+            min-height: 152px;
+            transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
         }
 
         .top-card:hover {
-            border-color: #A35AFF;
-            background: #FFFFFF;
+            border-color: rgba(163, 90, 255, 0.56);
+            transform: translateY(-1px);
         }
 
         .top-card-header {
             display: flex;
             align-items: start;
             justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 7px;
         }
 
         .top-card-title {
-            font-size: 22px;
+            font-size: 19px;
             line-height: 1.15;
             font-weight: 700;
             color: #070037;
@@ -967,55 +989,54 @@ def inject_styles() -> None:
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 64px;
-            height: 32px;
-            padding: 0 12px;
+            min-width: 58px;
+            height: 29px;
+            padding: 0 10px;
             border-radius: 999px;
-            background: #F8F2FF;
-            border: 1px solid #D7B8FF;
+            background: rgba(248,242,255,0.76);
+            border: 1px solid rgba(215,184,255,0.42);
             color: #3E20FF;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             white-space: nowrap;
+            flex: 0 0 auto;
         }
 
         .top-descriptor {
             font-size: 13px;
-            line-height: 1.45;
-            color: rgba(7, 0, 55, 0.62);
-            margin: 0 0 14px 0;
+            line-height: 1.4;
+            color: rgba(7, 0, 55, 0.56);
+            margin: 0 0 12px 0;
         }
 
         .mini-stats-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px 12px;
+            gap: 8px 10px;
         }
 
         .mini-stat {
-            background: #F8F2FF;
+            background: rgba(248,242,255,0.44);
+            border: 1px solid rgba(215,184,255,0.16);
             border-radius: 12px;
-            padding: 10px 12px;
+            padding: 10px 11px;
         }
 
         .mini-stat-label {
-            font-size: 12px;
-            line-height: 1.35;
-            color: rgba(7, 0, 55, 0.62);
-            margin-bottom: 6px;
+            font-size: 11px;
+            line-height: 1.3;
+            color: rgba(7, 0, 55, 0.50);
+            margin-bottom: 5px;
         }
 
         .mini-stat-value {
-            font-size: 16px;
-            line-height: 1.2;
+            font-size: 15px;
+            line-height: 1.15;
             font-weight: 700;
             color: #070037;
         }
 
-        .table-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(215, 184, 255, 0.8);
-            border-radius: 16px;
+        .table-shell {
             overflow: hidden;
         }
 
@@ -1024,13 +1045,14 @@ def inject_styles() -> None:
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            padding: 18px 20px 14px 20px;
-            border-bottom: 1px solid rgba(215, 184, 255, 0.55);
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(215, 184, 255, 0.22);
+            background: rgba(255,255,255,0.98);
         }
 
         .table-title {
             margin: 0;
-            font-size: 18px;
+            font-size: 17px;
             line-height: 1.2;
             font-weight: 700;
             color: #070037;
@@ -1038,9 +1060,13 @@ def inject_styles() -> None:
 
         .table-note {
             margin: 0;
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.4;
-            color: rgba(7, 0, 55, 0.62);
+            color: rgba(7, 0, 55, 0.56);
+        }
+
+        .table-inner {
+            padding: 2px 0 0 0;
         }
 
         div[data-testid="stDataFrame"] {
@@ -1056,12 +1082,12 @@ def inject_styles() -> None:
         }
 
         .format-card-wrap {
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .format-card-title {
-            margin: 0 0 14px 0;
-            font-size: 18px;
+            margin: 0 0 10px 0;
+            font-size: 17px;
             line-height: 1.2;
             font-weight: 700;
             color: #070037;
@@ -1069,13 +1095,19 @@ def inject_styles() -> None:
 
         .format-card {
             border-radius: 18px;
-            padding: 24px;
-            border: 1px solid rgba(215, 184, 255, 0.85);
+            padding: 22px 24px 24px 24px;
+            border: 1px solid rgba(215, 184, 255, 0.38);
+        }
+
+        .format-hero {
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(215, 184, 255, 0.18);
+            margin-bottom: 18px;
         }
 
         .format-name {
-            margin: 0 0 10px 0;
-            font-size: 30px;
+            margin: 0 0 8px 0;
+            font-size: 29px;
             line-height: 1.08;
             letter-spacing: -0.02em;
             font-weight: 700;
@@ -1085,33 +1117,48 @@ def inject_styles() -> None:
         .meta-row {
             font-size: 14px;
             line-height: 1.5;
-            color: rgba(7, 0, 55, 0.62);
-            margin-bottom: 20px;
+            color: rgba(7, 0, 55, 0.60);
+        }
+
+        .card-block {
+            margin-top: 18px;
+        }
+
+        .card-block:first-of-type {
+            margin-top: 0;
+        }
+
+        .card-block-title {
+            font-size: 14px;
+            line-height: 1.3;
+            font-weight: 700;
+            color: #070037;
+            margin: 0 0 8px 0;
         }
 
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px 12px;
         }
 
         .metric-box {
-            background: #F8F2FF;
+            background: rgba(248,242,255,0.50);
+            border: 1px solid rgba(215,184,255,0.16);
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 12px 14px;
         }
 
         .metric-box-label {
             font-size: 12px;
-            line-height: 1.35;
-            color: rgba(7, 0, 55, 0.62);
-            margin-bottom: 6px;
+            line-height: 1.3;
+            color: rgba(7, 0, 55, 0.52);
+            margin-bottom: 5px;
         }
 
         .metric-box-value {
-            font-size: 18px;
-            line-height: 1.2;
+            font-size: 17px;
+            line-height: 1.15;
             font-weight: 700;
             color: #070037;
         }
@@ -1121,11 +1168,11 @@ def inject_styles() -> None:
         }
 
         .subsection-title {
-            font-size: 14px;
-            line-height: 1.35;
+            font-size: 13px;
+            line-height: 1.3;
             font-weight: 700;
             color: #070037;
-            margin: 0 0 10px 0;
+            margin: 0 0 7px 0;
         }
 
         .body-text {
@@ -1138,26 +1185,26 @@ def inject_styles() -> None:
         .muted-empty {
             font-size: 14px;
             line-height: 1.5;
-            color: rgba(7, 0, 55, 0.62);
+            color: rgba(7, 0, 55, 0.56);
             margin: 0;
         }
 
         .pill-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         .pill {
             display: inline-flex;
             align-items: center;
-            min-height: 28px;
-            padding: 4px 10px;
+            min-height: 25px;
+            padding: 3px 8px;
             border-radius: 999px;
-            background: #F8F2FF;
-            border: 1px solid #D7B8FF;
-            color: #070037;
-            font-size: 12px;
+            background: rgba(248,242,255,0.56);
+            border: 1px solid rgba(215,184,255,0.30);
+            color: rgba(7, 0, 55, 0.88);
+            font-size: 11px;
             line-height: 1.2;
             font-weight: 500;
         }
@@ -1165,12 +1212,12 @@ def inject_styles() -> None:
         .link-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 7px;
         }
 
         .link-list a {
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.45;
             font-weight: 600;
             color: #3E20FF;
             text-decoration: none;
@@ -1182,11 +1229,11 @@ def inject_styles() -> None:
         }
 
         .empty-state {
-            background: #FFFFFF;
-            border: 1px dashed #D7B8FF;
+            background: rgba(255,255,255,0.96);
+            border: 1px dashed rgba(215,184,255,0.42);
             border-radius: 16px;
-            padding: 20px;
-            color: rgba(7, 0, 55, 0.62);
+            padding: 18px 20px;
+            color: rgba(7, 0, 55, 0.58);
             font-size: 14px;
             line-height: 1.5;
         }
@@ -1332,8 +1379,17 @@ def build_sidebar_state(df: pd.DataFrame) -> Tuple[Dict, bool, Dict[str, int]]:
     min_ctr = st.sidebar.number_input("Минимальный CTR", min_value=0.0, value=0.0, step=0.01, format="%.4f")
     min_vtr = st.sidebar.number_input("Минимальный VTR", min_value=0.0, value=0.0, step=0.01, format="%.4f")
     min_viewability = st.sidebar.number_input("Минимальный Viewability", min_value=0.0, value=0.0, step=0.01, format="%.4f")
-    max_ecpm_value = float(df["ecpm_discounted"].dropna().max()) if "ecpm_discounted" in df.columns and not df["ecpm_discounted"].dropna().empty else 1000.0
-    max_commission_value = float(df["commission"].dropna().max()) if "commission" in df.columns and not df["commission"].dropna().empty else 1.0
+
+    max_ecpm_value = (
+        float(df["ecpm_discounted"].dropna().max())
+        if "ecpm_discounted" in df.columns and not df["ecpm_discounted"].dropna().empty
+        else 1000.0
+    )
+    max_commission_value = (
+        float(df["commission"].dropna().max())
+        if "commission" in df.columns and not df["commission"].dropna().empty
+        else 1.0
+    )
     max_ecpm = st.sidebar.number_input("Максимальный eCPM", min_value=0.0, value=max_ecpm_value, step=10.0)
     max_commission = st.sidebar.number_input("Максимальная комиссия", min_value=0.0, value=max_commission_value, step=0.01, format="%.4f")
 
@@ -1342,48 +1398,12 @@ def build_sidebar_state(df: pd.DataFrame) -> Tuple[Dict, bool, Dict[str, int]]:
     render_sidebar_section_title("Скоринг")
     scoring_applied = st.sidebar.toggle("Использовать скоринг", value=True)
 
-    st.sidebar.slider(
-        "Вес охвата",
-        min_value=0,
-        max_value=100,
-        step=5,
-        key="weight_max_reach",
-    )
-    st.sidebar.slider(
-        "Вес eCPM",
-        min_value=0,
-        max_value=100,
-        step=5,
-        key="weight_ecpm_discounted",
-    )
-    st.sidebar.slider(
-        "Вес CTR",
-        min_value=0,
-        max_value=100,
-        step=5,
-        key="weight_ctr_avg",
-    )
-    st.sidebar.slider(
-        "Вес VTR",
-        min_value=0,
-        max_value=100,
-        step=5,
-        key="weight_vtr_avg",
-    )
-    st.sidebar.slider(
-        "Вес Viewability",
-        min_value=0,
-        max_value=100,
-        step=5,
-        key="weight_viewability_avg",
-    )
-    st.sidebar.slider(
-        "Вес комиссии",
-        min_value=0,
-        max_value=100,
-        step=5,
-        key="weight_commission",
-    )
+    st.sidebar.slider("Вес охвата", min_value=0, max_value=100, step=5, key="weight_max_reach")
+    st.sidebar.slider("Вес eCPM", min_value=0, max_value=100, step=5, key="weight_ecpm_discounted")
+    st.sidebar.slider("Вес CTR", min_value=0, max_value=100, step=5, key="weight_ctr_avg")
+    st.sidebar.slider("Вес VTR", min_value=0, max_value=100, step=5, key="weight_vtr_avg")
+    st.sidebar.slider("Вес Viewability", min_value=0, max_value=100, step=5, key="weight_viewability_avg")
+    st.sidebar.slider("Вес комиссии", min_value=0, max_value=100, step=5, key="weight_commission")
 
     weights_col1, weights_col2 = st.sidebar.columns(2)
     with weights_col1:
@@ -1444,12 +1464,11 @@ def render_header(found_count: int, scoring_applied: bool) -> None:
                 <div>
                     <h1 class="page-title">Подбор рекламных форматов</h1>
                     <p class="page-subtitle">
-                        Интерфейс для выбора оптимального формата: от фильтрации и настройки весов
-                        до ранжирования вариантов и детального просмотра карточки выбранного размещения.
+                        Фильтруйте форматы, настраивайте веса и сравнивайте варианты в одном рабочем интерфейсе выбора.
                     </p>
                 </div>
                 <div class="status-pills">
-                    <div class="status-pill">Найдено форматов: {found_count}</div>
+                    <div class="status-pill">Найдено: {found_count}</div>
                     <div class="status-pill">{status_text}</div>
                 </div>
             </div>
@@ -1490,60 +1509,91 @@ def render_kpi_row(df: pd.DataFrame, scoring_applied: bool) -> None:
     )
 
 
+def build_top_card_html(row: pd.Series, scoring_applied: bool, mode_label: str) -> str:
+    title = str(row.get("format_name", "")).strip()
+    if not title or title.lower() == "nan":
+        return ""
+
+    descriptor_parts = [
+        str(row.get("platform", "")).strip(),
+        str(row.get("type_service", "")).strip(),
+        str(row.get("buy_model", "")).strip(),
+    ]
+    descriptor_parts = [x for x in descriptor_parts if x and x.lower() != "nan"]
+    descriptor = " · ".join(descriptor_parts)
+    if not descriptor:
+        descriptor = mode_label
+
+    if scoring_applied and "score" in row.index and pd.notna(row.get("score")):
+        badge_text = format_number(row.get("score"))
+    else:
+        reach_text = format_number(row.get("max_reach"), 0) if pd.notna(row.get("max_reach")) else ""
+        badge_text = reach_text if reach_text and reach_text != "—" else ""
+
+    mini_stats = [
+        ("Охват", format_number(row.get("max_reach"), 0)),
+        ("eCPM", format_number(row.get("ecpm_discounted"))),
+        ("CTR", format_percent(row.get("ctr_avg"))),
+        ("Viewability", format_percent(row.get("viewability_avg"))),
+    ]
+
+    stats_html_parts = []
+    for label, value in mini_stats:
+        if value and value != "—":
+            stats_html_parts.append(
+                f"""
+                <div class="mini-stat">
+                    <div class="mini-stat-label">{label}</div>
+                    <div class="mini-stat-value">{value}</div>
+                </div>
+                """
+            )
+
+    if len(stats_html_parts) < 2:
+        return ""
+
+    badge_html = f'<div class="score-badge">{badge_text}</div>' if badge_text else ""
+
+    return f"""
+    <div class="top-card">
+        <div class="top-card-header">
+            <h3 class="top-card-title">{title}</h3>
+            {badge_html}
+        </div>
+        <p class="top-descriptor">{descriptor}</p>
+        <div class="mini-stats-grid">
+            {"".join(stats_html_parts[:4])}
+        </div>
+    </div>
+    """
+
+
 def render_top_formats(top_df: pd.DataFrame, scoring_applied: bool) -> None:
+    block_title = "Топ форматы" if scoring_applied else "Первые форматы в текущей выдаче"
+    block_hint = "Лучшие варианты по скорингу" if scoring_applied else "Первые позиции в текущем порядке сортировки"
+
     st.markdown(
-        """
+        f"""
         <div class="section-title-row">
-            <h2 class="section-title">Топ форматы</h2>
-            <p class="section-hint">Краткий срез лучших вариантов до основной таблицы</p>
+            <h2 class="section-title">{block_title}</h2>
+            <p class="section-hint">{block_hint}</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
     if top_df.empty:
-        st.markdown('<div class="empty-state">Нет данных для отображения топа форматов.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="empty-state">Нет данных для отображения этого блока.</div>', unsafe_allow_html=True)
         return
 
     cards = []
     for _, row in top_df.iterrows():
-        title = str(row.get("format_name", "Без названия"))
-        score = format_number(row.get("score")) if scoring_applied and "score" in row.index else "—"
-        descriptor_parts = [
-            str(row.get("platform", "")).strip(),
-            str(row.get("type_service", "")).strip(),
-            str(row.get("buy_model", "")).strip(),
-        ]
-        descriptor = " · ".join([x for x in descriptor_parts if x and x != "nan"]) or "Без дополнительных атрибутов"
+        card_html = build_top_card_html(row, scoring_applied, block_hint)
+        if card_html and "<" in card_html and "top-card" in card_html:
+            cards.append(card_html)
 
-        card_html = f"""
-        <div class="top-card">
-            <div class="top-card-header">
-                <h3 class="top-card-title">{title}</h3>
-                <div class="score-badge">{score}</div>
-            </div>
-            <p class="top-descriptor">{descriptor}</p>
-            <div class="mini-stats-grid">
-                <div class="mini-stat">
-                    <div class="mini-stat-label">Охват</div>
-                    <div class="mini-stat-value">{format_number(row.get("max_reach"), 0)}</div>
-                </div>
-                <div class="mini-stat">
-                    <div class="mini-stat-label">eCPM</div>
-                    <div class="mini-stat-value">{format_number(row.get("ecpm_discounted"))}</div>
-                </div>
-                <div class="mini-stat">
-                    <div class="mini-stat-label">CTR</div>
-                    <div class="mini-stat-value">{format_percent(row.get("ctr_avg"))}</div>
-                </div>
-                <div class="mini-stat">
-                    <div class="mini-stat-label">Viewability</div>
-                    <div class="mini-stat-value">{format_percent(row.get("viewability_avg"))}</div>
-                </div>
-            </div>
-        </div>
-        """
-        cards.append(card_html)
+    if not cards:
+        return
 
     st.markdown(f'<div class="top-grid">{"".join(cards)}</div>', unsafe_allow_html=True)
 
@@ -1576,17 +1626,18 @@ def prepare_display_table(df: pd.DataFrame, scoring_applied: bool) -> pd.DataFra
 def render_results_table(df: pd.DataFrame, scoring_applied: bool) -> None:
     st.markdown(
         """
-        <div class="table-card">
+        <div class="table-shell">
             <div class="table-title-row">
                 <h2 class="table-title">Результаты</h2>
                 <p class="table-note">Выберите один формат для просмотра карточки</p>
             </div>
-        </div>
+            <div class="table-inner">
         """,
         unsafe_allow_html=True,
     )
 
     if df.empty:
+        st.markdown('</div></div>', unsafe_allow_html=True)
         st.markdown('<div class="empty-state">По текущим фильтрам форматы не найдены.</div>', unsafe_allow_html=True)
         return
 
@@ -1600,6 +1651,8 @@ def render_results_table(df: pd.DataFrame, scoring_applied: bool) -> None:
         selection_mode="single-row",
         height=min(44 * (len(render_df) + 1), 620),
     )
+
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
     selected_rows = []
     if isinstance(selection_event, dict):
@@ -1619,10 +1672,11 @@ def render_results_table(df: pd.DataFrame, scoring_applied: bool) -> None:
 
 
 def render_pill_group(values: List[str]) -> None:
-    if not values:
+    clean_values = [str(v).strip() for v in values if pd.notna(v) and str(v).strip()]
+    if not clean_values:
         st.markdown('<p class="muted-empty">Нет данных</p>', unsafe_allow_html=True)
         return
-    pills = "".join([f'<span class="pill">{value}</span>' for value in values])
+    pills = "".join([f'<span class="pill">{value}</span>' for value in clean_values])
     st.markdown(f'<div class="pill-group">{pills}</div>', unsafe_allow_html=True)
 
 
@@ -1659,10 +1713,13 @@ def render_selected_format_card(row: Optional[pd.Series]) -> None:
     st.markdown(
         f"""
         <div class="format-card">
-            <h2 class="format-name">{data["title"]}</h2>
-            <div class="meta-row">{meta_text}</div>
-            <div class="subsection">
-                <h3 class="subsection-title">Основные показатели</h3>
+            <div class="format-hero">
+                <h2 class="format-name">{data["title"]}</h2>
+                <div class="meta-row">{meta_text}</div>
+            </div>
+
+            <div class="card-block">
+                <h3 class="card-block-title">Основные показатели</h3>
                 <div class="metrics-grid">
                     <div class="metric-box">
                         <div class="metric-box-label">Максимальный охват</div>
@@ -1690,7 +1747,6 @@ def render_selected_format_card(row: Optional[pd.Series]) -> None:
                     </div>
                 </div>
             </div>
-        </div>
         """,
         unsafe_allow_html=True,
     )
@@ -1703,7 +1759,7 @@ def render_selected_format_card(row: Optional[pd.Series]) -> None:
         f"Brand Lift: {data['stats']['bls']}",
         f"Sales Lift: {data['stats']['sales_lift']}",
     ]
-    st.markdown('<div class="subsection"><h3 class="subsection-title">Дополнительно</h3></div>', unsafe_allow_html=True)
+    st.markdown('<div class="card-block"><h3 class="card-block-title">Дополнительно</h3></div>', unsafe_allow_html=True)
     render_pill_group(additional_values)
 
     render_text_block("Описание", data.get("description"))
@@ -1714,8 +1770,11 @@ def render_selected_format_card(row: Optional[pd.Series]) -> None:
 
     if data["dict_groups"]:
         for label, values in data["dict_groups"].items():
+            clean_values = [v for v in values if pd.notna(v) and str(v).strip()]
+            if not clean_values:
+                continue
             st.markdown(f'<div class="subsection"><h3 class="subsection-title">{label}</h3></div>', unsafe_allow_html=True)
-            render_pill_group(values)
+            render_pill_group(clean_values)
 
     links_map = {
         "Пример размещения": data["links"].get("example_url"),
@@ -1737,6 +1796,8 @@ def render_selected_format_card(row: Optional[pd.Series]) -> None:
             """,
             unsafe_allow_html=True,
         )
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def main() -> None:
