@@ -112,14 +112,14 @@ p, span, div, label { color:var(--dark); }
             border-radius:12px; padding:16px 18px; box-shadow:var(--shadow-sm);
             display:flex; flex-direction:column; gap:3px; }
 /* muted 12px label */
-.kpi-label { font-size:12px; font-weight:500; color:var(--muted); text-transform:none; letter-spacing:0; }
+.kpi-label { font-size:11px; font-weight:400; color:var(--muted); text-transform:none; letter-spacing:0; }
 /* 28px number — only place we go big */
-.kpi-value { font-size:28px; font-weight:500; color:var(--dark); line-height:1.1;
+.kpi-value { font-size:26px; font-weight:500; color:var(--dark); line-height:1.1;
              font-family:var(--mono) !important; letter-spacing:-.02em; }
 /* 500 value — text KPI same size as others but non-mono */
 .kpi-value.text { font-family:'Inter',sans-serif !important; font-size:15px; font-weight:500; line-height:1.3; }
 /* small context string */
-.kpi-sub  { font-size:11px; color:var(--muted); margin-top:2px; }
+.kpi-sub  { font-size:12px; color:var(--muted); margin-top:2px; }
 /* colored dot */
 .kpi-dot  { display:inline-block; width:6px; height:6px; border-radius:50%;
             background:var(--accent); margin-right:5px; vertical-align:middle; }
@@ -693,8 +693,8 @@ if len(F)>0:
             fig1.update_layout(
                 title=dict(text="eCPM по форматам, ₽",font=dict(size=11,color="#B1B4B8",family="Inter")),
                 height=max(260,n*30+60), margin=dict(l=0,r=65,t=36,b=4),
-                paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
-                xaxis=dict(gridcolor="#F2F2F8",tickfont_size=10,
+                paper_bgcolor="#FFFFFF", plot_bgcolor="#F8F2FF",
+                xaxis=dict(gridcolor="#F0EBF8",gridwidth=0.5,tickfont_size=10,
                            tickfont_color="#B1B4B8",zeroline=False,title=None),
                 yaxis=dict(tickfont_size=11,tickfont_color="#070037",title=None,tickmode="linear"),
                 font_family="Inter", bargap=0.3)
@@ -722,10 +722,10 @@ if len(F)>0:
             fig2.update_layout(
                 title=dict(text="CTR vs eCPM",font=dict(size=11,color="#B1B4B8",family="Inter")),
                 height=max(260,len(sdf)*30+60), margin=dict(l=0,r=10,t=36,b=4),
-                paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
-                xaxis=dict(title="CTR, %",gridcolor="#F2F2F8",tickfont_size=10,title_font_size=10,
+                paper_bgcolor="#FFFFFF", plot_bgcolor="#F8F2FF",
+                xaxis=dict(title="CTR, %",gridcolor="#F0EBF8",gridwidth=0.5,tickfont_size=10,title_font_size=10,
                            tickfont_color="#B1B4B8",title_font_color="#B1B4B8",zeroline=False),
-                yaxis=dict(title="eCPM, ₽",gridcolor="#F2F2F8",tickfont_size=10,title_font_size=10,
+                yaxis=dict(title="eCPM, ₽",gridcolor="#F0EBF8",gridwidth=0.5,tickfont_size=10,title_font_size=10,
                            tickfont_color="#B1B4B8",title_font_color="#B1B4B8",zeroline=False),
                 font_family="Inter")
             st.plotly_chart(fig2,use_container_width=True,config={"displayModeBar":False})
